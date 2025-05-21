@@ -3,7 +3,6 @@ interface IAccount{
     _id?:mongoose.Types.ObjectId;
     userId:mongoose.Types.ObjectId;
     balance:number;
-
     createdAt?:Date;
     updatedAt?:Date;
 }

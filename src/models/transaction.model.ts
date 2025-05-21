@@ -1,8 +1,14 @@
 import mongoose, { model, models, Schema } from "mongoose";
+// Define enum for role
+enum TransactionType {
+  credit = "CREDIT",
+  debit="DEBIT"
+}
+
 interface ITransaction{
     _id?:mongoose.Types.ObjectId;
     amount:number;
-    type:"CREDIT"|"DEBIT";
+    type: TransactionType;
     isMeal:boolean;
     mealId?:mongoose.Types.ObjectId;
     userId:mongoose.Types.ObjectId;
@@ -12,14 +18,15 @@ interface ITransaction{
 }
 
 
-const TransactionSchema = new Schema<ITransaction>({
+const transactionSchema = new Schema<ITransaction>({
     amount:{
         type:Number,
         required:true,
     },
     type:{
         type:String,
-        default:"DEBIT",
+        enum: Object.values(TransactionType),
+        default:TransactionType.debit,
     },
     isMeal:{
         type:Boolean,
@@ -43,7 +50,7 @@ const TransactionSchema = new Schema<ITransaction>({
 );
 
 
-const Transaction= models?.Transaction || model<ITransaction>("Transaction", TransactionSchema);
+const Transaction= models?.Transaction || model<ITransaction>("Transaction", transactionSchema);
 
 export type { ITransaction };
 export default Transaction;

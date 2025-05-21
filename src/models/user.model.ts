@@ -1,6 +1,13 @@
 import mongoose, { model, models, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
+// Define enum for role
+enum UserRole {
+  admin = "ADMIN",
+  user = "USER",
+}
+
 interface IUser {
   _id?: mongoose.Types.ObjectId;
   username: string;
@@ -8,8 +15,8 @@ interface IUser {
   phone: string;
   email: string;
   password: string;
-  avatar:string;
-  role: "ADMIN" | "USER";
+  avatar: string;
+  role: UserRole;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -41,38 +48,39 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      default: "USER",
+      enum: Object.values(UserRole),
+      default: UserRole.user,
     },
-
-  avatar:{
-    type:String,
-    required:true,
-  }
+    avatar: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
+// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
+// Generate JWT access token
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
       username: this.username,
-      role:this.role
+      role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET!,
-    {expiresIn:"5d" }
+    { expiresIn: "5d" }
   );
 };
 
-
 const User = models?.User || model<IUser>("User", userSchema);
 
-export type { IUser };
+export type { IUser, UserRole };
 export default User;
