@@ -1,11 +1,8 @@
+import { MealStatus } from "@/constants/enum";
 import mongoose, { Schema, model, models } from "mongoose";
 
 // Define enum for meal status
-export enum MealStatus {
-  ORDERED = "ordered",
-  CANCELLED = "cancelled",
-  NOT_REQUIRED = "not_required",
-}
+
 
 interface IDailyMeal {
   _id?: mongoose.Types.ObjectId;

@@ -1,9 +1,6 @@
+import { MealType } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
-enum MealType {
-  regular = "REGULAR",
-  full = "FULL",
-  special = "SPL",
-}
+
 interface IMeal {
   _id?: mongoose.Types.ObjectId;
   name: string;

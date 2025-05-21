@@ -1,9 +1,6 @@
+import { PaymentStatus } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
-enum paymentStatus {
-  pending = "PENDING",
-  approved = "APPROVED",
-  rejected = "REJECTED",
-}
+
 interface IAddBalanceRequest {
   _id?: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
@@ -11,7 +8,7 @@ interface IAddBalanceRequest {
   paymentMode: "CASH" | "ONLINE";
   paymentScreenshot?: string;
   isVerified: boolean;
-  status: paymentStatus;
+  status: PaymentStatus;
   verifiedBy: mongoose.Types.ObjectId;
   createdAt?: Date;
   updateAt?: Date;
@@ -28,8 +25,8 @@ const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
     },
     status: {
       type: String,
-      enum: Object.values(paymentStatus),
-      default: paymentStatus.pending,
+      enum: Object.values(PaymentStatus),
+      default: PaymentStatus.pending,
       required: true,
     },
     verifiedBy: {

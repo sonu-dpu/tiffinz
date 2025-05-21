@@ -1,9 +1,6 @@
+import { TransactionType } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
-// Define enum for role
-enum TransactionType {
-  credit = "CREDIT",
-  debit="DEBIT"
-}
+
 
 interface ITransaction{
     _id?:mongoose.Types.ObjectId;
