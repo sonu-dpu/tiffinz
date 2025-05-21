@@ -7,7 +7,7 @@ import { userSchema } from "@/zod/user.schema";
 import { MongooseError } from "mongoose";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     console.log("HEllo  ");
     const connection = await connectDB();
