@@ -12,6 +12,7 @@ interface IUser {
   password: string;
   avatar: string;
   role: UserRole;
+  isVeriffied:boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -52,6 +53,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+    isVeriffied:{
+      type:Boolean,
+      default:false
+    }
   },
   { timestamps: true }
 );
@@ -64,8 +69,13 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.methods.isPasswordCorrect = async function(password:string):Promise<boolean> {
+  return await bcrypt.compare(password, this.password)
+}
+
+
 // Generate JWT access token
-userSchema.methods.generateAccessToken = function () {
+userSchema.methods.generateAccessToken = function ():string {
   return jwt.sign(
     {
       _id: this._id,
@@ -74,6 +84,15 @@ userSchema.methods.generateAccessToken = function () {
     },
     process.env.ACCESS_TOKEN_SECRET!,
     { expiresIn: "5d" }
+  );
+};
+userSchema.methods.generateRefreshToken = function ():string {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET!,
+    { expiresIn: "15d" }
   );
 };
 

@@ -3,10 +3,13 @@ import mongoose, { model, models, Schema } from "mongoose";
 interface ISession {
   _id?: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  accessToken: string;
   refreshToken: string;
-  verifyToken: string;
-  verifyTokenExpiry: Date;
+  verifyEmailToken?: string;
+  verifyEmailTokenExpiry?: Date;
+  forgetPasswordToken?:string;
+  forgetPasswordTokenExpiry?:Date;
+  createdAt?:Date;
+  updatedAt?:Date;
 }
 
 const sessionScehma = new Schema<ISession>({
@@ -14,22 +17,28 @@ const sessionScehma = new Schema<ISession>({
         type:Schema.Types.ObjectId,
         ref:"User"
     },
-    accessToken:{
-        type:String,
-    },
     refreshToken:{
         type:String,
     },
-    verifyToken:{
+    verifyEmailToken:{
         type:String
     },
-    verifyTokenExpiry:{
+    verifyEmailTokenExpiry:{
         type:Date,
-    }
-});
+    },
+      forgetPasswordToken:{
+        type:String
+    },
+    forgetPasswordTokenExpiry:{
+        type:Date,
+    },
+
+},
+{timestamps:true}
+);
 
 
-const Seesion = models?.Session || model<ISession>("Session", sessionScehma);
+const Session = models?.Session || model<ISession>("Session", sessionScehma);
 
 export type { ISession};
-export default Seesion
+export default Session
