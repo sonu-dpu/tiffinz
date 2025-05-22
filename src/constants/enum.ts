@@ -16,15 +16,21 @@ enum PaymentStatus {
 }
 
 enum MealStatus {
-  ORDERED = "ordered",
-  CANCELLED = "cancelled",
-  NOT_REQUIRED = "not_required",
+  ordered = "ORDERED",
+  cancelled = "CANCELLED ",
+  not_required = "NOT_REQUIRED",
 }
 enum TransactionType {
   credit = "CREDIT",
   debit="DEBIT"
 }
 
-export {MealType, UserRole, MealStatus, TransactionType, PaymentStatus }
+enum LoginType{
+  email="email",
+  phone="phone",
+  username="username"
+}
+
+export {MealType, UserRole, MealStatus, TransactionType, PaymentStatus, LoginType }
 
 
