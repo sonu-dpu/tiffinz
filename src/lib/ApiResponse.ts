@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError, z } from "zod/v4";
 
-type APIErrorDetail = ZodError | Record<string, string[]> | string[] | string | unknown;
+export type APIErrorDetail = ZodError | typeof Error |  Record<string, string[]> | string[] | string | unknown;
 export class ApiResponse{
     static success<T>(message:string, data?:T, status:number=200){
         return NextResponse.json(
