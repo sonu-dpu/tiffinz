@@ -34,7 +34,7 @@ const mealSchema = new Schema<IMeal>(
   { timestamps: true }
 );
 
-const Meal = models?.Meal || model<IMeal>("User", mealSchema);
+const Meal = models?.Meal || model<IMeal>("Meal", mealSchema);
 
 export type { IMeal };
 export default Meal;
