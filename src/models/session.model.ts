@@ -6,39 +6,39 @@ interface ISession {
   refreshToken: string;
   verifyEmailToken?: string;
   verifyEmailTokenExpiry?: Date;
-  forgetPasswordToken?:string;
-  forgetPasswordTokenExpiry?:Date;
-  createdAt?:Date;
-  updatedAt?:Date;
+  forgetPasswordToken?: string;
+  forgetPasswordTokenExpiry?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const sessionScehma = new Schema<ISession>({
-    userId:{
-        type:Schema.Types.ObjectId,
-        ref:"User"
+const sessionScehma = new Schema<ISession>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    refreshToken:{
-        type:String,
+    refreshToken: {
+      type: String,
     },
-    verifyEmailToken:{
-        type:String
+    verifyEmailToken: {
+      type: String,
     },
-    verifyEmailTokenExpiry:{
-        type:Date,
+    verifyEmailTokenExpiry: {
+      type: Date,
     },
-      forgetPasswordToken:{
-        type:String
+    forgetPasswordToken: {
+      type: String,
     },
-    forgetPasswordTokenExpiry:{
-        type:Date,
+    forgetPasswordTokenExpiry: {
+      type: Date,
     },
-
-},
-{timestamps:true}
+  },
+  { timestamps: true }
 );
-
 
 const Session = models?.Session || model<ISession>("Session", sessionScehma);
 
-export type { ISession};
-export default Session
+export type { ISession };
+export default Session;

@@ -16,6 +16,11 @@ interface IAddBalanceRequest {
 
 const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     amountAdded: {
       type: Number,
       required: true,
@@ -31,7 +36,7 @@ const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
     },
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin", // Adjust as needed
+      ref: "User",
     },
   },
   { timestamps: true }

@@ -9,7 +9,7 @@ interface IDailyMeal {
   userId: mongoose.Types.ObjectId;
   date: Date;
   status: MealStatus;
-  mealId: mongoose.Types.ObjectId;
+  mealLogId: mongoose.Types.ObjectId;
   description?: string;
   updatedBy?: string;
   createdAt?: Date;
@@ -31,9 +31,9 @@ const dailyMealSchema = new Schema<IDailyMeal>(
       enum: Object.values(MealStatus),
       required: true,
     },
-    mealId: {
+    mealLogId: {
       type: Schema.Types.ObjectId,
-      ref: "Meal",
+      ref: "MealLog",
       required: true,
     },
     description: {
