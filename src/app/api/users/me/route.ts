@@ -14,13 +14,10 @@ export const GET = asyncHandler(async(req)=>{
     }
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as MyJwtPayload;
     const userId = decodedToken?._id
-    
     if(!userId){
         return ApiResponse.error("Token Expired", 400)
     }
-
     const user = await User.findById(userId).select("-password");
-
     if(!user){
         return ApiResponse.error("User not found", 404)
     }

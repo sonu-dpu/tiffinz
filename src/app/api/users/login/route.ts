@@ -3,7 +3,7 @@ import { ApiResponse } from "@/lib/ApiResponse";
 import connectDB from "@/lib/dbConnect";
 import Session from "@/models/session.model";
 import User from "@/models/user.model";
-import generateRefreshAndAccessToken from "@/services/client/generateTokens";
+import generateRefreshAndAccessToken from "@/services/server/generateTokens";
 import {
   ILoginCredentials,
   loginWithEmailSchema,
