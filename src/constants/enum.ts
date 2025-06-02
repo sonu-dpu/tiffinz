@@ -7,6 +7,7 @@ enum MealType {
   regular = "REGULAR",
   full = "FULL",
   special = "SPL",
+  nonVeg = "NON_VEG"
 }
 
 enum PaymentStatus {
