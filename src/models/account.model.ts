@@ -7,7 +7,6 @@ interface IAccount{
     updatedAt?:Date;
 }
 
-
 const accountSchema = new Schema<IAccount>({
     balance:{
         type:Number,
