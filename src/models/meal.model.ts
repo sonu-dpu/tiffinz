@@ -6,6 +6,7 @@ interface IMeal {
   name: string;
   price: number;
   type: MealType;
+  isActive:boolean;
   description?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -25,6 +26,10 @@ const mealSchema = new Schema<IMeal>(
     price: {
       type: Number,
       required: true,
+    },
+    isActive:{
+      type:Boolean,
+      default:false,
     },
     description: {
       type: String,
