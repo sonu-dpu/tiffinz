@@ -2,7 +2,10 @@ import connectDB from "@/utils/dbConnect";
 import Meal from "@/models/meal.model";
 import { ApiError } from "@/utils/apiError";
 import { isValidObjectId } from "mongoose";
+import { UpdateMealInput } from "@/zod/meals.schema";
 
+
+//DELETE
 async function deleteMealById(id: string) {
   if (!isValidObjectId(id)) {
     throw new ApiError("Invalid Meal Id", 400);
@@ -18,10 +21,9 @@ async function deleteMealById(id: string) {
   return true;
 }
 
-
 async function deleteMealByIds(ids: string[]): Promise<number> {
-    console.log('ids', ids)
-  if (!Array.isArray(ids) || Array.isArray(ids) && ids.length === 0) {
+  console.log("ids", ids);
+  if (!Array.isArray(ids) || (Array.isArray(ids) && ids.length === 0)) {
     throw new ApiError("No Meal IDs provided", 400);
   }
   const invalidIds = ids.filter((id) => !isValidObjectId(id));
@@ -40,4 +42,38 @@ async function deleteMealByIds(ids: string[]): Promise<number> {
   return deletedCount;
 }
 
-export { deleteMealById, deleteMealByIds };
+
+//GET
+async function getAllMeals() {
+  await connectDB();
+  const meals = await Meal.find();
+  return meals;
+}
+
+async function getMealById(id: string) {
+  await connectDB();
+  if (!isValidObjectId(id)) {
+    throw new ApiError("Invalid mealId", 400);
+  }
+  const meal = await Meal.findById(id);
+  console.log(meal);
+  return meal;
+}
+
+
+//UPDATE
+
+async function updateMeal(id:string, mealData:UpdateMealInput){
+    if(!isValidObjectId(id)){
+        throw new ApiError("Invalid Meal id", 400);
+    }
+    await connectDB();
+    const updatedMeal = await Meal.findByIdAndUpdate(id, mealData, {new:true});
+
+    if(!updatedMeal){
+        throw new ApiError("Meal not found", 404);
+    }
+
+    return updatedMeal;
+}
+export { deleteMealById, deleteMealByIds, getAllMeals, getMealById, updateMeal };

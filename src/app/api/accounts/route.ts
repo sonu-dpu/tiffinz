@@ -1,11 +1,20 @@
-// import { ApiResponse } from "@/lib/ApiResponse";
-// import connectDB from "@/lib/dbConnect";
-// import Meal from "@/models/meal.model";
-// import {
-//   deleteMealById,
-//   deleteMealByIds,
-// } from "@/services/server/meals/delete.meal";
-// import { getAllMeals } from "@/services/server/meals/get.meals";
-// import { asyncHandler } from "@/utils/asyncHandler";
-// import { MealInput, mealSchema } from "@/zod/meals.schema";
+import { createAccount } from "@/services/server/user.accountService";
+import { ApiResponse } from "@/utils/ApiResponse";
+import { asyncHandler } from "@/utils/asyncHandler";
 
+export const POST = asyncHandler(async(req)=>{
+  const userId = req.headers.get("x-user-id");
+  if(!userId){
+    return ApiResponse.error("User id required");
+  }
+  const newAccount = await createAccount(userId);
+  if(!newAccount){
+    return ApiResponse.error("Failed to create user Acccout", 500)
+  }
+  return ApiResponse.success("Accout create successfully", {account: newAccount}, 201)
+})
+
+
+// export const DELETE = asyncHandler(async(req)=>{
+
+// })

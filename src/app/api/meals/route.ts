@@ -4,16 +4,15 @@ import Meal from "@/models/meal.model";
 import {
   deleteMealById,
   deleteMealByIds,
-} from "@/services/server/meals/delete.meal";
-import { getAllMeals } from "@/services/server/meals/get.meals";
+  getAllMeals,
+} from "@/services/server/mealService";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { MealInput, mealSchema } from "@/zod/meals.schema";
 
-export const GET = asyncHandler(async()=>{  
+export const GET = asyncHandler(async () => {
   const meals = await getAllMeals();
-  return ApiResponse.success("Meals fetched successfully", {meals})
-})
-
+  return ApiResponse.success("Meals fetched successfully", { meals });
+});
 
 export const POST = asyncHandler(async (req) => {
   const body = await req.json();
@@ -49,4 +48,3 @@ export const DELETE = asyncHandler(async (req) => {
 
   return ApiResponse.success("Meals deleted successfully", 200);
 });
-
