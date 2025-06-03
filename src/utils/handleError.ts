@@ -1,16 +1,17 @@
 import { MongooseError } from "mongoose";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { ApiError } from "./apiError";
-import { JsonWebTokenError } from "jsonwebtoken";
+import  {JOSEError} from "jose/errors";
 
 export function handleError(error: unknown) {
   if (error instanceof MongooseError) {
     return ApiResponse.error(error.message, 400);
   }
   if(error instanceof ApiError){
+    console.log("Api ERROR  : ", error )
     return ApiResponse.error(error.message, error.statusCode, error.errors)
   }
-  if(error instanceof JsonWebTokenError){
+  if(error instanceof JOSEError ){
     return ApiResponse.error(error.message, 401, error.stack)
   }
   const message =
