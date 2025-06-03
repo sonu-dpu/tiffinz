@@ -1,4 +1,4 @@
-import connectDB from "@/lib/dbConnect";
+import connectDB from "@/utils/dbConnect";
 import Meal from "@/models/meal.model";
 import { ApiError } from "@/utils/apiError";
 import { isValidObjectId } from "mongoose";

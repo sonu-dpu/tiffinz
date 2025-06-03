@@ -1,5 +1,5 @@
 import { MongooseError } from "mongoose";
-import { ApiResponse } from "@/lib/ApiResponse";
+import { ApiResponse } from "@/utils/ApiResponse";
 import { ApiError } from "./apiError";
 import { JsonWebTokenError } from "jsonwebtoken";
 

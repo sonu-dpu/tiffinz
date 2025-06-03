@@ -1,8 +1,8 @@
-import { ApiResponse } from "@/lib/ApiResponse";
-import connectDB from "@/lib/dbConnect";
+import { ApiResponse } from "@/utils/ApiResponse";
+import connectDB from "@/utils/dbConnect";
 import Session from "@/models/session.model";
 import User from "@/models/user.model";
-import generateRefreshAndAccessToken from "@/services/server/generateTokens";
+import generateRefreshAndAccessToken from "@/utils/generateTokens";
 import {
   ILoginCredentials,
   loginWithEmailSchema,
@@ -65,9 +65,7 @@ export const POST = asyncHandler(async (req) => {
     return ApiResponse.error("Invalid credentials", 401);
   }
 
-  const { refreshToken, accessToken } = await generateRefreshAndAccessToken(
-    user._id
-  );
+  const { refreshToken, accessToken } = await generateRefreshAndAccessToken(user._id);
   if (!accessToken || !refreshToken) {
     return ApiResponse.error("Failed to generate tokens", 500);
   }

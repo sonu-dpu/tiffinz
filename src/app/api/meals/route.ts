@@ -1,5 +1,5 @@
-import { ApiResponse } from "@/lib/ApiResponse";
-import connectDB from "@/lib/dbConnect";
+import { ApiResponse } from "@/utils/ApiResponse";
+import connectDB from "@/utils/dbConnect";
 import Meal from "@/models/meal.model";
 import {
   deleteMealById,

@@ -1,10 +1,11 @@
 import { DEFAULT_AVATAR_URI } from "@/constants/constants";
 import { UserRole } from "@/constants/enum";
-import { ApiResponse } from "@/lib/ApiResponse";
-import connectDB from "@/lib/dbConnect";
+import { ApiResponse } from "@/utils/ApiResponse";
+import connectDB from "@/utils/dbConnect";
 import User, { IUser } from "@/models/user.model";
 import { userSchema } from "@/zod/user.schema";
 import { asyncHandler } from "@/utils/asyncHandler";
+import { ApiError } from "@/utils/apiError";
 
 export const POST = asyncHandler(async (req) => {
   const body: typeof userSchema = await req.json();
@@ -55,7 +56,7 @@ export const POST = asyncHandler(async (req) => {
   const userDoc = await User.create(newUser);
   const createdUser = await User.findById(userDoc._id).select("-password");
   if (!createdUser) {
-    throw ApiResponse.error("Failed to register user", 500);
+    throw new ApiError("Failed to register user", 400);
   }
    const userType = userData.role === UserRole.admin ? "Admin" : "User"
   return ApiResponse.success(`${userType} registered successfully `,

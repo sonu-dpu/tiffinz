@@ -1,7 +1,7 @@
 import mongoose, { model, models, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { UserRole } from "@/constants/enum";
+import { SignJWT } from "jose";
 
 interface IUser {
   _id?: mongoose.Types.ObjectId;
@@ -75,25 +75,36 @@ userSchema.methods.isPasswordCorrect = async function(password:string):Promise<b
 
 
 // Generate JWT access token
-userSchema.methods.generateAccessToken = function ():string {
-  return jwt.sign(
-    {
-      _id: this._id,
-      username: this.username,
-      role: this.role,
-    },
-    process.env.ACCESS_TOKEN_SECRET!,
-    { expiresIn: "5d" }
-  );
+
+userSchema.methods.generateAccessToken = async function (): Promise<string> {
+  const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET!);
+
+  const token = await new SignJWT({
+    _id: this._id.toString(),  // ensure it's a string
+    username: this.username,
+    role: this.role,
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('5d')
+    .sign(secret);
+
+  return token;
 };
-userSchema.methods.generateRefreshToken = function ():string {
-  return jwt.sign(
-    {
-      _id: this._id,
-    },
-    process.env.REFRESH_TOKEN_SECRET!,
-    { expiresIn: "15d" }
-  );
+
+
+userSchema.methods.generateRefreshToken = async function (): Promise<string> {
+  const secret = new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET!);
+
+  const token = await new SignJWT({
+    _id: this._id.toString(), // always stringify ObjectId
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15d")
+    .sign(secret);
+
+  return token;
 };
 
 const User = models?.User || model<IUser>("User", userSchema);

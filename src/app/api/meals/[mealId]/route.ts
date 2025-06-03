@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/lib/ApiResponse";
+import { ApiResponse } from "@/utils/ApiResponse";
 import { deleteMealById } from "@/services/server/meals/delete.meal";
 import { getMealById } from "@/services/server/meals/get.meals";
 import { updateMeal } from "@/services/server/meals/update.meal";
