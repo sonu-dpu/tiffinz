@@ -10,6 +10,7 @@ export class ApiResponse{
         );
     }
     static error(message: string, status: number=400, errors?: APIErrorDetail){
+        console.log('message', message)
         return NextResponse.json(
             {success:false, message, errors},
             {status}

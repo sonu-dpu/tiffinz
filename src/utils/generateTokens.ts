@@ -8,8 +8,8 @@ export default async function generateRefreshAndAccessToken(
 
   try {
     const user = await User.findById(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    const accessToken = await user.generateAccessToken();
+    const refreshToken = await user.generateRefreshToken();
 
     return { accessToken, refreshToken };
   } catch (error) {
