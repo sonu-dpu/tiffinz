@@ -7,13 +7,17 @@ enum MealType {
   regular = "REGULAR",
   full = "FULL",
   special = "SPL",
-  nonVeg = "NON_VEG"
+  nonVeg = "NON_VEG",
 }
 
 enum PaymentStatus {
   pending = "PENDING",
   approved = "APPROVED",
   rejected = "REJECTED",
+}
+enum PaymentMode {
+  cash = "CASH",
+  online = "ONLINE",
 }
 
 enum MealStatus {
@@ -23,15 +27,21 @@ enum MealStatus {
 }
 enum TransactionType {
   credit = "CREDIT",
-  debit="DEBIT"
+  debit = "DEBIT",
 }
 
-enum LoginType{
-  email="email",
-  phone="phone",
-  username="username"
+enum LoginType {
+  email = "email",
+  phone = "phone",
+  username = "username",
 }
 
-export {MealType, UserRole, MealStatus, TransactionType, PaymentStatus, LoginType }
-
-
+export {
+  MealType,
+  UserRole,
+  MealStatus,
+  TransactionType,
+  PaymentStatus,
+  LoginType,
+  PaymentMode
+};

@@ -1,7 +1,7 @@
-import { PaymentStatus } from "@/constants/enum";
+import { PaymentMode, PaymentStatus } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
 
-interface IAddBalanceRequest {
+export interface IAddBalanceRequest {
   _id?: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   amountAdded: number;
@@ -27,6 +27,8 @@ const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
     },
     paymentMode: {
       type: String,
+      enum:Object.values(PaymentMode),
+      default:PaymentMode.cash,
     },
     status: {
       type: String,
@@ -47,3 +49,4 @@ const AddBalanceRequest =
   model<IAddBalanceRequest>("AddBalanceRequest", addBalanceRequestSchema);
 
 export default AddBalanceRequest;
+
