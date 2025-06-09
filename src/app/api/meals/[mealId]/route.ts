@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/utils/ApiResponse";
-import { deleteMealById, updateMeal, getMealById  } from "@/services/server/mealService";
+import { deleteMealById, updateMeal, getMealById  } from "@/helpers/server/admin.meal";
 import { ApiError } from "@/utils/apiError";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { updateMealSchema } from "@/zod/meals.schema";

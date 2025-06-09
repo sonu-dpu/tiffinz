@@ -5,7 +5,7 @@ import {
   deleteMealById,
   deleteMealByIds,
   getAllMeals,
-} from "@/services/server/mealService";
+} from "@/helpers/server/admin.meal";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { MealInput, mealSchema } from "@/zod/meals.schema";
 
