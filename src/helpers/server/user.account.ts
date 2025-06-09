@@ -1,8 +1,10 @@
 import Account, { IAccount } from "@/models/account.model";
+import AddBalanceRequest from "@/models/addBalanceRequest.model";
+import User from "@/models/user.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
 import { handleError } from "@/utils/handleError";
-import { AddBalanceRequestInput, addBalanceRequestSchema } from "@/zod/addBalanceRequest.schema";
+import { AddBalanceRequestInput } from "@/zod/addBalanceRequest.schema";
 import { isValidObjectId } from "mongoose";
 
 async function doesUserAccountExist(
@@ -33,11 +35,20 @@ async function createAccount(userId: string) {
   return newAccount;
 }
 
-async function addBalanceRequest(reqData: AddBalanceRequestInput) {
-  const parseResult = addBalanceRequestSchema.safeParse(reqData);
-  if(!parseResult.success){
-    throw parseResult.error;
+async function addBalanceRequest(requestData: AddBalanceRequestInput) {
+  const userId = requestData.userId;
+  if (!isValidObjectId(userId)) {
+    throw new ApiError("Invalid object id", 400);
   }
-
+  await connectDB();
+  const existingUser = await User.findById(userId);
+  if (!existingUser) {
+    throw new ApiError("User does not exists");
+  }
+  const balanceReqDoc = await AddBalanceRequest.create(requestData);
+  if (!balanceReqDoc) {
+    throw new ApiError("Failed to create balance request ", 500);
+  }
+  return balanceReqDoc;
 }
 export { createAccount, doesUserAccountExist, addBalanceRequest };
