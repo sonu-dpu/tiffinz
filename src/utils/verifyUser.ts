@@ -11,8 +11,8 @@ export function isAdmin(req: NextResponse) {
   return userRole === UserRole.admin;
 }
 
-// check if the
-export function verifyAdminHandler<T>(
+// higher order function to check if user is admin
+export function  withAdminAuth<T>(
   callback: (req: NextRequest, params?: T) => Promise<Response>
 ) {
   return async function (req: NextRequest, context?: { params?: T }) {

@@ -18,9 +18,9 @@ export async function middleware(req: NextRequest) {
     if (error || !payload?._id) {
       return ApiResponse.error("Auhentication required", 401)
     }
-    // response.headers.set("x-user-id", String(payload?._id));
-    // response.headers.set("x-user-role", String(payload?.role));
-    // console.log("payload", payload);
+    response.headers.set("x-user-id", String(payload?._id));
+    response.headers.set("x-user-role", String(payload?.role));
+    console.log("payload", payload);
   }
 
   return response;
