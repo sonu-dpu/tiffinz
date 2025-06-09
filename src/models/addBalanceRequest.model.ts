@@ -5,9 +5,8 @@ export interface IAddBalanceRequest {
   _id?: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   amountAdded: number;
-  paymentMode: "CASH" | "ONLINE";
+  paymentMode: PaymentMode;
   paymentScreenshot?: string;
-  isVerified: boolean;
   status: PaymentStatus;
   verifiedBy: mongoose.Types.ObjectId;
   createdAt?: Date;
