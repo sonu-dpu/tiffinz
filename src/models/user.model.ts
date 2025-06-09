@@ -12,7 +12,7 @@ interface IUser {
   password: string;
   avatar: string;
   role: UserRole;
-  isVeriffied:boolean;
+  isVerified:boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -53,7 +53,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    isVeriffied:{
+    isVerified:{
       type:Boolean,
       default:false
     }
