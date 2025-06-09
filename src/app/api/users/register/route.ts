@@ -38,7 +38,9 @@ export const POST = asyncHandler(async (req) => {
   const existingUser = await User.findOne({ $or: orConditions }); //checking if user already exists or not
 
   if (existingUser) {
-    const credential = userData?.email ? "Email" : "phone number/username";
+    // console.log(userData, existingUser);
+    const credential = (existingUser?.email === userData?.email) ? "Email" : "Phone/Username";
+    // console.log('userData?.email', userData?.email ? "Email" : "Other")
     return ApiResponse.error(`User with ${credential} already registered`);
   }
 
