@@ -1,9 +1,9 @@
 import { ApiResponse } from "@/utils/ApiResponse";
 import connectDB from "@/utils/dbConnect";
 import User from "@/models/user.model";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { withAuth } from "@/utils/withAuth";
 
-export const GET = asyncHandler(async (req) => {
+export const GET = withAuth(async (req) => {
   const userId = req.headers.get("x-user-id");
   console.log(req.headers)
   if (!userId) {
