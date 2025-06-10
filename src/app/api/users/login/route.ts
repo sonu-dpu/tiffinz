@@ -59,7 +59,7 @@ export const POST = asyncHandler(async (req) => {
   if (!user) {
     return ApiResponse.error("No valid login identifier provided", 400);
   }
-  console.log("user", user);
+  // console.log("user", user);
   const isValidPassword = await user.isPasswordCorrect(data?.password);
   if (!isValidPassword) {
     return ApiResponse.error("Invalid credentials", 401);
