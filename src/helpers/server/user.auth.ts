@@ -1,9 +1,9 @@
+import { ApiResponse } from "@/utils/ApiResponse";
 import { handleError } from "@/utils/handleError";
-import { NextResponse } from "next/server";
 
 async function logoutUser() {
   try {
-    const res = NextResponse.json("User logged out");
+    const res = ApiResponse.success("User logged out");
     res.cookies.delete("accessToken");
     res.cookies.delete("refreshToken");
     return res;
