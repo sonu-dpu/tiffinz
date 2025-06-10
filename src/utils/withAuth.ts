@@ -1,0 +1,41 @@
+import { UserRole } from "@/constants/enum";
+import { NextRequest } from "next/server";
+import { handleError } from "./handleError";
+import { verifyJWT } from "./verifyJWT";
+import { ApiError } from "./apiError";
+import User, { IUser } from "@/models/user.model";
+
+
+type withAuthOptions={
+  requiredRole?:UserRole
+}
+// higher order function to check if user is authenticated
+export function  withAuth<T>(
+  callback: (req: NextRequest, params?: Promise<T>, user?:IUser) => Promise<Response>, options?: withAuthOptions
+) {
+  return async function (req: NextRequest, context?: { params?: Promise<T>}) {
+    try {
+      const token = req.cookies.get("accessToken")?.value;
+      if (!token) {
+        throw new ApiError("Authentication required", 401);
+      }
+
+      const { payload, error } = await verifyJWT(token);
+      if (error || !payload) {
+        throw error || new ApiError("Invalid token", 401);
+      }
+      const userId = payload?._id;
+      const user = await User.findById(userId).select("-password");
+      if(!user){
+        throw new ApiError("User not found", 404)
+      }
+      if (options?.requiredRole &&  (user.role !== options.requiredRole && user.role !== UserRole.admin) ) {
+        throw new ApiError("Access denied", 403);
+      }
+
+      return await callback(req, context?.params, user);
+    } catch (error) {
+      return handleError(error);
+    }
+  };
+}
