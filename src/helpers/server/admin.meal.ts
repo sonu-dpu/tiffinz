@@ -56,6 +56,9 @@ async function getMealById(id: string) {
     throw new ApiError("Invalid mealId", 400);
   }
   const meal = await Meal.findById(id);
+  if(!meal){
+    throw new ApiError("Meal with id not found", 404)
+  }
   console.log(meal);
   return meal;
 }
