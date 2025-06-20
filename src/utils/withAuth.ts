@@ -4,6 +4,7 @@ import { handleError } from "./handleError";
 import { verifyJWT } from "./verifyJWT";
 import { ApiError } from "./apiError";
 import User, { IUser } from "@/models/user.model";
+import connectDB from "./dbConnect";
 
 
 type withAuthOptions={
@@ -25,6 +26,7 @@ export function  withAuth<T>(
         throw error || new ApiError("Invalid token", 401);
       }
       const userId = payload?._id;
+      await connectDB();
       const user = await User.findById(userId).select("-password");
       if(!user){
         throw new ApiError("User not found", 404)

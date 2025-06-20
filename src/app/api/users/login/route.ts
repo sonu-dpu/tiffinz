@@ -1,95 +1,70 @@
 import { ApiResponse } from "@/utils/ApiResponse";
-import connectDB from "@/utils/dbConnect";
-import Session from "@/models/session.model";
-import User from "@/models/user.model";
-import generateRefreshAndAccessToken from "@/utils/generateTokens";
+import { asyncHandler } from "@/utils/asyncHandler";
 import {
-  ILoginCredentials,
   loginWithEmailSchema,
   loginWithPhoneSchema,
   loginWithUsernameSchema,
+  ILoginCredentials,
 } from "@/zod/user.login.schema";
-import { asyncHandler } from "@/utils/asyncHandler";
-type LoginOption = {
-  key: "email" | "username" | "phone";
-  schema: typeof loginWithEmailSchema | typeof loginWithPhoneSchema | typeof loginWithUsernameSchema;
-  notFoundMsg: string;
-};
-const loginOptions: LoginOption[] = [
-  {
-    key: "email",
-    schema: loginWithEmailSchema,
-    notFoundMsg: "User with this email does not exist",
-  },
-  {
-    key: "username",
-    schema: loginWithUsernameSchema,
-    notFoundMsg: "User with this username does not exist",
-  },
-  {
-    key: "phone",
-    schema: loginWithPhoneSchema,
-    notFoundMsg: "User with this phone number does not exist",
-  },
-];
+
+import { loginUser, createUserSession } from "@/helpers/server/user.auth";
+// type LoginOption = {
+//   key: keyof ILoginCredentials;
+//   schema:
+//     | typeof loginWithEmailSchema
+//     | typeof loginWithPhoneSchema
+//     | typeof loginWithUsernameSchema;
+// };
+
+// const loginOptions: LoginOption[] = [
+//   { key: "email", schema: loginWithEmailSchema },
+//   { key: "username", schema: loginWithUsernameSchema },
+//   { key: "phone", schema: loginWithPhoneSchema },
+// ];
 
 export const POST = asyncHandler(async (req) => {
   const body: ILoginCredentials = await req.json();
-  let user = null;
-  let data = null;
+  type LoginKey = "email" | "username" | "phone";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loginOptions: { key: LoginKey; schema: any }[] = [
+  { key: "email", schema: loginWithEmailSchema },
+  { key: "username", schema: loginWithUsernameSchema },
+  { key: "phone", schema: loginWithPhoneSchema },
+];
+  let validatedData: {
+  key: LoginKey;
+  value: string;
+  password: string;
+} | null = null;
 
   for (const option of loginOptions) {
     if (option.key in body) {
-      const parseResult = option.schema.safeParse(body);
-      if (!parseResult.success) {
-        return ApiResponse.zodError(parseResult.error);
+      const parsed = option.schema.safeParse(body);
+      if (!parsed.success) {
+        return ApiResponse.zodError(parsed.error);
       }
-      await connectDB();
-      data = parseResult.data;
-      const query: Record<string, string> = {};
-      query[option.key] = data[option.key];
-      user = await User.findOne(query);
-
-      if (!user) {
-        return ApiResponse.error(option.notFoundMsg, 404);
-      }
+      const { password } = parsed.data;
+      validatedData = {
+        key: option.key,
+        value: parsed.data[option.key],
+        password,
+      };
       break;
     }
   }
-  if (!user) {
+  if (!validatedData) {
     return ApiResponse.error("No valid login identifier provided", 400);
   }
-  // console.log("user", user);
-  const isValidPassword = await user.isPasswordCorrect(data?.password);
-  if (!isValidPassword) {
-    return ApiResponse.error("Invalid credentials", 401);
-  }
+  console.log('validatedData', validatedData)
 
-  const { refreshToken, accessToken } = await generateRefreshAndAccessToken(user._id);
-  if (!accessToken || !refreshToken) {
-    return ApiResponse.error("Failed to generate tokens", 500);
-  }
-  const userSession = await Session.findOneAndUpdate(
-    { userId: user._id },
-    { refreshToken },
-    { upsert: true, new: true }
+  const loginResult = await loginUser(
+    validatedData.key,
+    validatedData.value,
+    validatedData.password  
   );
-  if (!userSession) {
-    return ApiResponse.error("Session creation failed", 500);
-  }
-  const cookieFlags = {
-    sameSite: true,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
-  }; //60*60*24*7 & days in seconds
-  const loggedInUser = await User.findById(user._id).select("-password");
-  const response = ApiResponse.success("User logged in successfully", {
-    user: loggedInUser,
-  });
-  response.cookies
-    .set("accessToken", accessToken, cookieFlags)
-    .set("refreshToken", refreshToken, cookieFlags);
+  
+  const { user } = loginResult;
 
-  return response;
+  return await createUserSession(user._id);
 });

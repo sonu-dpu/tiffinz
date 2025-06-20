@@ -8,6 +8,7 @@ enum MealType {
   full = "FULL",
   special = "SPL",
   nonVeg = "NON_VEG",
+  extras = "EXTRA",
 }
 
 enum PaymentStatus {
@@ -24,6 +25,13 @@ enum MealStatus {
   ordered = "ORDERED",
   cancelled = "CANCELLED ",
   not_required = "NOT_REQUIRED",
+  taken = "TAKEN",
+  not_taken = "NOT_TAKEN",
+}
+enum DailyMealFor {
+  breakfast = "BREAKFAST",
+  morning = "LUNCH",
+  dinner = "DINNER",
 }
 enum TransactionType {
   credit = "CREDIT",
@@ -40,8 +48,9 @@ export {
   MealType,
   UserRole,
   MealStatus,
+  DailyMealFor,
   TransactionType,
   PaymentStatus,
   LoginType,
-  PaymentMode
+  PaymentMode,
 };

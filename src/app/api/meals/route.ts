@@ -5,7 +5,7 @@ import {
   deleteMealById,
   deleteMealByIds,
   getAllMeals,
-} from "@/helpers/server/admin.meal";
+} from "@/helpers/server/meals";
 import { withAuth } from "@/utils/withAuth";
 import { MealInput, mealSchema } from "@/zod/meals.schema";
 import { UserRole } from "@/constants/enum";

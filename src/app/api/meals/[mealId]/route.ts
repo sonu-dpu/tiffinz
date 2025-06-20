@@ -3,7 +3,7 @@ import {
   deleteMealById,
   updateMeal,
   getMealById,
-} from "@/helpers/server/admin.meal";
+} from "@/helpers/server/meals";
 import { ApiError } from "@/utils/apiError";
 import { withAuth } from "@/utils/withAuth";
 import { updateMealSchema } from "@/zod/meals.schema";
@@ -22,6 +22,10 @@ export const GET = withAuth<MealParams>(
   },
   // { requiredRole: UserRole.user }
 );
+
+
+
+// admin routes
 export const PATCH = withAuth<MealParams>(
   async (req, params) => {
     const body = await req.json();

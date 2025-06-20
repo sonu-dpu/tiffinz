@@ -4,6 +4,7 @@ import { ApiError } from "./apiError";
 import  {JOSEError} from "jose/errors";
 
 export function handleError(error: unknown) {
+  console.log('error', error)
   if (error instanceof MongooseError) {
     return ApiResponse.error(error.message, 400);
   }
