@@ -7,6 +7,9 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const token = req.cookies.get("accessToken")?.value;
   const response = NextResponse.next();
+  if(pathname.startsWith("/api/users/register")){
+    return response;
+  }
   if (pathname.startsWith("/api/users/login") && !token) {
     return response;
   }
