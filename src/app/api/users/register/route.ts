@@ -24,7 +24,7 @@ export const POST = asyncHandler(async (req) => {
     );
     userData.role = UserRole.user;
   }
-
+console.log('userData', userData)
   const createdUser = await registerUser(userData as IUser);
   const userType = userData.role === UserRole.admin ? "Admin" : "User";
   return ApiResponse.success(
