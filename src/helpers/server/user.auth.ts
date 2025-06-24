@@ -21,14 +21,14 @@ export async function registerUser(userData: IUser) {
     { phone: userData.phone },
     { username: userData.username },
   ];
+  console.log('userData.email', userData.email)
   if (userData.email) {
     orConditions.push({ email: userData.email });
   }
-
+  await connectDB();
   const existingUser = await User.findOne({ $or: orConditions });
   if (existingUser) {
-    const credential =
-      existingUser.email === userData.email ? "Email" : "Phone/Username";
+    const credential = existingUser?.email &&  existingUser.email === userData.email ? "Email" : "Phone/Username";
     throw new ApiError(`User with ${credential} already registered`, 409);
   }
 
