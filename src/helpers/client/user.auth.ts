@@ -9,11 +9,12 @@ async function registerUser(userData: UserInput) {
     });
     if (!response.ok) {
       const error = await response.json();
-      return error;
+      console.log('error', error)
+      throw error
     }
-    const user = await response.json();
-    return user;
+    return await response.json();
   } catch (error) {
+    console.log('error', error)
     return error;
   }
 }

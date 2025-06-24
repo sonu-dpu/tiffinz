@@ -1,13 +1,17 @@
 "use client";
 import { UserInput, userSchema } from "@/zod/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import LoaderButton from "../ui/loader-button";
 import { Input } from "../ui/input";
 import { registerUser } from "@/helpers/client/user.auth";
-import { Card, CardContent } from "../ui/card";
-
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+// interface ErrorResponse{
+//   success:boolean,
+//   message:string,
+//   errors: unknown,
+// }
 function RegisterForm() {
   const {
     register,
@@ -16,43 +20,90 @@ function RegisterForm() {
   } = useForm({
     resolver: zodResolver(userSchema),
   });
+  const [errorResponse, setErrorResponse] = useState<string>("");
+  const [isLoading, startTransition] = useTransition();
   console.log("errors", errors);
   const onSubmit = async (data: UserInput) => {
-    const response = await registerUser(data);
-    if (response.success) {
-      console.log("response", response);
-    }
+    startTransition(async () => {
+      setErrorResponse("");
+      const response = await registerUser(data);
+      if (!response.success) {
+        setErrorResponse(response.message);
+        return;
+      }
+      if (response.success) {
+        console.log("response", response);
+      }
+    });
   };
   return (
     <Card className="w-full max-w-sm mx-auto">
-
+      <CardHeader>
+        <CardTitle>Register</CardTitle>
+        {/* <CardDescription></CardDescription> */}
+        {/* <CardAction>Card Action</CardAction> */}
+      </CardHeader>
       <CardContent>
-        <form className="space-y-1" onSubmit={handleSubmit(onSubmit)}>
-          <Input type="text" {...register("username")} placeholder="Username" />
-          {errors.username && <span>{errors.username.message}</span>}
+        <form
+          className="flex flex-col gap-y-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          {errorResponse && (
+            <span className="text-red-600 text-sm">{errorResponse}</span>
+          )}
 
           <Input
+            label="Username"
+            type="text"
+            {...register("username")}
+            placeholder="Username"
+          />
+          {errors.username && (
+            <span className="text-red-600 text-sm">
+              {errors.username.message}
+            </span>
+          )}
+
+          <Input
+            label="Full Name"
             type="text"
             {...register("fullName")}
-            placeholder="Full Name"
+            placeholder="First Last"
           />
-          {errors.fullName && <span>{errors.fullName.message}</span>}
-
-          <Input type="tel" {...register("phone")} placeholder="Phone Number" />
-          {errors.phone && <span>{errors.phone.message}</span>}
-
-          <Input type="email" {...register("email")} placeholder="Email" />
-          {errors.email && <span>{errors.email.message}</span>}
+          {errors.fullName && (
+            <span className="text-red-600 text-sm">
+              {errors.fullName.message}
+            </span>
+          )}
 
           <Input
+            label="Phone"
+            type="tel"
+            {...register("phone")}
+            placeholder="Phone Number"
+            required
+          />
+          {errors.phone && (
+            <span className="text-red-600 text-sm">{errors.phone.message}</span>
+          )}
+
+          {/* <Input label="Email" type="email" {...register("email", {required:false})} placeholder="Email" required={false} />
+          {errors.email && <span>{errors.email.message}</span>} */}
+
+          <Input
+            label="Password"
             type="password"
             {...register("password")}
             placeholder="Password"
           />
-          {errors.password && <span>{errors.password.message}</span>}
+          {errors.password && (
+            <span className="text-red-600 text-sm">
+              {errors.password.message}
+            </span>
+          )}
 
-          <LoaderButton isLoading={false} fallbackText="Logingin...">
-            Login
+          <LoaderButton isLoading={isLoading} fallbackText="Registering...">
+            Register
           </LoaderButton>
         </form>
       </CardContent>
