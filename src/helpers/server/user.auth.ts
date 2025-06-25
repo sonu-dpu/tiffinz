@@ -90,7 +90,7 @@ async function loginUser(
 
   const isValidPassword = await user.isPasswordCorrect(password);
   if (!isValidPassword) {
-    throw new ApiError("Invalid credentials password", 401);
+    throw new ApiError("Invalid credentials", 401);
   }
   console.log("user", user);
   return { user };
