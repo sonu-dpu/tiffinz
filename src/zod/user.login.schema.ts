@@ -1,11 +1,10 @@
-
 import { z } from "zod/v4";
 
-interface ILoginCredentials{
- password:string;
- email?:string;
- phone?:string;
- username?:string;
+interface ILoginCredentials {
+  password: string;
+  email?: string;
+  phone?: string;
+  username?: string;
 }
 
 const passwordSchema = z
@@ -32,6 +31,6 @@ const loginWithPhoneSchema = z.object({
   password: passwordSchema,
 });
 
-
-export {loginWithEmailSchema, loginWithPhoneSchema, loginWithUsernameSchema}
-export type {ILoginCredentials}
+export { loginWithEmailSchema, loginWithPhoneSchema, loginWithUsernameSchema };
+type UserLoginWithPhoneInput= z.infer<typeof loginWithPhoneSchema>;
+export type { ILoginCredentials, UserLoginWithPhoneInput };
