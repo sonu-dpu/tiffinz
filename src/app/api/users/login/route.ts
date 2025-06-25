@@ -66,5 +66,5 @@ const loginOptions: { key: LoginKey; schema: any }[] = [
   
   const { user } = loginResult;
 
-  return await createUserSession(user._id);
+  return await createUserSession(user?._id);
 });
