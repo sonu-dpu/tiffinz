@@ -7,11 +7,6 @@ import LoaderButton from "../ui/loader-button";
 import { Input } from "../ui/input";
 import { registerUser } from "@/helpers/client/user.auth";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-// interface ErrorResponse{
-//   success:boolean,
-//   message:string,
-//   errors: unknown,
-// }
 function RegisterForm() {
   const {
     register,
@@ -22,7 +17,7 @@ function RegisterForm() {
   });
   const [errorResponse, setErrorResponse] = useState<string>("");
   const [isLoading, startTransition] = useTransition();
-  console.log("errors", errors);
+  //console.log("errors", errors);
   const onSubmit = async (data: UserInput) => {
     startTransition(async () => {
       setErrorResponse("");
@@ -51,57 +46,64 @@ function RegisterForm() {
           {errorResponse && (
             <span className="text-red-600 text-sm">{errorResponse}</span>
           )}
-
-          <Input
-            label="Username"
-            type="text"
-            {...register("username")}
-            placeholder="Username"
-          />
-          {errors.username && (
-            <span className="text-red-600 text-sm">
-              {errors.username.message}
-            </span>
-          )}
-
-          <Input
-            label="Full Name"
-            type="text"
-            {...register("fullName")}
-            placeholder="First Last"
-          />
-          {errors.fullName && (
-            <span className="text-red-600 text-sm">
-              {errors.fullName.message}
-            </span>
-          )}
-
-          <Input
-            label="Phone"
-            type="tel"
-            {...register("phone")}
-            placeholder="Phone Number"
-            required
-          />
-          {errors.phone && (
-            <span className="text-red-600 text-sm">{errors.phone.message}</span>
-          )}
-
+          <div>
+            <Input
+              label="Username"
+              type="text"
+              {...register("username")}
+              placeholder="Username"
+              isError={!!errors.username?.message}
+            />
+            {errors.username && (
+              <span className="text-red-600 text-sm">
+                {errors.username.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <Input
+              label="Full Name"
+              type="text"
+              {...register("fullName")}
+              placeholder="First Last"
+              isError={!!errors.fullName?.message}
+            />
+            {errors.fullName && (
+              <span className="text-red-600 text-sm">
+                {errors.fullName.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <Input
+              label="Phone"
+              type="tel"
+              {...register("phone")}
+              placeholder="Phone Number"
+              isError={!!errors.phone?.message}
+            />
+            {errors.phone && (
+              <span className="text-red-600 text-sm">
+                {errors.phone.message}
+              </span>
+            )}
+          </div>
           {/* <Input label="Email" type="email" {...register("email", {required:false})} placeholder="Email" required={false} />
           {errors.email && <span>{errors.email.message}</span>} */}
-
-          <Input
-            label="Password"
-            type="password"
-            {...register("password")}
-            placeholder="Password"
-          />
-          {errors.password && (
-            <span className="text-red-600 text-sm">
-              {errors.password.message}
-            </span>
-          )}
-
+          <div>
+            <Input
+              label="Password"
+              type="password"
+              {...register("password")}
+              placeholder="Password"
+              isError={!!errors.password?.message}
+            />
+            {errors.password && (
+              <span className="text-red-600 text-sm">
+                {errors.password.message}
+              </span>
+            )}
+          </div>
           <LoaderButton isLoading={isLoading} fallbackText="Registering...">
             Register
           </LoaderButton>
