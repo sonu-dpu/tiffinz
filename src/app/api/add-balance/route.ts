@@ -4,9 +4,9 @@ import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
 import { addBalanceRequestInput } from "@/zod/addBalanceRequest.schema";
 
-export const POST = withAuth(async (req) => {
+export const POST = withAuth(async (req,context, user) => {
   const body = await req.json();
-  const userId = req.headers.get("x-user-id") || "";
+  const userId = String(user?._id)
   if (!userId) {
     return ApiResponse.error("User id not found", 400);
   }
