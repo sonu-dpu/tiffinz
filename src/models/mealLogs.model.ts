@@ -1,6 +1,6 @@
 import { DailyMealFor, MealStatus } from "@/constants/enum";
 import mongoose, { AggregatePaginateModel, model, models, Schema } from "mongoose";
-import Meal, { IMeal } from "./meal.model";
+import Meal from "./meal.model";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface IMealExtras {
@@ -67,21 +67,21 @@ const mealLogSchema = new Schema<IMealLog>(
   { timestamps: true }
 );
 
-mealLogSchema
-  .virtual("priceBreakdown")
-  .get(function (this: IMealLog & { mealId?: IMeal }) {
-    console.log("Calculating price breakdown for meal log");
-    const basePrice = this.mealId?.price || 0;
-    const extrasTotal = (this.extras || []).reduce((sum, extra) => {
-      const itemPrice = extra.extrasId?.price || 0;
-      return sum + itemPrice * extra.quantity;
-    }, 0);
-    return {
-      basePrice,
-      extrasTotal,
-      totalAmount: this.totalAmount,
-    };
-  });
+// mealLogSchema
+//   .virtual("priceBreakdown")
+//   .get(function (this: IMealLog & { mealId?: IMeal }) {
+//     console.log("Calculating price breakdown for meal log");
+//     const basePrice = this.mealId?.price || 0;
+//     const extrasTotal = (this.extras || []).reduce((sum, extra) => {
+//       const itemPrice = extra.extrasId?.price || 0;
+//       return sum + itemPrice * extra.quantity;
+//     }, 0);
+//     return {
+//       basePrice,
+//       extrasTotal,
+//       totalAmount: this.totalAmount,
+//     };
+//   });
 
 mealLogSchema.pre("save", async function (next) {
   console.log("MealLogSchema pre save hook triggered");
@@ -110,6 +110,6 @@ mealLogSchema.pre("save", async function (next) {
 
 
 mealLogSchema.plugin(mongooseAggregatePaginate)
-const MealLog = (models?.MealLog as MealLogModel )|| model<IMealLog>("MealLog", mealLogSchema);
+const MealLog = (models?.MealLog as MealLogModel ) || model<IMealLog>("MealLog", mealLogSchema);
 export type { IMealLog, IMealExtras, MealLogModel };
 export default MealLog;
