@@ -136,7 +136,7 @@ interface paginationParams {
   page?: number;
   limit?: number;
 }
-interface ISearchQuery {
+export interface ISearchQuery {
   userId?: string;
   username?: string;
   start?: string;
