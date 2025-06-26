@@ -4,10 +4,10 @@ import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth"
 import { mealLogSchemaInput } from "@/zod/mealLog.schema";
 type MealParams = { mealId: string };
-export const POST = withAuth<MealParams>(async(req, params, user)=>{
+export const POST = withAuth<MealParams>(async(req, context, user)=>{
   const body = await req.json();
   const userId = user?._id;
-  const { mealId } = (await params) as MealParams;
+  const { mealId } = await context.params
   
   if(!userId){
     return ApiResponse.error("User not found", 400);

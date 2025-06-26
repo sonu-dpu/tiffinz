@@ -5,8 +5,8 @@ import { withAuth } from "@/utils/withAuth"
 
 
 type UserIdParams = {id: string}
-export const GET = withAuth<UserIdParams>(async(_req, params)=>{
-  const {id} = await params as UserIdParams;
+export const GET = withAuth<UserIdParams>(async(_req, context)=>{
+  const {id} = await context.params
   const user = await getUserById(id);
   return ApiResponse.success("User details fetched", {user})
 }, {requiredRole: UserRole.admin})

@@ -11,8 +11,8 @@ import { UserRole } from "@/constants/enum";
 
 type MealParams = { mealId: string };
 export const GET = withAuth<MealParams>(
-  async (_req, params, user) => {
-    const { mealId } = (await params) as MealParams;
+  async (_req, context, user) => {
+    const { mealId } = await context.params
     if (!mealId) {
       throw new ApiError("Meal id not found", 400);
     }
@@ -27,9 +27,9 @@ export const GET = withAuth<MealParams>(
 
 // admin routes
 export const PATCH = withAuth<MealParams>(
-  async (req, params) => {
+  async (req, context) => {
     const body = await req.json();
-    const { mealId } = (await params) as MealParams;
+    const { mealId } = await context.params
     console.log("mealId", mealId);
     if (!mealId) {
       throw new ApiError("Meal id not found", 400);
@@ -46,8 +46,8 @@ export const PATCH = withAuth<MealParams>(
 );
 
 export const DELETE = withAuth<MealParams>(
-  async (_req, params) => {
-    const { mealId } = (await params) as MealParams;
+  async (_req, context) => {
+    const { mealId } = await context.params
     if (!mealId) {
       throw new ApiError("Meal id not found", 400);
     }
