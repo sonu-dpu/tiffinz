@@ -6,15 +6,23 @@ import { ApiError } from "./apiError";
 import User, { IUser } from "@/models/user.model";
 import connectDB from "./dbConnect";
 
+type withAuthOptions = {
+  requiredRole?: UserRole;
+};// Define the RouteContext type to match Next.js expectations
+type RouteContext<T = Record<string, never>> = {
+  params: Promise<T>;
+};
 
-type withAuthOptions={
-  requiredRole?:UserRole
-}
-// higher order function to check if user is authenticated
-export function  withAuth<T>(
-  callback: (req: NextRequest, params?: Promise<T>, user?:IUser) => Promise<Response>, options?: withAuthOptions
+// Higher order function to check if user is authenticated
+export function withAuth<T = Record<string, never>>(
+  callback: (
+    req: NextRequest,
+    context: RouteContext<T>,
+    user?: IUser
+  ) => Promise<Response>,
+  options?: withAuthOptions
 ) {
-  return async function (req: NextRequest, context?: { params?: Promise<T>}) {
+  return async function (req: NextRequest, context: RouteContext<T>) {
     try {
       const token = req.cookies.get("accessToken")?.value;
       if (!token) {
@@ -28,14 +36,18 @@ export function  withAuth<T>(
       const userId = payload?._id;
       await connectDB();
       const user = await User.findById(userId).select("-password");
-      if(!user){
-        throw new ApiError("User not found", 404)
+      if (!user) {
+        throw new ApiError("User not found", 404);
       }
-      if (options?.requiredRole &&  (user.role !== options.requiredRole && user.role !== UserRole.admin) ) {
+      if (
+        options?.requiredRole &&
+        user.role !== options.requiredRole &&
+        user.role !== UserRole.admin
+      ) {
         throw new ApiError("Access denied", 403);
       }
 
-      return await callback(req, context?.params, user);
+      return await callback(req, context, user);
     } catch (error) {
       return handleError(error);
     }

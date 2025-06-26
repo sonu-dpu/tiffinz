@@ -1,10 +1,17 @@
 import { handleError } from "@/utils/handleError";
 import { NextRequest } from "next/server";
-
-export function asyncHandler<T>(handler: (req: NextRequest, params?:  Promise<T> ) => Promise<Response>) {
-  return async function (req: NextRequest, context?: { params?: Promise<T> }) {
+type RouteContext<T = Record<string, never>> = {
+  params: Promise<T>;
+};
+export function asyncHandler<T = Record<string, never>>(
+  handler: (
+    req: NextRequest,
+    context: RouteContext<T>
+  ) => Promise<Response>
+) {
+  return async function (req: NextRequest, context: RouteContext<T>) {
     try {
-      return await handler(req, context?.params);
+      return await handler(req, context);
     } catch (error) {
       return handleError(error);
     }
