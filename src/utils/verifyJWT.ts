@@ -1,9 +1,9 @@
 import { JWTPayload, jwtVerify } from "jose";
-import { handleError } from "./handleError";
-import { NextResponse } from "next/server";
+import { JOSEError } from "jose/errors";
+// import { handleError } from "./handleError";
 type verifyJWTResponse = Promise<{
   payload: JWTPayload | null;
-  error: NextResponse | null;
+  error: string | unknown | null;
 }>;
 export async function verifyJWT(token: string): verifyJWTResponse {
   try {
@@ -11,7 +11,13 @@ export async function verifyJWT(token: string): verifyJWTResponse {
     const { payload } = await jwtVerify(token, secret);
     return { payload, error: null };
   } catch (error) {
-    const errorRespose = handleError(error);
-    return { payload: null, error: errorRespose };
+    let errorMessage: string | unknown;
+    if (error instanceof JOSEError) {
+      errorMessage = error.message;
+    }
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return { payload: null, error: errorMessage };
   }
 }
