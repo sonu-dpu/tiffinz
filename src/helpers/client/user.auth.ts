@@ -1,5 +1,15 @@
+import { handleError } from "@/lib/handleError";
 import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";
 import { UserInput } from "@/zod/user.schema";
+
+interface IAuthUser{
+  user : UserInput | null,
+  error: {
+    type: string;
+    message: string;
+  } | null;
+}
+
 
 async function registerUser(userData: UserInput) {
   try {
@@ -19,17 +29,24 @@ async function registerUser(userData: UserInput) {
     return error;
   }
 }
-async function loginUserWithPhone(credentials: UserLoginWithPhoneInput) {
+
+async function loginUserWithPhone(credentials: UserLoginWithPhoneInput): Promise<IAuthUser> {
   try {
     const response = await fetch("/api/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
-
-    return await response.json();
+    if( !response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Login failed");
+    }
+    const payload = await response.json();
+    const data = payload.data;
+    const user = data.user;
+    return {user, error: null}
   } catch (error) {
-    return error;
+    return {user: null, error:handleError(error, "login")};
   }
 }
 export { registerUser, loginUserWithPhone };
