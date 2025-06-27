@@ -46,64 +46,38 @@ function RegisterForm() {
           {errorResponse && (
             <span className="text-red-600 text-sm">{errorResponse}</span>
           )}
-          <div>
-            <Input
-              label="Username"
-              type="text"
-              {...register("username")}
-              placeholder="Username"
-              isError={!!errors.username?.message}
-            />
-            {errors.username && (
-              <span className="text-red-600 text-sm">
-                {errors.username.message}
-              </span>
-            )}
-          </div>
-          <div>
-            <Input
-              label="Full Name"
-              type="text"
-              {...register("fullName")}
-              placeholder="First Last"
-              isError={!!errors.fullName?.message}
-            />
-            {errors.fullName && (
-              <span className="text-red-600 text-sm">
-                {errors.fullName.message}
-              </span>
-            )}
-          </div>
-          <div>
-            <Input
-              label="Phone"
-              type="tel"
-              {...register("phone")}
-              placeholder="Phone Number"
-              isError={!!errors.phone?.message}
-            />
-            {errors.phone && (
-              <span className="text-red-600 text-sm">
-                {errors.phone.message}
-              </span>
-            )}
-          </div>
-          {/* <Input label="Email" type="email" {...register("email", {required:false})} placeholder="Email" required={false} />
-          {errors.email && <span>{errors.email.message}</span>} */}
-          <div>
-            <Input
-              label="Password"
-              type="password"
-              {...register("password")}
-              placeholder="Password"
-              isError={!!errors.password?.message}
-            />
-            {errors.password && (
-              <span className="text-red-600 text-sm">
-                {errors.password.message}
-              </span>
-            )}
-          </div>
+          <Input
+            label="Username"
+            type="text"
+            {...register("username")}
+            placeholder="Username"
+            errorMessage={errors.username?.message}
+          />
+
+          <Input
+            label="Full Name"
+            type="text"
+            {...register("fullName")}
+            placeholder="First Last"
+            errorMessage={errors.fullName?.message}
+          />
+
+          <Input
+            label="Phone"
+            type="tel"
+            {...register("phone")}
+            placeholder="Phone Number"
+            errorMessage={errors.phone?.message}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            {...register("password")}
+            placeholder="Password"
+            errorMessage={errors.password?.message}
+          />
+
           <LoaderButton isLoading={isLoading} fallbackText="Registering...">
             Register
           </LoaderButton>

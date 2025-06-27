@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import LoaderButton from "../ui/loader-button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -15,6 +14,7 @@ import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
+import { EyeClosed, LucideEye } from "lucide-react";
 
 function LoginForm() {
   const {
@@ -28,10 +28,13 @@ function LoginForm() {
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  if (isLoggedIn && user) {
-    router.push("/");
-    return null; // Prevent rendering the form if already logged in
-  }
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      router.push("/");
+      return ()=>{}
+    }
+  }, [user, isLoggedIn, router]);
+
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -67,16 +70,22 @@ function LoginForm() {
             errorMessage={errors.phone?.message}
             {...register("phone")}
           />
-          <Input
-            errorMessage={errors.password?.message}
-            label="Enter your password"
-            placeholder="Password"
-            type={showPassword ? "text" : "password"}
-            {...register("password")}
-          />
-          <div>
-            <Button variant={"secondary"} onClick={toggleShowPassword}>
-              {showPassword ? "Hide Password" : "Show Password"}
+          <div className="w-full flex items-end">
+            <Input
+              className="border w-full"
+              errorMessage={errors.password?.message}
+              label="Enter your password"
+              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+            />
+            <Button
+              className=""
+              variant={"outline"}
+              type="button"
+              onClick={toggleShowPassword}
+            >
+              {showPassword ? <LucideEye /> : <EyeClosed />}
             </Button>
           </div>
           {errorResponse && (
@@ -87,7 +96,7 @@ function LoginForm() {
           <LoaderButton
             className="w-full"
             isLoading={isLoggingIn}
-            fallbackText="logging in"
+            fallbackText="logging in..."
           >
             Login
           </LoaderButton>
