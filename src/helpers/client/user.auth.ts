@@ -1,10 +1,13 @@
+
+
 import { handleError } from "@/lib/handleError";
+import { IUser } from "@/models/user.model";
 import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";
 import { UserInput } from "@/zod/user.schema";
 import axios from "axios";
 
 interface IAuthUser {
-  user: UserInput | null;
+  user: IUser | null;
   error: {
     type: string;
     message: string;
@@ -55,15 +58,16 @@ async function loginUserWithPhone(
 async function getCurrentUser(): Promise<IAuthUser> {
   try {
     const response = await axios.get("/api/users");
-    if (!response.data) {
-      const error = await response.data;
-      throw new Error(error.message || "Login failed");
+    const user = response.data?.data?.user;
+    if(!user){
+      throw new Error("Failed to fetch user")
     }
-    const user = response.data.data.user;
-    console.log('user', user)
     return { user, error: null };
   } catch (error) {
+    console.log('error in catch', error)
     return { user: null, error: handleError(error, "getUser") };
   }
 }
+
+
 export { registerUser, loginUserWithPhone, getCurrentUser };
