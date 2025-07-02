@@ -18,8 +18,6 @@ import { useAppSelector } from "@/hooks/reduxHooks"
 import Link from "next/link"
 import { UserRole } from "@/constants/enum"
 
-
-
 interface ISidebarItem {
   title: string
   url: string
@@ -32,18 +30,18 @@ interface ISidebarItem {
 const sidebarItems: ISidebarItem[] =[
   {
     title: "Home",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "Users",
-    url: "/users",
+    url: "/dashboard/users",
     icon: User,
     onlyForAdmin: true, // Only for admin users
   },
   {
     title: "Transactions",
-    url: "/transactions",
+    url: "/dashboard/transactions",
     icon: BadgeIndianRupee,
   },
   {
@@ -53,13 +51,13 @@ const sidebarItems: ISidebarItem[] =[
   },
   {
     title:"Add Balance",
-    url: "/add-balance",
+    url: "/dashboard/add-balance",
     icon: PlusCircleIcon,
     onlyForUser: true, // Only for regular users
   },
   {
     title: "Settings",
-    url: "/settings",
+    url: "/dashboard/settings",
     icon: Settings,
   },
 ]
@@ -68,6 +66,8 @@ export function AppSidebar() {
   const currentUser = useAppSelector((state) => state.auth.user)
   const pathname = usePathname();
   const currentUserRole = currentUser?.role || UserRole.user; // Default to user role if not defined
+  // console.log('currentUser', currentUser);
+  
   if(pathname === "/login" || pathname === "/register") {
     return null; // Don't render the sidebar on login or register pages.
   }
