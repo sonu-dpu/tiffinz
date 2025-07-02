@@ -13,8 +13,10 @@ import { Button } from "../ui/button";
 import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { useRouter } from "next/navigation";
 import { EyeClosed, LucideEye } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSessionExists } from "@/hooks/useSessionExists";
+import { toast } from "sonner";
 
 function LoginForm() {
   const {
@@ -25,16 +27,17 @@ function LoginForm() {
   const [isLoggingIn, startLoggingIn] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [errorResponse, setErrorResponse] = useState("");
-  const { isLoggedIn, user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
+  const { user, isLoggedIn } = useAppSelector((state) => state.auth);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const isSessionExists = useSessionExists();
   useEffect(() => {
+    console.log("user", user);
     if (isLoggedIn && user) {
-      router.push("/");
-      return ()=>{}
+      toast.success("User logged in successfully");
+      router.push("/dashboard");
     }
-  }, [user, isLoggedIn, router]);
-
+  }, [user, isLoggedIn, router, isSessionExists]);
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -51,6 +54,7 @@ function LoginForm() {
       if (error) {
         setErrorResponse(error.message);
         console.error("Login failed:", error);
+        toast.error("Login failed: " + error.message);
         return;
       }
       console.log("Login successful:", user);
