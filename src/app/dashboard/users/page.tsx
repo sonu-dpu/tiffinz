@@ -1,57 +1,68 @@
-"use client"
-import axios from "axios"
-import { columns } from "./columns"
-import { DataTable } from "./data-table"
+"use client";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 import { useEffect } from "react";
-import { IUser } from "@/models/user.model";
 import { useSessionExists } from "@/hooks/useSessionExists";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { setUsers } from "@/store/usersSlice";
 import { UserTable } from "@/components/dashboard/users/UserTable";
-import { handleError } from "@/lib/handleError";
-async function getData() :Promise<IUser[] | []> {
+import { UserRole } from "@/constants/enum";
+import { toast } from "sonner";
+import { getUsers } from "@/helpers/client/admin.users";
+import Loader from "@/components/ui/Loader";
 
-  try {
-    const res = await axios.get("/api/admin/users/", {headers:{Accept: "application/json"}});
-    if(res.status !== 200) {
-      throw new Error("Failed to fetch data");
-    }
-    const data = res.data.data.users;
-    console.log('data', data)
-    return data;
-  } catch (error) {
-    handleError(error, "users");
-    return []
-  }
-}
-
-export default function DemoPage() {
-const isSessionExists = useSessionExists();
-const {users} = useAppSelector((state)=>state.users);
-const dispatch = useAppDispatch();
-  useEffect(()=>{
-    const fetchUsers = async ()=>{
-      if(!isSessionExists) {
+export default function UsersPage() {
+  const isSessionExists =  useSessionExists();
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const { users } = useAppSelector((state) => state.users);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!isSessionExists) {
         return;
       }
-        const data = await getData();
-        console.log('users', JSON.stringify(data))
-        dispatch(setUsers(data));
-    } 
-    if(!users || users.length === 0) {
-      console.log('fetching users')
-      fetchUsers();
-    }
+      console.log("fetching users from server");
+      const {data, error} = await getUsers();
+      // console.log("users", JSON.stringify(data));
+      if(error) {
+        console.error("Error fetching users:", error.message);
+        toast.error(`Error fetching users: ${error.message}`);
+        return;
+      }
+      dispatch(setUsers(data || []));
+    };
     
-  },[isSessionExists, dispatch, users])
+    if (!users || users.length === 0) {
+      if (currentUser && currentUser.role !== UserRole.admin) {
+        console.error("Unauthorized access to users page");
+        return;
+      }else if(currentUser && currentUser.role === UserRole.admin) {
+        console.log("fetching users");
+        fetchUsers();
+      }
+    }
+  }, [isSessionExists, dispatch, users, currentUser]);
 
-  if(!users){
-    return <div className="container mx-auto py-10">Loading...</div>
+
+  if(currentUser && currentUser.role !== UserRole.admin) {
+    return (
+      <div className="container mx-auto py-10">
+        <h1 className="text-2xl font-bold">Unauthorized Access</h1>
+        <p>You do not have permission to view this page.</p>
+      </div>
+    );
+  }
+  if (!users) {
+    return <Loader />;
   }
   return (
     <div className="container mx-auto py-10">
+    {/* {console.count("render")} */}
       <DataTable columns={columns} data={users} />
-      <UserTable users={users} onVerify={(users)=>console.log('users', users)} />
+      <UserTable
+        users={users}
+        onVerify={(users) => console.log("users", users)}
+      />
     </div>
-  )
+  );
 }

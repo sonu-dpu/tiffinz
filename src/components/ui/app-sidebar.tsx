@@ -1,10 +1,17 @@
-"use client"
-
-import { BadgeIndianRupee, Home, PlusCircleIcon, Search, Settings, User } from "lucide-react"
+"use client";
+import {
+  BadgeIndianRupee,
+  Home,
+  PlusCircleIcon,
+  Search,
+  Settings,
+  User,
+} from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,22 +19,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { usePathname } from "next/navigation"
-import { useAppSelector } from "@/hooks/reduxHooks"
-import Link from "next/link"
-import { UserRole } from "@/constants/enum"
+} from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import Link from "next/link";
+import { UserRole } from "@/constants/enum";
+import LogoutButton from "../auth/Logout";
 
 interface ISidebarItem {
-  title: string
-  url: string
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  onlyForAdmin?: boolean
-  onlyForUser?: boolean
+  title: string;
+  url: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  onlyForAdmin?: boolean;
+  onlyForUser?: boolean;
 }
 // Menu items.
 
-const sidebarItems: ISidebarItem[] =[
+const sidebarItems: ISidebarItem[] = [
   {
     title: "Home",
     url: "/dashboard",
@@ -50,7 +58,7 @@ const sidebarItems: ISidebarItem[] =[
     icon: Search,
   },
   {
-    title:"Add Balance",
+    title: "Add Balance",
     url: "/dashboard/add-balance",
     icon: PlusCircleIcon,
     onlyForUser: true, // Only for regular users
@@ -60,18 +68,18 @@ const sidebarItems: ISidebarItem[] =[
     url: "/dashboard/settings",
     icon: Settings,
   },
-]
+];
 
 export function AppSidebar() {
-  const currentUser = useAppSelector((state) => state.auth.user)
+  const currentUser = useAppSelector((state) => state.auth.user);
   const pathname = usePathname();
   const currentUserRole = currentUser?.role || UserRole.user; // Default to user role if not defined
   // console.log('currentUser', currentUser);
-  
-  if(pathname === "/login" || pathname === "/register") {
+
+  if (pathname === "/login" || pathname === "/register") {
     return null; // Don't render the sidebar on login or register pages.
   }
-  
+
   return (
     <Sidebar>
       <SidebarHeader>Tiffinz</SidebarHeader>
@@ -81,27 +89,30 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => {
-                if(item.onlyForAdmin && currentUserRole !== UserRole.admin) {
+                if (item.onlyForAdmin && currentUserRole !== UserRole.admin) {
                   return null; // Skip items that are only for admin users
                 }
-                if(item.onlyForUser && currentUserRole !== UserRole.user) {
+                if (item.onlyForUser && currentUserRole !== UserRole.user) {
                   return null; // Skip items that are only for regular users
                 }
                 return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <LogoutButton/>
+      </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
