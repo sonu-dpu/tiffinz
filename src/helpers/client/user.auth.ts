@@ -69,5 +69,17 @@ async function getCurrentUser(): Promise<IAuthUser> {
   }
 }
 
-
-export { registerUser, loginUserWithPhone, getCurrentUser };
+async function logoutUser(): Promise<boolean> {
+  try {
+    const response = await axios.get("/api/users/logout");
+    if (response.status === 200) {
+      return true;
+    } else {
+      throw new Error("Logout failed");
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+    return false;
+  }
+} 
+export { registerUser, loginUserWithPhone, getCurrentUser, logoutUser };
