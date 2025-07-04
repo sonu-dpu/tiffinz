@@ -10,9 +10,11 @@ function DashboardLayout({
   return (
     <>
       <AppSidebar />
-      <main className="max-w-full w-full p-2">
+      <main className="max-w-full w-full p-2 mx-auto">
         <SidebarTrigger />
-        {children}
+        <div className="container mx-auto">
+          {children}
+          </div>
       </main>
     </>
   );
