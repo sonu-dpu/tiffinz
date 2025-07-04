@@ -2,7 +2,8 @@ import { PaymentStatus } from "@/constants/enum";
 import { addBalanceRequest } from "@/helpers/server/user.account";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
-import { addBalanceRequestInput } from "@/zod/addBalanceRequest.schema";
+import { addBalanceRequestSchema } from "@/zod/addBalanceRequest.schema";
+import { z } from "zod/v4";
 
 export const POST = withAuth(async (req,context, user) => {
   const body = await req.json();
@@ -10,16 +11,19 @@ export const POST = withAuth(async (req,context, user) => {
   if (!userId) {
     return ApiResponse.error("User id not found", 400);
   }
-  const parseResult = addBalanceRequestInput.safeParse(body);
+    console.log('body', body)
+  const parseResult = addBalanceRequestSchema.extend({amountAdded:z.number()}).safeParse(body);
   if (!parseResult.success) {
     return ApiResponse.zodError(parseResult.error);
   }
+
   const reqData = {
     ...parseResult.data,
     userId: userId,
     status: PaymentStatus.pending,
     isVerified: false,
   };
+  console.log('reqData', reqData)
   const reqDoc = await addBalanceRequest(reqData);
   if (!reqDoc) {
     return ApiResponse.error("Failed to create balance request", 500);
