@@ -81,7 +81,7 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>Tiffinz</SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -111,7 +111,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <LogoutButton/>
+        <LogoutButton />
       </SidebarFooter>
     </Sidebar>
   );
