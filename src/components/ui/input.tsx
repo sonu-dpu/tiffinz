@@ -39,6 +39,7 @@ function Input({
   );
 
   const inputElement = (
+    <>
     <input
       type={type}
       id={id}
@@ -46,6 +47,10 @@ function Input({
       className={inputClassNames}
       {...props}
     />
+    {errorMessage && (
+        <span className="text-red-600 text-sm">{errorMessage}</span>
+      )}
+    </>
   );
 
   return label ? (
