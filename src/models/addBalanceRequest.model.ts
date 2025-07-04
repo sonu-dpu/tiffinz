@@ -29,6 +29,11 @@ const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
       enum:Object.values(PaymentMode),
       default:PaymentMode.cash,
     },
+    paymentScreenshot: {
+      type: String,
+      required: false,
+      default: null,
+    },
     status: {
       type: String,
       enum: Object.values(PaymentStatus),
