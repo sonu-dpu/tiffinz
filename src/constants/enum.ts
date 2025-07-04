@@ -44,6 +44,12 @@ enum LoginType {
   username = "username",
 }
 
+
+enum ImageKitFolder {
+  users = "/tifinz/users",
+  payments = "/tifinz/payments",    
+}
+
 export {
   MealType,
   UserRole,
@@ -53,4 +59,5 @@ export {
   PaymentStatus,
   LoginType,
   PaymentMode,
+  ImageKitFolder,
 };

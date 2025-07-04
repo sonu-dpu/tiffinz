@@ -18,6 +18,7 @@ export class ApiResponse {
   }
 
   static zodError(error: ZodError) {
-    return this.error("Validation failed", 400, z.treeifyError(error));
+    console.error("Zod validation error:", error);
+    return NextResponse.json({success: false, message: "Validation error", errors: z.treeifyError(error)}, { status: 400 });
   }
 }
