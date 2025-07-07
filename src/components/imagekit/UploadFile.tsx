@@ -103,7 +103,7 @@ const UploadFile = ({
       console.log("Starting file upload:", file.name);
       
       toast.dismiss();
-      toast.loading("Uploading file...", {
+      toast.loading(`Uploading ${progress}%`, {
         id: "upload-toast",
         duration: 0, // Keep the toast visible until manually dismissed
       });

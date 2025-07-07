@@ -3,16 +3,16 @@ import { addBalanceRequest } from "@/helpers/server/user.account";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
 import { addBalanceRequestSchema } from "@/zod/addBalanceRequest.schema";
-import { z } from "zod/v4";
 
-export const POST = withAuth(async (req,context, user) => {
+
+export const POST = withAuth(async (req,_context, user) => {
   const body = await req.json();
   const userId = String(user?._id)
   if (!userId) {
     return ApiResponse.error("User id not found", 400);
   }
     console.log('body', body)
-  const parseResult = addBalanceRequestSchema.extend({amountAdded:z.number()}).safeParse(body);
+  const parseResult = addBalanceRequestSchema.safeParse(body);
   if (!parseResult.success) {
     return ApiResponse.zodError(parseResult.error);
   }

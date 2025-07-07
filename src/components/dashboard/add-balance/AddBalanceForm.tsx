@@ -20,12 +20,19 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBalanceRequest } from "@/helpers/client/add-balance";
 import { toast } from "sonner";
+import { z } from "zod/v4";
 
-// interface AddBalanceFormProps extends React.HTMLAttributes<HTMLDivElement> {
-
-// }
+const addBalanceRequestSchemaClient = addBalanceRequestSchema.extend({
+  amountAdded: z
+    .string()
+    .transform((val) => Number(val))
+    .refine((val) => val > 50, "Amount must be greater than 50")
+    .refine((val) => val <= 5000, "Amount must be less than 5,000"),
+  paymentScreenshot: z.string().optional(),
+});
 function AddBalanceForm() {
   const [paymentMode, setPaymentMode] = useState<PaymentMode | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const {
     handleSubmit,
     register,
@@ -33,41 +40,38 @@ function AddBalanceForm() {
     setError,
     formState: { errors, isLoading },
   } = useForm({
-    resolver: zodResolver(addBalanceRequestSchema),
+    resolver: zodResolver(addBalanceRequestSchemaClient),
   });
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
-
 
   useEffect(() => {
-    // Reset payment mode and file URL when the component mounts
-    setValue("paymentScreenshot", "NAN");
-  }, [paymentMode, setValue]);
-  useEffect(() => {
-    if (paymentMode) {
+    if(paymentMode) {
       setValue("paymentMode", paymentMode);
     }
-    if (fileUrl) {
-      setValue("paymentScreenshot", fileUrl);
-    }
+    setValue("paymentScreenshot", paymentMode === PaymentMode.online ? fileUrl || "" : "");
   }, [paymentMode, fileUrl, setValue]);
 
   const handleSelect = (value: string) => {
     setFileUrl(null); // Reset file URL when payment mode changes
-    console.log('selected payment mode:', value, fileUrl);
+    console.log("selected payment mode:", value, fileUrl);
     setPaymentMode(value as PaymentMode);
   };
   console.log("errors", errors, isLoading);
   const onSubmit = async (formData: AddBalanceRequestInput) => {
     console.log("Form data submiting:", formData);
-    if (paymentMode === PaymentMode.online) {
-      if (!fileUrl) {
-        console.error("Payment screenshot is required for online payments.");
-        setError("paymentScreenshot", {
-          type: "manual",
-          message: "Payment screenshot is required for online payments.",
-        });
-        return;
-      }
+
+    // Validate payment screenshot for online payments
+    if (paymentMode === PaymentMode.online && !fileUrl) {
+      setError("paymentScreenshot", {
+      type: "manual",
+      message: "Payment screenshot is required for online payments.",
+      });
+      console.error("Payment screenshot is required for online payments.");
+      return;
+    }
+
+    // Remove empty paymentScreenshot for cash payments
+    if (paymentMode === PaymentMode.cash && !formData.paymentScreenshot?.trim()) {
+      delete formData.paymentScreenshot;
     }
     const { data, error } = await addBalanceRequest(formData);
     if (error) {
@@ -82,7 +86,7 @@ function AddBalanceForm() {
     toast.success("Balance request added successfully!");
     console.log("Balance request added successfully:", data);
   };
-  console.log("fileUrl", fileUrl);
+  // console.log("fileUrl", fileUrl);
   return (
     <Card className="w-full">
       <CardHeader>
@@ -104,7 +108,7 @@ function AddBalanceForm() {
                 <label id="paymentMode" className="font-medium text-sm">
                   Select Payment Mode
                   <Select onValueChange={handleSelect}>
-                    <SelectTrigger className=" max-w-[300px] w-full">
+                    <SelectTrigger className="max-w-[300px] w-full">
                       <SelectValue placeholder="Payment Mode" />
                     </SelectTrigger>
                     <SelectContent {...register("paymentMode")}>
