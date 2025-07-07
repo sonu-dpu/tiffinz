@@ -5,6 +5,7 @@ import { verifyJWT } from "./utils/verifyJWT";
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const token = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
   if (pathname.startsWith("/api/users/register")) {
     return response;
@@ -17,7 +18,11 @@ export async function middleware(req: NextRequest) {
     if (!token) {
       return ApiResponse.error("Authentication required", 401);
     }
+    
     const { payload, error } = await verifyJWT(token);
+    if(pathname.startsWith("/api/refresh-tokens") && refreshToken && error){
+        return response;
+    }
     if (error || !payload?._id) {
       return ApiResponse.error("Auhentication required", 401);
     }

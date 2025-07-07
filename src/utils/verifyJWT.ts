@@ -5,9 +5,17 @@ type verifyJWTResponse = Promise<{
   payload: JWTPayload | null;
   error: string | unknown | null;
 }>;
-export async function verifyJWT(token: string): verifyJWTResponse {
+type verifyType = "access" | "refresh";
+export async function verifyJWT(
+  token: string,
+  verifyType: verifyType = "access"
+): verifyJWTResponse {
   try {
-    const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET!);
+    const encoder = new TextEncoder();
+    let secret = encoder.encode(process.env.ACCESS_TOKEN_SECRET!);
+    if (verifyType === "refresh") {
+      secret = encoder.encode(process.env.REFRESH_TOKEN_SECRET!);
+    }
     const { payload } = await jwtVerify(token, secret);
     return { payload, error: null };
   } catch (error) {
