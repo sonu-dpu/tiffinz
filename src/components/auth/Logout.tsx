@@ -39,7 +39,7 @@ function LogoutButton() {
   return (
     <Drawer>
       <DrawerTrigger className="flex justify-center gap-2 border p-2"><LogOutIcon/>Logout </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent aria-describedby="logout-drawer">
         <DrawerHeader>
           <DrawerTitle>Are you absolutely sure to logout?</DrawerTitle>
           {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
