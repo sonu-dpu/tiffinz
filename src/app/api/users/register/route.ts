@@ -7,8 +7,8 @@ import { IUser } from "@/models/user.model";
 
 export const POST = asyncHandler(async (req) => {
   const body = await req.json();
+  // console.log('body', body)
   const parseResult = userSchema.safeParse(body);
-
   if (!parseResult.success) {
     return ApiResponse.zodError(parseResult.error);
   }

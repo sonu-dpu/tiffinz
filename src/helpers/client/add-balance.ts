@@ -1,7 +1,12 @@
 import { handleError } from "@/lib/handleError";
 import { IAddBalanceRequest } from "@/models/addBalanceRequest.model";
+import { IUser } from "@/models/user.model";
 import { AddBalanceRequestInput } from "@/zod/addBalanceRequest.schema";
 import axios from "axios";
+
+export interface IAddBalanceRequestWithUser extends Omit<IAddBalanceRequest, "user">{
+  user:IUser
+}
 
 interface IAddBalanceResponse<T> {
   data: T | null;
@@ -10,9 +15,10 @@ interface IAddBalanceResponse<T> {
     message: string;
   } | null;
 }
+
 async function addBalanceRequest(
   data: AddBalanceRequestInput
-): Promise<IAddBalanceResponse<IAddBalanceRequest>> {
+): Promise<IAddBalanceResponse<IAddBalanceRequestWithUser>> {
   try {
     const response = await axios.post("/api/add-balance", data);
     if (response.status !== 200) {
@@ -22,12 +28,25 @@ async function addBalanceRequest(
     }
 
     return {
-      data: response.data.data, 
-      error: null,}
+      data: response.data.data,
+      error: null,
+    };
   } catch (error) {
     console.error("Error adding balance:", error);
-    return {data: null, error:handleError(error, "addBalanceRequest")};
+    return { data: null, error: handleError(error, "addBalanceRequest") };
   }
 }
 
-export { addBalanceRequest };
+async function getAllBalanceRequests(): Promise<
+  IAddBalanceResponse<IAddBalanceRequestWithUser[]>
+> {
+  try {
+    const response = await axios.get("/api/add-balance");
+    const requests = response.data.data.requests;
+    console.log('requests', requests)
+    return {data: requests, error: null}
+  } catch (error) {
+    return {data:null, error: handleError(error, "Get Requests")}
+  }
+}
+export { addBalanceRequest, getAllBalanceRequests };

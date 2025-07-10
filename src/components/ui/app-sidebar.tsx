@@ -64,6 +64,12 @@ const sidebarItems: ISidebarItem[] = [
     onlyForUser: true, // Only for regular users
   },
   {
+    title:"Add Balance Request",
+    url:"/dashboard/requests",
+    icon: PlusCircleIcon,
+    onlyForAdmin:true
+  },
+  {
     title: "Settings",
     url: "/dashboard/settings",
     icon: Settings,
