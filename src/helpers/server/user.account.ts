@@ -12,7 +12,7 @@ async function doesUserAccountExist(
 ): Promise<boolean | IAccount> {
   try {
     await connectDB();
-    const existingAccount = await Account.findOne({ userId });
+    const existingAccount = await Account.findOne({ user:userId });
     return !!existingAccount;
   } catch (error) {
     throw handleError(error);
@@ -28,7 +28,7 @@ async function createAccount(userId: string) {
   if (existingAccount) {
     throw new ApiError("Account already exists", 400);
   }
-  const newAccount: IAccount = await Account.create({ userId, balace: 0 });
+  const newAccount: IAccount = await Account.create({ user:userId, balace: 0 });
   if (!newAccount) {
     throw new ApiError("Failed to create new user account", 500);
   }
@@ -36,7 +36,7 @@ async function createAccount(userId: string) {
 }
 
 async function addBalanceRequest(requestData: AddBalanceRequestInput) {
-  const userId = requestData.userId;
+  const userId = requestData.user;
   if (!isValidObjectId(userId)) {
     throw new ApiError("Invalid object id", 400);
   }

@@ -113,7 +113,7 @@ async function createUserSession(userId: string) {
   }
 
   const userSession = await Session.findOneAndUpdate(
-    { userId },
+    { user:userId },
     { refreshToken },
     { upsert: true, new: true }
   );

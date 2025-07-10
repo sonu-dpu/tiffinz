@@ -97,8 +97,8 @@ async function orderMeal(
   }
   const mealLogDoc = {
     ...mealData,
-    userId: userId,
-    mealId: meal._id,
+    user: userId,
+    meal: meal._id,
     totalAmount: meal.price,
   };
   const mealLog = await MealLog.create(mealLogDoc);
@@ -113,7 +113,7 @@ async function getMealLogById(mealLogId: string) {
     throw new ApiError("Invalid meal log id");
   }
   const mealLog = await MealLog.findById(mealLogId)
-    .populate("mealId")
+    .populate("meal")
     .populate("extras.etxrasId");
   if (!mealLog) {
     throw new ApiError("Meal log not found", 404);
@@ -160,7 +160,7 @@ async function getAllMealLogs(
     if (!isValidObjectId(query?.userId)) {
       throw new ApiError("Invalid userId", 400);
     }
-    match.userId = new mongoose.Types.ObjectId(query.userId);
+    match.user = new mongoose.Types.ObjectId(query.userId);
   }
   if (query?.start || query?.end) {
     if (query.start && !query.end) {
@@ -183,7 +183,7 @@ async function getAllMealLogs(
       {
         $lookup: {
           from: "users",
-          localField: "userId",
+          localField: "user",
           foreignField: "_id",
           as: "user",
           pipeline: [
@@ -265,7 +265,7 @@ async function getAllMealLogs(
         },
       },
       {
-        $unset: ["userId", "mealId", "populatedExtras"],
+        $unset: ["user", "mealId", "populatedExtras"],
       },
       {
         $addFields: {
