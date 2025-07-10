@@ -89,7 +89,7 @@ function LoginForm() {
               type="button"
               onClick={toggleShowPassword}
             >
-              {showPassword ? <LucideEye /> : <EyeClosed />}
+              {showPassword ? <EyeClosed /> :<LucideEye />}
             </Button>
           </div>
           {errorResponse && (
