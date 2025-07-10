@@ -4,14 +4,14 @@ import Meal from "./meal.model";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface IMealExtras {
-  extrasId: mongoose.Types.ObjectId;
+  extras: mongoose.Types.ObjectId;
   quantity: number;
 }
 
 interface IMealLog {
   _id?: mongoose.Types.ObjectId;
   date: Date;
-  mealId: mongoose.Types.ObjectId;
+  meal: mongoose.Types.ObjectId;
   mealFor: DailyMealFor;
   userId: mongoose.Types.ObjectId;
   totalAmount: number;
@@ -27,7 +27,7 @@ interface MealLogModel extends AggregatePaginateModel<IMealLog> {
   _sample?:string
 }
 const MealExtrasSchema = new Schema<IMealExtras>({
-  extrasId: { type: Schema.Types.ObjectId, ref: "Meal", required: true },
+  extras: { type: Schema.Types.ObjectId, ref: "Meal", required: true },
   quantity: { type: Number, required: true, min: 1 },
 });
 
@@ -39,7 +39,7 @@ const mealLogSchema = new Schema<IMealLog>(
       required: true,
     },
     date: { type: Date, required: true },
-    mealId: {
+    meal: {
       type: Schema.Types.ObjectId,
       ref: "Meal",
       required: true,
@@ -69,11 +69,11 @@ const mealLogSchema = new Schema<IMealLog>(
 
 // mealLogSchema
 //   .virtual("priceBreakdown")
-//   .get(function (this: IMealLog & { mealId?: IMeal }) {
+//   .get(function (this: IMealLog & { meal?: IMeal }) {
 //     console.log("Calculating price breakdown for meal log");
-//     const basePrice = this.mealId?.price || 0;
+//     const basePrice = this.meal?.price || 0;
 //     const extrasTotal = (this.extras || []).reduce((sum, extra) => {
-//       const itemPrice = extra.extrasId?.price || 0;
+//       const itemPrice = extra.extras?.price || 0;
 //       return sum + itemPrice * extra.quantity;
 //     }, 0);
 //     return {
@@ -85,19 +85,19 @@ const mealLogSchema = new Schema<IMealLog>(
 
 mealLogSchema.pre("save", async function (next) {
   console.log("MealLogSchema pre save hook triggered");
-  if (this.isModified("extras") || this.isModified("mealId") || this.isNew) {
+  if (this.isModified("extras") || this.isModified("meal") || this.isNew) {
     console.log("Calculating total amount for meal log");
-    const meal = await Meal.findById(this.mealId);
+    const meal = await Meal.findById(this.meal);
     const basePrice = meal?.price ?? 0;
     let extrasTotal = 0;
     let extraMealItems = null;
     if (this.extras && this.extras.length > 0) {
       extraMealItems = await Meal.find({
-        _id: { $in: this.extras.map((e) => e.extrasId) },
+        _id: { $in: this.extras.map((e) => e.extras) },
       });
     }
     this.extras?.forEach((extra) => {
-      const item = extraMealItems?.find((m) => m._id.equals(extra.extrasId));
+      const item = extraMealItems?.find((m) => m._id.equals(extra.extras));
       if (item) {
         extrasTotal += item.price * extra.quantity;
       }

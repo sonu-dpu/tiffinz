@@ -6,10 +6,10 @@ import mongoose, { Schema, model, models } from "mongoose";
 
 interface IDailyMeal {
   _id?: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   date: Date;
   status: MealStatus;
-  mealLogId: mongoose.Types.ObjectId;
+  mealLog: mongoose.Types.ObjectId;
   description?: string;
   updatedBy?: string;
   createdAt?: Date;
@@ -17,7 +17,7 @@ interface IDailyMeal {
 
 const dailyMealSchema = new Schema<IDailyMeal>(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -31,7 +31,7 @@ const dailyMealSchema = new Schema<IDailyMeal>(
       enum: Object.values(MealStatus),
       required: true,
     },
-    mealLogId: {
+    mealLog: {
       type: Schema.Types.ObjectId,
       ref: "MealLog",
       required: true,

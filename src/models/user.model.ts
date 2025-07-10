@@ -51,7 +51,7 @@ const userSchema = new Schema<IUser>(
     },
     avatar: {
       type: String,
-      required: true,
+      required: false,
     },
     isVerified: {
       type: Boolean,

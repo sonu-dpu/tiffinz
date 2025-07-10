@@ -2,7 +2,7 @@ import mongoose, { model, models, Schema } from "mongoose";
 
 interface ISession {
   _id?: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   refreshToken: string;
   verifyEmailToken?: string;
   verifyEmailTokenExpiry?: Date;
@@ -14,7 +14,7 @@ interface ISession {
 
 const sessionScehma = new Schema<ISession>(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

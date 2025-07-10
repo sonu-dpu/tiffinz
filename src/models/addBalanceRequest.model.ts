@@ -3,7 +3,7 @@ import mongoose, { model, models, Schema } from "mongoose";
 
 export interface IAddBalanceRequest {
   _id?: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   amountAdded: number;
   paymentMode: PaymentMode;
   paymentScreenshot?: string;
@@ -15,7 +15,7 @@ export interface IAddBalanceRequest {
 
 const addBalanceRequestSchema = new Schema<IAddBalanceRequest>(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

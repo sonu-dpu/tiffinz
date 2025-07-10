@@ -6,9 +6,9 @@ interface ITransaction {
   amount: number;
   type: TransactionType;
   isMeal: boolean;
-  mealLogId?: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
-  accountId: mongoose.Types.ObjectId;
+  mealLog?: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  account: mongoose.Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,16 +28,16 @@ const transactionSchema = new Schema<ITransaction>(
       type: Boolean,
       default: true,
     },
-    mealLogId: {
+    mealLog: {
       type: Schema.Types.ObjectId,
       ref: "MealLogs",
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    accountId: {
+    account: {
       type: Schema.Types.ObjectId,
       ref: "Account",
       required: true,
