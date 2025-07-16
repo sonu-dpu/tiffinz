@@ -6,7 +6,7 @@ import { withAuth } from "@/utils/withAuth";
 export const GET = withAuth(
   async (req) => {
     const { searchParams } = req.nextUrl;
-    const userId = searchParams.get("userId") || "";
+    const userId = searchParams.get("user") || "";
     const username = searchParams.get("username") || "";
     const start = searchParams.get("start") || "";
     const end = searchParams.get("end") || "";
