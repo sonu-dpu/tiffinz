@@ -114,7 +114,7 @@ async function getMealLogById(mealLogId: string) {
   }
   const mealLog = await MealLog.findById(mealLogId)
     .populate("meal")
-    .populate("extras.etxrasId");
+    .populate("extras.etxras");
   if (!mealLog) {
     throw new ApiError("Meal log not found", 404);
   }
@@ -143,7 +143,7 @@ export interface ISearchQuery {
   end?: string;
   sortType?: "asc" | "desc";
 }
-async function getAllMealLogs(
+async function getAllMealLogsAggregate(
   query: ISearchQuery = {
     start: "",
     end: "",
@@ -285,6 +285,48 @@ async function getAllMealLogs(
 
   return meals;
 }
+
+async function getAllMealLogs(
+  query: ISearchQuery = {
+    start: "",
+    end: "",
+    userId: "",
+    username: "",
+    sortType: "desc",
+  },
+  options: paginationParams = { page: 1, limit: 10 }
+) {
+  const match = {} as Record<string, any>;
+
+  if (query.userId) {
+    if (!isValidObjectId(query?.userId)) {
+      throw new ApiError("Invalid userId", 400);
+    }
+    match.user = new mongoose.Types.ObjectId(query.userId);
+  }
+  if (query?.start || query?.end) {
+    if (query.start && !query.end) {
+      match.createdAt = { $gte: new Date(query.start) };
+    } else if (!query.start && query.end) {
+      match.createdAt = { $lte: new Date(query.end) };
+    } else {
+      match.createdAt = {
+        $gte: new Date(String(query?.start)),
+        $lte: new Date(String(query?.end)),
+      };
+    }
+  }
+  await connectDB();
+  const mealLogs = await MealLog.find(match)
+    .populate("user")
+    .populate("extras.extras");
+
+  if (mealLogs.length === 0) {
+    throw new ApiError("No meal logs found", 400);
+  }
+  const mealLogsWithVirtuals = mealLogs.map(log => log.toObject({ virtuals: true }));
+  return mealLogsWithVirtuals;
+}
 export {
   deleteMealById,
   deleteMealByIds,
@@ -294,4 +336,5 @@ export {
   orderMeal,
   getMealLogById,
   getAllMealLogs,
+  getAllMealLogsAggregate,
 };

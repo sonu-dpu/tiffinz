@@ -1,6 +1,6 @@
 import { DailyMealFor, MealStatus } from "@/constants/enum";
 import mongoose, { AggregatePaginateModel, model, models, Schema } from "mongoose";
-import Meal from "./meal.model";
+import Meal, { IMeal } from "./meal.model";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface IMealExtras {
@@ -8,15 +8,19 @@ interface IMealExtras {
   quantity: number;
 }
 
+interface IMealExtrasWithMeal {
+  extras: IMeal;
+  quantity: number;
+}
 interface IMealLog {
   _id?: mongoose.Types.ObjectId;
   date: Date;
   meal: mongoose.Types.ObjectId;
   mealFor: DailyMealFor;
-  userId: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   totalAmount: number;
   status: MealStatus; // Ordered, cancelled, taken, alll in one
-  extras?: IMealExtras[];
+  extras?: IMealExtrasWithMeal[];
   description?: string;
   updatedBy?: mongoose.Types.ObjectId;
   createdAt?: Date;
@@ -33,7 +37,7 @@ const MealExtrasSchema = new Schema<IMealExtras>({
 
 const mealLogSchema = new Schema<IMealLog>(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -67,21 +71,21 @@ const mealLogSchema = new Schema<IMealLog>(
   { timestamps: true }
 );
 
-// mealLogSchema
-//   .virtual("priceBreakdown")
-//   .get(function (this: IMealLog & { meal?: IMeal }) {
-//     console.log("Calculating price breakdown for meal log");
-//     const basePrice = this.meal?.price || 0;
-//     const extrasTotal = (this.extras || []).reduce((sum, extra) => {
-//       const itemPrice = extra.extras?.price || 0;
-//       return sum + itemPrice * extra.quantity;
-//     }, 0);
-//     return {
-//       basePrice,
-//       extrasTotal,
-//       totalAmount: this.totalAmount,
-//     };
-//   });
+mealLogSchema
+  .virtual("priceBreakdown")
+  .get(function (this: IMealLog & { meal?: IMeal }) {
+    console.log("Calculating price breakdown for meal log");
+    const basePrice = this.meal.price || 0;
+    const extrasTotal = (this.extras || []).reduce((sum, extra) => {
+      const itemPrice = extra.extras.price || 0;
+      return sum + itemPrice * extra.quantity;
+    }, 0);
+    return {
+      basePrice,
+      extrasTotal,
+      totalAmount: this.totalAmount,
+    };
+  });
 
 mealLogSchema.pre("save", async function (next) {
   console.log("MealLogSchema pre save hook triggered");

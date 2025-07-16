@@ -7,7 +7,7 @@ const mealLogSchemaInput = z.object({
   extras: z
     .array(
       z.object({
-        extrasId: z.string(),
+        extras: z.string(),
         quantity: z.number().min(1),
       })
     )
