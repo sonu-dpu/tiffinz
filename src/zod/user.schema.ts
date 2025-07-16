@@ -18,7 +18,7 @@ export const userSchema = z
     role: z.enum(UserRole).optional().default(UserRole.user),
     avatar: z.url("Avatar must be a valid URL").optional(),
     adminSecret: z.string().optional(),
-    confirmPassword: z.string(),
+    confirmPassword: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
