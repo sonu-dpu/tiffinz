@@ -3,7 +3,7 @@
 import { handleError } from "@/lib/handleError";
 import { IUser } from "@/models/user.model";
 import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";
-import { UserInput } from "@/zod/user.schema";
+import { RegisterFormInput } from "@/zod/user.schema";
 import axios from "axios";
 
 interface IAuthUser {
@@ -14,7 +14,7 @@ interface IAuthUser {
   } | null;
 }
 
-async function registerUser(userData: UserInput) {
+async function registerUser(userData: RegisterFormInput) {
   try {
     const response = await fetch("/api/users/register", {
       method: "POST",

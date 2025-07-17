@@ -1,5 +1,5 @@
 "use client";
-import { UserInput, userSchema } from "@/zod/user.schema";
+import { RegisterFormInput, registerUserSchema } from "@/zod/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
+
+
+
 function RegisterForm() {
   const {
     register,
@@ -19,7 +22,7 @@ function RegisterForm() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(registerUserSchema),
   });
   const [errorResponse, setErrorResponse] = useState<string>("");
   const [isLoading, startTransition] = useTransition();
@@ -27,7 +30,7 @@ function RegisterForm() {
   const router = useRouter()
   //console.log("errors", errors);
   const registrationType = searchParams.get("type");
-  const onSubmit = async (data: UserInput) => {
+  const onSubmit = async (data: RegisterFormInput) => {
     if (registrationType === "admin" && !data.adminSecret) {
       setError("adminSecret", {
         message: "Admin secret is required for admin registration",
