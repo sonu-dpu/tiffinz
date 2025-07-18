@@ -1,14 +1,15 @@
 import { TransactionType } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
 
-interface ITransaction {
-  _id?: mongoose.Types.ObjectId;
+interface ITransaction extends mongoose.Document {
+  _id: mongoose.Types.ObjectId;
   amount: number;
   type: TransactionType;
   isMeal: boolean;
   mealLog?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   account: mongoose.Types.ObjectId;
+  description?:string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -42,6 +43,9 @@ const transactionSchema = new Schema<ITransaction>(
       ref: "Account",
       required: true,
     },
+    description:{
+      type:String
+    }
   },
   { timestamps: true }
 );

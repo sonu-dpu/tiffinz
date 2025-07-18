@@ -1,6 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
-interface IAccount{
-    _id?:mongoose.Types.ObjectId;
+interface IAccount extends mongoose.Document{
+    _id:mongoose.Types.ObjectId;
     user:mongoose.Types.ObjectId;
     balance:number;
     createdAt?:Date;

@@ -318,13 +318,15 @@ async function getAllMealLogs(
   }
   await connectDB();
   const mealLogs = await MealLog.find(match)
-    .populate("user")
-    .populate("extras.extras");
-
+    .populate({path:"user", select:"username fullName email"})
+    .populate("meal")
+    .populate("extras.extras")
   if (mealLogs.length === 0) {
     throw new ApiError("No meal logs found", 400);
   }
-  const mealLogsWithVirtuals = mealLogs.map(log => log.toObject({ virtuals: true }));
+  const mealLogsWithVirtuals = mealLogs.map((log) =>
+    log.toObject({ virtuals: true })
+  );
   return mealLogsWithVirtuals;
 }
 export {
