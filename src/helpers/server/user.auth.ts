@@ -6,7 +6,6 @@ import { ApiError } from "@/utils/apiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 import connectDB from "@/utils/dbConnect";
 import generateRefreshAndAccessToken from "@/utils/generateTokens";
-import { handleError } from "@/utils/handleError";
 
 import {
   ILoginCredentials,
@@ -14,6 +13,7 @@ import {
   loginWithPhoneSchema,
   loginWithUsernameSchema,
 } from "@/zod/user.login.schema";
+import { NextRequest } from "next/server";
 
 export async function registerUser(userData: IUser) {
   // Check if user exists
@@ -21,14 +21,17 @@ export async function registerUser(userData: IUser) {
     { phone: userData.phone },
     { username: userData.username },
   ];
-  console.log('userData.email', userData.email)
+  console.log("userData.email", userData.email);
   if (userData.email) {
     orConditions.push({ email: userData.email });
   }
   await connectDB();
   const existingUser = await User.findOne({ $or: orConditions });
   if (existingUser) {
-    const credential = existingUser?.email &&  existingUser.email === userData.email ? "Email" : "Phone/Username";
+    const credential =
+      existingUser?.email && existingUser.email === userData.email
+        ? "Email"
+        : "Phone/Username";
     throw new ApiError(`User with ${credential} already registered`, 409);
   }
 
@@ -84,7 +87,7 @@ async function loginUser(
   await connectDB();
   const user = await User.findOne(query);
   if (!user) {
-    console.log('query', query)
+    console.log("query", query);
     throw new ApiError(`User with ${key} not found`, 404);
   }
 
@@ -113,7 +116,7 @@ async function createUserSession(userId: string) {
   }
 
   const userSession = await Session.findOneAndUpdate(
-    { user:userId },
+    { user: userId },
     { refreshToken },
     { upsert: true, new: true }
   );
@@ -133,15 +136,25 @@ async function createUserSession(userId: string) {
   return response;
 }
 
-async function logoutUser() {
-  try {
-    const res = ApiResponse.success("User logged out");
-    res.cookies.delete("accessToken");
-    res.cookies.delete("refreshToken");
-    return res;
-  } catch (error) {
-    throw handleError(error);
+async function logoutUser(req: NextRequest) {
+  const refreshToken = req.cookies.get("refreshToken")?.value;
+  if (!refreshToken) {
+    console.log("refreshToken not found in cookies");
+    return ApiResponse.success("User already logged out");
   }
+
+  await connectDB();
+  const deletedSession = await Session.findOneAndDelete({ refreshToken });
+
+  if (!deletedSession) {
+    console.log("Session not found — probably already logged out");
+    // Proceed anyway
+  }
+
+  const res = ApiResponse.success("User logged out");
+  res.cookies.delete("accessToken");
+  res.cookies.delete("refreshToken");
+  return res;
 }
 
 export { logoutUser, createUserSession, loginOptions, loginUser };
