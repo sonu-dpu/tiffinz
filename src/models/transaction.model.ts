@@ -1,8 +1,8 @@
 import { TransactionType } from "@/constants/enum";
 import mongoose, { model, models, Schema } from "mongoose";
 
-interface ITransaction extends mongoose.Document {
-  _id: mongoose.Types.ObjectId;
+interface ITransaction  {
+  _id?: mongoose.Types.ObjectId;
   amount: number;
   type: TransactionType;
   isMeal: boolean;
