@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { use, useEffect, useState, useTransition } from "react";
 import LoaderButton from "../ui/loader-button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -10,13 +10,17 @@ import {
   UserLoginWithPhoneInput,
 } from "@/zod/user.login.schema";
 import { Button } from "../ui/button";
-import { loginUserWithPhone } from "@/helpers/client/user.auth";
+import { getCurrentUser, IAuthUser, loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useSessionExists } from "@/hooks/useSessionExists";
 import { toast } from "sonner";
+import consumablePromise from "@/lib/consumablePromise";
+
+
+
+const cachedGetUserPromise = consumablePromise<IAuthUser>(getCurrentUser)
 
 function LoginForm() {
   const {
@@ -27,17 +31,29 @@ function LoginForm() {
   const [isLoggingIn, startLoggingIn] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [errorResponse, setErrorResponse] = useState("");
-  const { user, isLoggedIn } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const isSessionExists = useSessionExists();
-  useEffect(() => {
-    console.log("user", user);
-    if (isLoggedIn && user) {
-      toast.success("User logged in successfully");
-      router.push("/dashboard");
+  if(!user){
+    const {user:currentUser} = use(cachedGetUserPromise)
+    if(currentUser){
+      dispatch(login(currentUser));
     }
-  }, [user, isLoggedIn, router, isSessionExists]);
+    console.log('currentUser', currentUser);
+  }
+  useEffect(()=>{
+    if(user){
+      router.push("/dashboard")
+    }
+  },[user, router])
+  // const isSessionExists = useSessionExists();
+  // useEffect(() => {
+  //   console.log("user", user);
+  //   if (isLoggedIn && user) {
+  //     toast.success("User logged in successfully");
+  //     router.push("/dashboard");
+  //   }
+  // }, [user, isLoggedIn, router, isSessionExists]);
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -57,6 +73,7 @@ function LoginForm() {
         toast.error("Login failed: " + error.message);
         return;
       }
+      toast.success("Login Success")
       console.log("Login successful:", user);
       dispatch(login(user));
     });
