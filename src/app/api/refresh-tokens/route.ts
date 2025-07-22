@@ -22,5 +22,5 @@ export const GET = asyncHandler(async (req) => {
     response.cookies.delete("accessToken").delete("refreshToken");
     return response;
   }
-  return await createUserSession(userExists.id);
+  return await createUserSession(userExists._id);
 });

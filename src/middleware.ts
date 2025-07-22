@@ -7,10 +7,10 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-  if (pathname.startsWith("/api/users/register")) {
+  if (pathname.startsWith("/api/users/register") || pathname.startsWith("/api/user/logout")) {
     return response;
   }
-  if (pathname.startsWith("/api/users/login") && !token) {
+  if (pathname.startsWith("/api/users/login")) {
     return response;
   }
   if (pathname.startsWith("/api")) {
