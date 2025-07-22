@@ -1,6 +1,6 @@
 import { logoutUser } from "@/helpers/server/user.auth";
-import { withAuth } from "@/utils/withAuth";
+import { asyncHandler } from "@/utils/asyncHandler";
 
-export const GET = withAuth(async(req)=>{
+export const GET = asyncHandler(async(req)=>{
   return await logoutUser(req);
 })
