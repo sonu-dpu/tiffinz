@@ -296,8 +296,8 @@ async function getAllMealLogs(
   },
   options: paginationParams = { page: 1, limit: 10 }
 ) {
-  const match = {} as Record<string, any>;
-
+  const match = {} as Record<string, unknown>;
+  const {page=1, limit=10} = options
   if (query.userId) {
     if (!isValidObjectId(query?.userId)) {
       throw new ApiError("Invalid userId", 400);
@@ -321,6 +321,8 @@ async function getAllMealLogs(
     .populate({path:"user", select:"username fullName email"})
     .populate("meal")
     .populate("extras.extras")
+    .skip( (page-1) * limit)
+    .limit(limit)
   if (mealLogs.length === 0) {
     throw new ApiError("No meal logs found", 400);
   }
