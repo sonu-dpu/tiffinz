@@ -1,12 +1,10 @@
-
-
 import { handleError } from "@/lib/handleError";
 import { IUser } from "@/models/user.model";
 import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";
 import { RegisterFormInput } from "@/zod/user.schema";
 import axios from "axios";
 
-interface IAuthUser {
+export interface IAuthUser {
   user: IUser | null;
   error: {
     type: string;
@@ -59,12 +57,12 @@ async function getCurrentUser(): Promise<IAuthUser> {
   try {
     const response = await axios.get("/api/users");
     const user = response.data?.data?.user;
-    if(!user){
-      throw new Error("Failed to fetch user")
+    if (!user) {
+      throw new Error("Failed to fetch user");
     }
     return { user, error: null };
   } catch (error) {
-    console.log('error in catch', error)
+    console.log("error in catch", error);
     return { user: null, error: handleError(error, "getUser") };
   }
 }
@@ -81,5 +79,26 @@ async function logoutUser(): Promise<boolean> {
     console.error("Logout error:", error);
     return false;
   }
-} 
-export { registerUser, loginUserWithPhone, getCurrentUser, logoutUser };
+}
+
+async function refreshUserSession(): Promise<IAuthUser> {
+  try {
+    const resp = await axios.get("/api/refresh-tokens");
+    console.log("resp", resp);
+    const user: IUser = resp.data.data.user;
+    if (!user) {
+      return { error: resp.data.message, user: null };
+    }
+    return { user, error: null };
+  } catch (error) {
+    console.log("error while refreshing token", error);
+    return { error: handleError(error, "Session expired"), user: null };
+  }
+}
+export {
+  registerUser,
+  loginUserWithPhone,
+  getCurrentUser,
+  logoutUser,
+  refreshUserSession,
+};
