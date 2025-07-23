@@ -1,4 +1,5 @@
 "use client";
+import BottomNav from "@/components/navbar/BottomNav";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getCurrentUser, IAuthUser } from "@/helpers/client/user.auth";
@@ -45,6 +46,7 @@ function DashboardLayout({
         <SidebarTrigger />
         <div className="container mx-auto">{children}</div>
       </main>
+      {currentUser && <BottomNav role={currentUser?.role} /> }
     </>
   );
 }
