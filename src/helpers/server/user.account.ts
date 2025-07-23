@@ -12,7 +12,7 @@ async function doesUserAccountExist(
 ): Promise<boolean | IAccount> {
   try {
     await connectDB();
-    const existingAccount = await Account.findOne({ user:userId });
+    const existingAccount = await Account.findOne({ user: userId });
     return !!existingAccount;
   } catch (error) {
     throw handleError(error);
@@ -28,11 +28,27 @@ async function createAccount(userId: string) {
   if (existingAccount) {
     throw new ApiError("Account already exists", 400);
   }
-  const newAccount: IAccount = await Account.create({ user:userId, balace: 0 });
+  const newAccount: IAccount = await Account.create({
+    user: userId,
+    balace: 0,
+  });
   if (!newAccount) {
     throw new ApiError("Failed to create new user account", 500);
   }
   return newAccount;
+}
+
+async function getUserAccount(userId: string) {
+  if (!isValidObjectId(userId)) {
+    throw new ApiError("Invalid user id", 400);
+  }
+  await connectDB();
+  const userAccount = await Account.findOne({ user: userId })
+    .populate({ path: "user", select: "-password" });
+  if (!userAccount) {
+    throw new ApiError("User account not found", 404);
+  }
+  return userAccount;
 }
 
 async function addBalanceRequest(requestData: AddBalanceRequestInput) {
@@ -51,4 +67,9 @@ async function addBalanceRequest(requestData: AddBalanceRequestInput) {
   }
   return balanceReqDoc;
 }
-export { createAccount, doesUserAccountExist, addBalanceRequest };
+export {
+  createAccount,
+  doesUserAccountExist,
+  addBalanceRequest,
+  getUserAccount,
+};
