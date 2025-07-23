@@ -11,7 +11,7 @@ export const GET = withAuth(
     // if(status){
     //     match.status = status;
     // }
-    const requests = await AddBalanceRequest.find().populate("user");
+    const requests = await AddBalanceRequest.find().populate({path:"user", select:"-password"});
     if (!requests) {
       return ApiResponse.error("no requests found", 404);
     }
