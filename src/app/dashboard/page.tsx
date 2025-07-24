@@ -1,10 +1,11 @@
 "use client";
 
+import { OrderMeal } from "@/components/dashboard";
+
 function DashboardPage() {
   return (
     <div>
-      <div className="container grid grid-cols-1 md:grid-cols-2 items-center gap-2">
-      </div>
+      <OrderMeal/>
     </div>
   );
 }

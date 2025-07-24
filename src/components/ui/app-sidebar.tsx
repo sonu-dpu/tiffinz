@@ -21,7 +21,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import Link from "next/link";
 import { UserRole } from "@/constants/enum";
 import LogoutButton from "../auth/Logout";
@@ -76,10 +75,10 @@ const sidebarItems: ISidebarItem[] = [
   },
 ];
 
-export function AppSidebar() {
-  const currentUser = useAppSelector((state) => state.auth.user);
+export function AppSidebar({currentUserRole}:{currentUserRole:UserRole|undefined
+}) {
   const pathname = usePathname();
-  const currentUserRole = currentUser?.role || UserRole.user; // Default to user role if not defined
+
   // console.log('currentUser', currentUser);
 
   if (pathname === "/login" || pathname === "/register") {
