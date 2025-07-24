@@ -1,6 +1,7 @@
 import axios from "axios";
 import { IUser } from "@/models/user.model";
 import { handleError } from "@/lib/handleError";
+import { helperResponse } from "./client.types";
 interface IUsersResponse<T> {
   data: T | null;
   error: {
@@ -21,10 +22,20 @@ async function getUsers(): Promise<IUsersResponse<IUser[]>> {
     console.log("data", data);
     return { data: data, error: null };
   } catch (error) {
-    handleError(error, "users");
+    // handleError(error, "users");
     return { data: null, error: handleError(error, "users") };
   }
 }
 
-export { getUsers };
-export type { IUsersResponse };
+async function verifyUser(userId: string):Promise<helperResponse> {
+  try {
+    const resp = await axios.patch(`/api/admin/users/${userId}/verify`);
+    const {user} = resp.data.data;
+    return {data: user, error: null}
+  } catch (error) {
+    return { data: null, error: handleError(error, "verify user") };
+  }
+}
+
+export { getUsers,verifyUser };
+export type { IUsersResponse,  };
