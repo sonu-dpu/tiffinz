@@ -49,7 +49,7 @@ export default function BottomNav({ role }: BottomNavProps) {
               onClick={() => router.push(item.path)}
               className={cn(
                 "flex flex-col items-center text-xs text-gray-500 cursor-pointer transition-all",
-                isActive && "text-blue-600 font-medium"
+                isActive && "text-primary font-medium"
               )}
             >
               {item.icon}

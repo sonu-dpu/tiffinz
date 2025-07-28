@@ -155,7 +155,7 @@ const UploadFile = ({
   return (
     <>
       {/* File input element using React ref */}
-      <label className="block mb-2 text-sm font-medium text-gray-700">
+      <label className="block mb-2 text-sm font-medium text-gray-700 text-left">
         Upload File
         <span className="text-xs text-gray-500">(Max size: 5MB)</span>
         <Input

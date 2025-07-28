@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import LoaderButton from "@/components/ui/loader-button";
 import { ImageKitFolder, PaymentMode } from "@/constants/enum";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addBalanceRequest } from "@/helpers/client/add-balance";
 import { toast } from "sonner";
 import { z } from "zod/v4";
+import { cn } from "@/lib/utils";
 
 const addBalanceRequestSchemaClient = addBalanceRequestSchema.extend({
   amountAdded: z
@@ -30,24 +31,29 @@ const addBalanceRequestSchemaClient = addBalanceRequestSchema.extend({
     .refine((val) => val <= 5000, "Amount must be less than 5,000"),
   paymentScreenshot: z.string().optional(),
 });
-function AddBalanceForm() {
+function AddBalanceForm({ className = "" }: { className?: string }) {
   const [paymentMode, setPaymentMode] = useState<PaymentMode | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [isSubmiting, startSubmiting] = useTransition()
   const {
     handleSubmit,
     register,
     setValue,
     setError,
-    formState: { errors, isLoading },
+    reset,
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(addBalanceRequestSchemaClient),
   });
 
   useEffect(() => {
-    if(paymentMode) {
+    if (paymentMode) {
       setValue("paymentMode", paymentMode);
     }
-    setValue("paymentScreenshot", paymentMode === PaymentMode.online ? fileUrl || "" : "");
+    setValue(
+      "paymentScreenshot",
+      paymentMode === PaymentMode.online ? fileUrl || "" : ""
+    );
   }, [paymentMode, fileUrl, setValue]);
 
   const handleSelect = (value: string) => {
@@ -55,25 +61,33 @@ function AddBalanceForm() {
     console.log("selected payment mode:", value, fileUrl);
     setPaymentMode(value as PaymentMode);
   };
-  console.log("errors", errors, isLoading);
+  console.log("errors", errors);
   const onSubmit = async (formData: AddBalanceRequestInput) => {
-    console.log("Form data submiting:", formData);
+    // console.log("Form data submiting:", formData);
 
     // Validate payment screenshot for online payments
     if (paymentMode === PaymentMode.online && !fileUrl) {
       setError("paymentScreenshot", {
-      type: "manual",
-      message: "Payment screenshot is required for online payments.",
+        type: "manual",
+        message: "Payment screenshot is required for online payments.",
       });
       console.error("Payment screenshot is required for online payments.");
       return;
     }
 
     // Remove empty paymentScreenshot for cash payments
-    if (paymentMode === PaymentMode.cash && !formData.paymentScreenshot?.trim()) {
+    if (
+      paymentMode === PaymentMode.cash &&
+      !formData.paymentScreenshot?.trim()
+    ) {
       delete formData.paymentScreenshot;
     }
-    const { data, error } = await addBalanceRequest(formData);
+    startSubmiting(async()=>makeAddBalanceRequest(formData))
+  };
+
+
+  async function makeAddBalanceRequest(formData:AddBalanceRequestInput) {
+        const { data, error } = await addBalanceRequest(formData);
     if (error) {
       toast.error(error.message || "Failed to add balance request");
       setError("root", {
@@ -83,12 +97,13 @@ function AddBalanceForm() {
       console.error("Error adding balance request:", error);
       return;
     }
+    reset();
     toast.success("Balance request added successfully!");
     console.log("Balance request added successfully:", data);
-  };
+  }
   // console.log("fileUrl", fileUrl);
   return (
-    <Card className="w-full">
+    <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle>Add Balance</CardTitle>
       </CardHeader>
@@ -101,48 +116,47 @@ function AddBalanceForm() {
               placeholder="Enter amount to add"
               type="number"
               errorMessage={errors.amountAdded?.message}
-              className="w-full max-w-[300px]"
+              className="w-full"
             />
-            <div className="grid grid-cols-1 gap-2 md:grid-cols-2 justify-items-start lg:w-[50%]">
-              <div className="w-full">
-                <label id="paymentMode" className="font-medium text-sm">
-                  Select Payment Mode
-                  <Select onValueChange={handleSelect}>
-                    <SelectTrigger className="max-w-[300px] w-full">
-                      <SelectValue placeholder="Payment Mode" />
-                    </SelectTrigger>
-                    <SelectContent {...register("paymentMode")}>
-                      {Object.values(PaymentMode).map((mode) => (
-                        <SelectItem key={mode} value={mode}>
-                          {mode}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </label>
-                {errors.paymentMode && (
-                  <span className="text-red-600 text-sm">
-                    {errors.paymentMode.message}
-                  </span>
-                )}
-              </div>
-              {paymentMode === PaymentMode.online && (
-                <UploadFile
-                  folder={ImageKitFolder.payments}
-                  setFileUrl={setFileUrl}
-                  errorMessage={errors.paymentScreenshot?.message}
-                  // {...register("paymentScreenshot", {required:false})} // Register the file input with react-hook-form
-                />
-              )}
-            </div>
-            <LoaderButton
-              fallbackText=""
-              isLoading={isLoading}
-              className="min-w-[150px]"
-            >
-              Add Balance{" "}
-            </LoaderButton>
+
+            <label className="block mb-2 text-sm font-medium text-gray-700 text-left">
+              Select Payment Mode
+              <Select onValueChange={handleSelect}>
+                <SelectTrigger className=" w-full">
+                  <SelectValue placeholder="Payment Mode" />
+                </SelectTrigger>
+                <SelectContent {...register("paymentMode")}>
+                  {Object.values(PaymentMode).map((mode) => (
+                    <SelectItem key={mode} value={mode}>
+                      {mode}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
+
+            {errors.paymentMode && (
+              <span className="text-red-600 text-sm">
+                {errors.paymentMode.message}
+              </span>
+            )}
           </div>
+          {paymentMode === PaymentMode.online && (
+            <UploadFile
+              folder={ImageKitFolder.payments}
+              setFileUrl={setFileUrl}
+              errorMessage={errors.paymentScreenshot?.message}
+              // {...register("paymentScreenshot", {required:false})} // Register the file input with react-hook-form
+            />
+          )}
+
+          <LoaderButton
+            fallbackText="Adding..."
+            isLoading={isSubmiting}
+            className="min-w-[150px]"
+          >
+            Add Balance{" "}
+          </LoaderButton>
         </form>
         {errors.root && (
           <div className="mt-4 text-red-600 text-sm">

@@ -1,3 +1,5 @@
+"use client"
+
 import { handleError } from "@/lib/handleError";
 import { IUser } from "@/models/user.model";
 import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";

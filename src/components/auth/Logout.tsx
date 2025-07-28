@@ -1,6 +1,5 @@
-"use client";   
+"use client";
 import React from "react";
-import { Button } from "../ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -19,14 +18,13 @@ import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function LogoutButton() {
-  // const { user, error } = useAppSelector((state) => state.user);
-  const router = useRouter();
   const dispatch = useAppDispatch();
-  const handleLogout = async() => {
+  const router = useRouter();
+  const handleLogout = async () => {
     toast.loading("Logging out...");
     const resp = await logoutUser();
-    if(!resp){
-    toast.dismiss();
+    if (!resp) {
+      toast.dismiss();
       console.error("Logout failed");
       toast.error("Logout failed");
       return;
@@ -34,23 +32,24 @@ function LogoutButton() {
     toast.dismiss();
     toast.success("Logged out successfully");
     dispatch(logout());
-    router.push("/login");
+    router.push("/login")
+    
   };
+
   return (
     <Drawer>
-      <DrawerTrigger className="flex justify-center gap-2 border p-2"><LogOutIcon/>Logout </DrawerTrigger>
+      <DrawerTrigger className="flex justify-center gap-2 border p-2">
+        <LogOutIcon />
+        Logout{" "}
+      </DrawerTrigger>
       <DrawerContent aria-describedby="logout-drawer">
         <DrawerHeader>
           <DrawerTitle>Are you absolutely sure to logout?</DrawerTitle>
           {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
         </DrawerHeader>
         <DrawerFooter>
-          <DrawerClose asChild>
-            <Button onClick={handleLogout}>Logout</Button>
-          </DrawerClose>
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
+          <DrawerClose onClick={handleLogout}>Logout</DrawerClose>
+          <DrawerClose variant={"outline"}>Cancel</DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

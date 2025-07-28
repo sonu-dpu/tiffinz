@@ -57,7 +57,7 @@ function Input({
     <div className="space-y-1 w-full">
       <label
         htmlFor={id}
-        className={cn("block text-sm font-medium", errorMessage && "text-red-600")}
+        className={cn("block text-sm font-medium text-left", errorMessage && "text-red-600")}
       >
         {label}
       </label>

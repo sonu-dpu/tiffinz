@@ -2,17 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IUser } from "@/models/user.model";
 import Image from "next/image";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState} from "react";
 
 interface UserTableProps {
   users: IUser[];
-  onVerify?: (user: IUser) => void;
+  onVerify?: (user: IUser) => Promise<void>;
   onDelete?: (user: IUser) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete }) => {
   const [search, setSearch] = useState("");
-
   const filteredUsers = useMemo(() => {
     const s = search.trim().toLowerCase();
     if (!s) return users;
@@ -79,7 +78,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete 
               <td className="px-4 py-2 border-b space-x-2">
                 {onVerify && !user.isVerified && (
                   <Button
-                    onClick={() => onVerify(user)}
+                    onClick={()=>onVerify(user)}
                   >
                     Verify
                   </Button>

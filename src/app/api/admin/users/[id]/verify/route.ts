@@ -6,9 +6,9 @@ import { withAuth } from "@/utils/withAuth";
 // export const PATCH = withAuth(async()=>{}, {requiredRole:UserRole.admin})
 type UserIdParams = {id:string}
 export const PATCH = withAuth<UserIdParams>(async(req, context)=>{
-  const body = await req.json();
-  const userIds = body?.userIds;
   const {id:userId} = await context.params ;
+  const body = !userId ? await req.json() : null;
+  const userIds = body?.userIds;
   if(!userIds && !userId){
     return ApiResponse.error("User id not provided", 400);
   }

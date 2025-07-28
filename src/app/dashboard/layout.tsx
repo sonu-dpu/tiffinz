@@ -17,11 +17,12 @@ function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = useAppSelector((state) => state.auth.user);
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   // Declare variables that might be assigned conditionally
-  let user=null, error=null;
+  let user = null,
+    error = null;
 
   // Conditionally fetch user and assign to the outer-scoped variables
   if (!currentUser) {
@@ -31,8 +32,8 @@ function DashboardLayout({
   }
 
   useEffect(() => {
-    if(user){
-      dispatch(login(user))
+    if (user) {
+      dispatch(login(user));
     }
     if (error) {
       toast.message("Session expired", { description: "Refreshing session" });
@@ -41,12 +42,12 @@ function DashboardLayout({
   }, [error, router, user, dispatch]);
   return (
     <>
-      <AppSidebar />
+      <AppSidebar currentUserRole={currentUser?.role} />
       <main className="max-w-full w-full p-2 mx-auto">
         <SidebarTrigger />
         <div className="container mx-auto">{children}</div>
       </main>
-      {currentUser && <BottomNav role={currentUser?.role} /> }
+      {currentUser && <BottomNav role={currentUser?.role} />}
     </>
   );
 }
