@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useSessionExists } from "@/hooks/useSessionExists";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { setUsers, updateUser } from "@/store/usersSlice";
+import { setUsers,  } from "@/store/usersSlice";
 import { UserTable } from "@/components/dashboard/admin/users/UserTable";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
@@ -22,10 +22,7 @@ export default function UsersPage() {
       console.log("error", error);
       toast.error("Failed to verify user");
     }
-    if (data?.isVerified) {
-      toast.success("Verified success fully")
-      dispatch(updateUser(data?._id))
-    }
+    console.log('data', data)
   }
   useEffect(() => {
     const fetchUsers = async () => {
