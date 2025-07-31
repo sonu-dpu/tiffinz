@@ -1,4 +1,5 @@
 import mongoose, { model, models, Schema } from "mongoose";
+import { IUser } from "./user.model";
 interface IAccount extends mongoose.Document{
     _id:mongoose.Types.ObjectId;
     user:mongoose.Types.ObjectId;
@@ -23,6 +24,8 @@ const accountSchema = new Schema<IAccount>({
 
 
 const Account= models?.Account || model<IAccount>("Account", accountSchema);
-
-export type { IAccount };
+type IAccountWithUser = Omit<IAccount, "user"> & {
+  user: IUser
+}
+export type { IAccount, IAccountWithUser };
 export default Account;

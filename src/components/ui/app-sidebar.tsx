@@ -63,10 +63,10 @@ const sidebarItems: ISidebarItem[] = [
     onlyForUser: true, // Only for regular users
   },
   {
-    title:"Add Balance Request",
-    url:"/dashboard/requests",
+    title: "Add Balance Request",
+    url: "/dashboard/requests",
     icon: PlusCircleIcon,
-    onlyForAdmin:true
+    onlyForAdmin: true,
   },
   {
     title: "Settings",
@@ -75,7 +75,10 @@ const sidebarItems: ISidebarItem[] = [
   },
 ];
 
-export function AppSidebar({currentUserRole}:{currentUserRole:UserRole|undefined
+export function AppSidebar({
+  currentUserRole,
+}: {
+  currentUserRole: UserRole | undefined;
 }) {
   const pathname = usePathname();
 
