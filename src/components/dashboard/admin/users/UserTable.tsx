@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IUser } from "@/models/user.model";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useMemo, useState} from "react";
 
 interface UserTableProps {
@@ -60,7 +61,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete 
                   className="w-8 h-8 rounded-full mx-auto"
                 />
               </td>
-              <td className="px-4 py-2 border-b">{user.username}</td>
+              <td className="px-4 py-2 border-b"><Link href={"/dashboard/users/"+user._id}> {user.username}</Link></td>
               <td className="px-4 py-2 border-b">{user.fullName}</td>
               <td className="px-4 py-2 border-b">{user.email || "-"}</td>
               <td className="px-4 py-2 border-b">{user.phone}</td>

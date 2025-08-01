@@ -2,7 +2,7 @@ import { UserRole } from "@/constants/enum";
 import User, { IUser } from "@/models/user.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
-import { isValidObjectId } from "mongoose";
+import mongoose ,{ isValidObjectId} from "mongoose";
 import { createAccount } from "./admin.accounts";
 
 export interface GetUserOptions {
@@ -35,6 +35,47 @@ async function getUserById(userId: string) {
     throw new ApiError("User not found", 404);
   }
   return user;
+}
+
+async function getUserByIdWithAccount(userId:string) {
+  if(!isValidObjectId(userId)){
+    throw new ApiError("Invalid user id", 400);
+  }
+  await connectDB();
+  const userWithAccount = await User.aggregate([
+    {
+      $match:{
+        _id : new mongoose.Types.ObjectId(userId)
+      },
+    },{
+      $lookup:{
+        from:"accounts",
+        localField:"_id",
+        foreignField:"user",
+        as:"account",
+        pipeline:[
+          {
+            $project:{
+              _id:1,
+              balance:1,
+              createdAt:1,
+              updatedAt:1,
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields:{
+        account:{$first:"$account"}
+      }
+    },
+    {
+      $unset:["password"]
+    }
+  ]);
+
+  return {user: userWithAccount[0]}
 }
 
 async function verifyUsers(userIds: string[]) {
@@ -77,4 +118,4 @@ async function verifyUser(userId: string) {
   }
   return {verifiedUser, userAccount}
 }
-export { getUserById, getAllUsers, verifyUsers, verifyUser};
+export { getUserById, getUserByIdWithAccount, getAllUsers, verifyUsers, verifyUser};
