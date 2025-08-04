@@ -55,19 +55,17 @@ async function loginUserWithPhone(
   }
 }
 
-async function getCurrentUser(): Promise<IAuthUser> {
-  try {
-    const response = await axios.get("/api/users");
-    const user = response.data?.data?.user;
-    if (!user) {
-      throw new Error("Failed to fetch user");
-    }
-    return { user, error: null };
-  } catch (error) {
-    console.log("error in catch", error);
-    return { user: null, error: handleError(error, "getUser") };
+async function getCurrentUser(): Promise<unknown> {
+  const response = await axios.get("/api/users");
+  const user = response.data?.data?.user;
+
+  if (!user) {
+    throw new Error("Failed to fetch user");
   }
+
+  return user; // Just return the user object, no error handling here
 }
+
 
 async function logoutUser(): Promise<boolean> {
   try {
@@ -97,6 +95,7 @@ async function refreshUserSession(): Promise<IAuthUser> {
     return { error: handleError(error, "Session expired"), user: null };
   }
 }
+
 export {
   registerUser,
   loginUserWithPhone,

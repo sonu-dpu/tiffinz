@@ -14,22 +14,28 @@ interface IUsersResponse<T> {
 interface IUserWithAccount extends IUser {
   account: IAccount | null;
 }
-async function getUsers(): Promise<IUsersResponse<IUser[]>> {
+async function getUsers(): Promise<IUser[]> {
   try {
     const res = await axios.get("/api/admin/users/", {
       headers: { Accept: "application/json" },
     });
+
     if (res.status !== 200) {
-      throw new Error("Failed to fetch data");
+      throw new Error("Failed to fetch users");
     }
-    const data = res.data.data.users;
-    console.log("data", data);
-    return { data: data, error: null };
+
+    const users = res.data?.data?.users;
+
+    if (!users) {
+      throw new Error("No users found in response");
+    }
+
+    return users;
   } catch (error) {
-    // handleError(error, "users");
-    return { data: null, error: handleError(error, "users") };
+    throw handleError(error, "users"); // Let React Query handle the error
   }
 }
+
 
 async function verifyUser(userId: string): Promise<helperResponse> {
   try {

@@ -2,54 +2,39 @@
 // import { columns } from "./columns";
 // import { DataTable } from "./data-table";
 import { useEffect } from "react";
-import { useSessionExists } from "@/hooks/useSessionExists";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { setUsers,  } from "@/store/usersSlice";
+import { setUsers } from "@/store/usersSlice";
 import { UserTable } from "@/components/dashboard/admin/users/UserTable";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
 import { getUsers, verifyUser } from "@/helpers/client/admin.users";
 import Loader from "@/components/ui/Loader";
+import { useQuery } from "@tanstack/react-query";
+
 export default function UsersPage() {
-  const isSessionExists = useSessionExists();
   const currentUser = useAppSelector((state) => state.auth.user);
   const { users } = useAppSelector((state) => state.users);
   const dispatch = useAppDispatch();
 
-  async function handleVerifyUser(userId:string) {
+  const {data: usersData, error, isLoading} = useQuery({
+    queryKey: ["getUsers"],
+    queryFn: getUsers,
+    enabled: !users && currentUser?.role === UserRole.admin,
+  });
+
+  async function handleVerifyUser(userId: string) {
     const { data, error } = await verifyUser(userId);
     if (error) {
       console.log("error", error);
       toast.error("Failed to verify user");
     }
-    console.log('data', data)
+    console.log("data", data);
   }
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (!isSessionExists) {
-        return;
-      }
-      console.log("fetching users from server");
-      const { data, error } = await getUsers();
-      // console.log("users", JSON.stringify(data));
-      if (error) {
-        console.error("Error fetching users:", error.message);
-        toast.error(`Error fetching users: ${error.message}`);
-        return;
-      }
-      dispatch(setUsers(data || []));
-    };
-
-    if (!users || users.length === 0) {
-      if (currentUser && currentUser.role !== UserRole.admin) {
-        console.error("Unauthorized access to users page");
-        return;
-      } else if (currentUser && currentUser.role === UserRole.admin) {
-        console.log("fetching users");
-        fetchUsers();
-      }
+    if(usersData && !users){
+      dispatch(setUsers(usersData))
     }
-  }, [isSessionExists, dispatch, users, currentUser]);
+  }, [dispatch, users, usersData, error]);
 
   if (currentUser && currentUser.role !== UserRole.admin) {
     return (
@@ -59,16 +44,21 @@ export default function UsersPage() {
       </div>
     );
   }
-  if (!users) {
+  if (isLoading) {
     return <Loader />;
+  }else if( error){
+    return <div>{error?.message}</div>
+  }else if(!users){
+    return <div>Failed to fetch users</div>
   }
   return (
     <div className="container mx-auto py-10">
       {/* {console.count("render")} */}
       {/* <DataTable columns={columns} data={users} /> */}
+
       <UserTable
         users={users}
-        onVerify={(user)=>handleVerifyUser(String(user._id))}
+        onVerify={(user) => handleVerifyUser(String(user._id))}
       />
     </div>
   );
