@@ -85,18 +85,19 @@ async function logoutUser(): Promise<boolean> {
   }
 }
 
-async function refreshUserSession(): Promise<IAuthUser> {
+async function refreshUserSession(): Promise<IUser> {
   try {
     const resp = await axios.get("/api/refresh-tokens");
     console.log("resp", resp);
     const user: IUser = resp.data.data.user;
     if (!user) {
-      return { error: resp.data.message, user: null };
+      throw new Error("Failed to refresh user session");
     }
-    return { user, error: null };
+    return user
   } catch (error) {
     console.log("error while refreshing token", error);
-    return { error: handleError(error, "Session expired"), user: null };
+    const message = handleError(error, "refresh user session").message;
+    throw new Error(message);
   }
 }
 

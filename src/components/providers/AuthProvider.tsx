@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 
-const publicRoutes = ["/", "/login", "/register"];
+const publicRoutes = ["/", "/login", "/register", "/refresh-session"]; // add your actual public routes
 const validProtectedRoutes = [
   "/dashboard",
   "/dashboard/users",

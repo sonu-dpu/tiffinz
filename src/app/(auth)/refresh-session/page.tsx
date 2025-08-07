@@ -1,33 +1,38 @@
 "use client"
 import Loader from "@/components/ui/Loader";
-import { IAuthUser, refreshUserSession } from "@/helpers/client/user.auth";
-import consumablePromise from "@/lib/consumablePromise";
+import { refreshUserSession } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import React, { use, useEffect} from "react";
+import React, { useEffect} from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-const cachedPromise = consumablePromise<IAuthUser>(refreshUserSession);
+
 
 
 function RefreshPage() {
-  const {error, user} = use(cachedPromise);
+  const {data:user, error, isFetching} = useQuery({
+    queryKey: ["refreshUserSession"],
+    queryFn: refreshUserSession,
+    retry: false
+  });
   const dispatch = useDispatch();
   const router = useRouter();
-  useEffect(()=>{
-    if(error){
-        toast.dismiss();
-        toast.error("Session expired", {description:"Login again"})
-        router.push("/login");
-    }else if(user){
-        toast.dismiss();
-        dispatch(login(user));
-        router.push("/dashboard")
+  useEffect(() => {
+    if (user) {
+      dispatch(login(user));
+      router.push("/dashboard");
+    } else if (error) {
+      toast.error("Failed to refresh session: " + error.message);
+      router.push("/login");
     }
-  },[error, user, router, dispatch])
+  }, [user, error, dispatch, router]);
+  if (isFetching) {
+    return <Loader />;
+  }
   return (
-    <div className="h-screen w-full">
+    <div className="flex items-center justify-center min-h-screen">
       <Loader />
     </div>
   );

@@ -13,9 +13,16 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/api/users/login")) {
     return response;
   }
+  if( pathname.startsWith("/api/refresh-tokens") && refreshToken) {
+    return response;
+  }
   if (pathname.startsWith("/api")) {
     console.log("inside /api pathname", pathname);
     if (!token) {
+      if(refreshToken){
+        console.log("refresh token found, but access token not found");
+        return NextResponse.redirect(new URL("/api/refresh-tokens", req.url));
+      }
       return ApiResponse.error("Authentication required", 401);
     }
     
