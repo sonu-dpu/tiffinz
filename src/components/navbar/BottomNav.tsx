@@ -39,7 +39,7 @@ export default function BottomNav({ role }: BottomNavProps) {
   const navItems = role === "ADMIN" ? adminNav : userNav;
 
   return (
-    <nav  className="fixed bottom-0 z-50 w-full border-t bg-white shadow-sm ">
+    <nav  className="fixed bottom-0 z-50 w-full border-t bg-accent shadow-sm ">
       <ul className="flex justify-around items-center py-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
@@ -48,8 +48,8 @@ export default function BottomNav({ role }: BottomNavProps) {
               key={item.label}
               onClick={() => router.push(item.path)}
               className={cn(
-                "flex flex-col items-center text-xs text-gray-500 cursor-pointer transition-all",
-                isActive && "text-primary font-medium"
+                "flex flex-col items-center text-xs text-accent-foreground cursor-pointer transition-all border-b-2 border-transparent hover:text-primary hover:border-primary",
+                isActive && "text-primary font-medium border-b-2 border-primary"
               )}
             >
               {item.icon}
