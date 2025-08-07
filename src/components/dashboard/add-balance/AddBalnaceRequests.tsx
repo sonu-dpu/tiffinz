@@ -16,28 +16,30 @@ import {
   getAllBalanceRequests,
   IAddBalanceRequestWithUser,
 } from "@/helpers/client/add-balance";
+import { useQuery } from "@tanstack/react-query";
 // import { ImageKitProvider } from "@imagekit/next";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import React from "react";
 import { toast } from "sonner";
 
 function AddBalnaceRequests() {
-  const [requests, setRequests] = useState<IAddBalanceRequestWithUser[] | null>(
-    null
-  );
-  useEffect(() => {
-    async function fetchData() {
-      const { data, error } = await getAllBalanceRequests();
-      console.log("data", data);
-      if (error) {
-        toast.error("Error fethinf data");
-      }
-      setRequests(data ?? []);
-    }
-    fetchData();
-  }, []);
-  if (!requests) {
+  const {
+    data: requests,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: ["allBalanceRequests"],
+    queryFn: getAllBalanceRequests,
+    retry: false,
+  });
+
+  if (isFetching) {
     return <Loader />;
+  }
+  if (error) {
+    toast.error(error.message);
+    return <p>{error.message}</p>;
   }
   return (
     <div className="flex justify-center flex-wrap">
@@ -48,7 +50,7 @@ function AddBalnaceRequests() {
               <RequestCard key={String(req._id)} request={req}></RequestCard>
             ))}
         </ImageKitProvider> */}
-        <BalanceRequestTable requests={requests} />
+        <BalanceRequestTable requests={requests || []} />
       </div>
     </div>
   );
@@ -94,23 +96,26 @@ const BalanceRequestTable = ({
   if (requests?.length <= 0) {
     return <div>Not Requests Found..</div>;
   }
-  const theadings = ["SrNo.", "Id", "Name", "Email", "Amount", "Status"];
+  const theadings = ["SrNo.", "Req Id", "Name", "Email", "Amount", "Status"];
   return (
     <Table>
       <TableHeader>
-
-      <TableRow>
-        {theadings.map((th) => (
-          <TableHead key={th}>{th}</TableHead>
-        ))}
-      </TableRow>
-        </TableHeader>
+        <TableRow>
+          {theadings.map((th) => (
+            <TableHead key={th}>{th}</TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
 
       <TableBody>
         {requests.map((req, i) => (
           <TableRow key={String(req._id) + i}>
             <TableCell>{i + 1}</TableCell>
-            <TableCell>{String(req._id)}</TableCell>
+            <TableCell>
+              <Link href={`/dashboard/requests/${String(req._id)}`}>
+                {String(req._id)}
+              </Link>
+            </TableCell>
             <TableCell>{req.user.fullName}</TableCell>
             <TableCell>{req.user?.email || "-"}</TableCell>
             <TableCell>{req.amountAdded}</TableCell>

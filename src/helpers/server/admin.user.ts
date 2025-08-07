@@ -74,7 +74,9 @@ async function getUserByIdWithAccount(userId:string) {
       $unset:["password"]
     }
   ]);
-
+  if(!userWithAccount || userWithAccount.length===0){
+    throw new ApiError("User not found", 404);
+  }
   return {user: userWithAccount[0]}
 }
 

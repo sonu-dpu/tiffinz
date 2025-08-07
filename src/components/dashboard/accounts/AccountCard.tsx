@@ -3,29 +3,29 @@ import WithDrawer from "@/components/ui/withDrawer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Loader from "@/components/ui/Loader";
-import { helperResponse } from "@/helpers/client/client.types";
 import { getCurrentUserAccount } from "@/helpers/client/user.account";
-import consumablePromise from "@/lib/consumablePromise";
+
 import { IAccountWithUser } from "@/models/account.model";
 import { ArrowLeftRight, PlusCircleIcon } from "lucide-react";
-import React, { use, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import AddBalanceForm from "../add-balance/AddBalanceForm";
-const cachedUserAccount = consumablePromise<helperResponse<IAccountWithUser>>(
-  getCurrentUserAccount
-);
+import { useQuery } from "@tanstack/react-query";
+
 function AccountCard() {
   const [account, setAccount] = useState<IAccountWithUser | null>(null);
   const [errors, setErrors] = useState<null | string>(null);
-
-  const { data, error } = use(cachedUserAccount);
-  console.log("error", error);
+  const {data, error} = useQuery({
+    queryKey: ["currentUserAccount"],
+    queryFn: getCurrentUserAccount,
+    retry: false,
+  })
   useEffect(() => {
     if (error) {
       setErrors(error.message);
     }
     if (data) {
       setErrors("");
-      setAccount(data);
+      setAccount(data as IAccountWithUser);
     }
   }, [error, data]);
 
@@ -40,7 +40,7 @@ function AccountCard() {
     );
   } else if (account) {
     return (
-      <Card>
+      <Card className="w-full max-w-md mx-auto">
         <AccountCardContent account={account}></AccountCardContent>
         <ActionButtons/>
       </Card>

@@ -1,14 +1,28 @@
 import axios from "axios";
-import { helperResponse } from "./client.types";
 import { handleError } from "@/lib/handleError";
 
-async function getCurrentUserAccount():Promise<helperResponse>{
+async function getCurrentUserAccount():Promise<unknown> {
     try {
         const resp = await axios.get("/api/accounts");
         const data = resp.data?.data?.account
-        return {data, error:null}
+        return data
     } catch (error) {
-        return {data:null, error:handleError(error, "account error")}
+        throw handleError(error, "get current user account").message;
     }
 }
 export {getCurrentUserAccount}
+
+
+// try {
+//     const response = await axios.get("/api/users");
+//     const user = response.data?.data?.user;
+
+//     if (!user) {
+//       throw new Error("Failed to fetch user");
+//     }
+
+//     return user;
+//   } catch (error) {
+//     const message = handleError(error,"get current user").message
+//     throw new Error(message)
+//   } //

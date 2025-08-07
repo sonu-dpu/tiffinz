@@ -29,11 +29,11 @@ export default function BottomNav({ role }: BottomNavProps) {
   ];
 
   const adminNav: NavItem[] = [
-    { label: "Users", icon: <Users size={20} />, path: "/admin/users" },
-    { label: "Meals", icon: <List size={20} />, path: "/admin/meals" },
-    { label: "Requests", icon: <Receipt size={20} />, path: "/admin/requests" },
-    { label: "Analytics", icon: <BarChart2 size={20} />, path: "/admin/analytics" },
-    { label: "Settings", icon: <Settings size={20} />, path: "/admin/settings" },
+    { label: "Users", icon: <Users size={20} />, path: "/dashboard/users" },
+    { label: "Meals", icon: <List size={20} />, path: "/dashboard/meals" },
+    { label: "Requests", icon: <Receipt size={20} />, path: "/dashboard/requests" },
+    { label: "Analytics", icon: <BarChart2 size={20} />, path: "/dashboard/analytics" },
+    { label: "Settings", icon: <Settings size={20} />, path: "/dashboard/settings" },
   ];
 
   const navItems = role === "ADMIN" ? adminNav : userNav;

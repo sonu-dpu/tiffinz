@@ -32,7 +32,7 @@ export default function RootLayout({
           {/* <AppSidebar/> */}
           {children}
         </Providers>
-        <Toaster />
+        <Toaster position="top-right" />
       </body>
     </html>
   );

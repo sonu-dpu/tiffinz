@@ -49,17 +49,17 @@ async function verifyUser(userId: string): Promise<helperResponse> {
 
 async function getUserWithAccount(
   userId: string
-): Promise<helperResponse<IUserWithAccount>> {
+): Promise<IUserWithAccount> {
   try {
     if (!userId.trim()) {
       throw new Error("User id not passed");
     }
-
     const resp = await axios.get(`/api/admin/users/${userId}?full=true`);
     const data = resp.data?.data?.user;
-    return { data, error: null };
+    return data
   } catch (error) {
-    return { data: null, error: handleError(error, "get user with account") };
+    console.log('error', error)
+    throw new  Error(handleError(error, "get user with account").message)
   }
 }
 

@@ -36,17 +36,35 @@ async function addBalanceRequest(
     return { data: null, error: handleError(error, "addBalanceRequest") };
   }
 }
-
 async function getAllBalanceRequests(): Promise<
-  IAddBalanceResponse<IAddBalanceRequestWithUser[]>
+  IAddBalanceRequestWithUser[]
 > {
   try {
     const response = await axios.get("/api/add-balance");
-    const requests = response.data.data.requests;
+    const requests = response.data?.data?.requests;
     console.log('requests', requests)
-    return {data: requests, error: null}
+    return requests
   } catch (error) {
-    return {data:null, error: handleError(error, "Get Requests")}
+    throw new Error(handleError(error, "getAllBalanceRequests").message);
   }
 }
-export { addBalanceRequest, getAllBalanceRequests };
+
+async function getBalanceRequestDetailsById(
+  id: string
+): Promise<IAddBalanceRequestWithUser | null> {
+  try {
+    const response = await axios.get(`/api/admin/add-balance/${id}`);
+    const request = response.data?.data?.request;
+    if (!request) {
+      throw new Error("No request found with the given ID");
+    }
+    return request;
+  } catch (error) {
+    console.error("Error fetching balance request details:", error);
+    throw new Error(handleError(error, "getBalanceRequestDetailsById").message);
+  }
+}
+
+
+
+export { addBalanceRequest, getAllBalanceRequests, getBalanceRequestDetailsById };

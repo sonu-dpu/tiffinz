@@ -1,14 +1,10 @@
-import Loader from "@/components/ui/Loader";
-import React, { lazy, Suspense } from "react";
-const AccountCard = lazy(
-  () => import("@/components/dashboard/accounts/AccountCard")
-);
+import { AccountCard } from "@/components/dashboard";
+
+import React from "react";
 function AccountPage() {
   return (
     <div>
-      <Suspense fallback={<Loader/>}>
-        <AccountCard></AccountCard>
-      </Suspense>
+      <AccountCard></AccountCard>
     </div>
   );
 }

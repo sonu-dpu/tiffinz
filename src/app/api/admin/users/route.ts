@@ -1,7 +1,6 @@
 import { UserRole } from "@/constants/enum";
 import { getAllUsers, GetUserOptions } from "@/helpers/server/admin.user";
 import { ApiResponse } from "@/utils/ApiResponse";
-import connectDB from "@/utils/dbConnect";
 // import { asyncHandler } from "@/utils/asyncHandler";
 import { withAuth } from "@/utils/withAuth"
 
@@ -22,7 +21,6 @@ export const GET = withAuth(async (req) => {
     }
     // console.log("options", options);
 
-    await connectDB();
     const users = await getAllUsers(options);
 
     if (!users || users.length === 0) {

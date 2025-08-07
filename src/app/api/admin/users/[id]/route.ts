@@ -13,6 +13,9 @@ export const GET = withAuth<UserIdParams>(
     const { id } = await context.params;
     if (didRequestedFull) {
       const { user } = await getUserByIdWithAccount(id);
+      // if (!user) {
+      //   return ApiResponse.error("User not found", 404);
+      // }
       return ApiResponse.success(
         "User details fetched successfully",
         { user },
@@ -20,6 +23,7 @@ export const GET = withAuth<UserIdParams>(
       );
     }
     const user = await getUserById(id);
+    console.log('user', user)
     return ApiResponse.success("User details fetched", { user });
   },
   { requiredRole: UserRole.admin }

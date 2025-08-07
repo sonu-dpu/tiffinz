@@ -13,29 +13,30 @@ import {
   getUserWithAccount,
   IUserWithAccount,
 } from "@/helpers/client/admin.users";
+import { useQuery } from "@tanstack/react-query";
 import { PlusCircleIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect } from "react";
 import { toast } from "sonner";
 
 function UserPage() {
   const { id: userId } = useParams();
-  const [user, setUser] = useState<null | IUserWithAccount>(null);
-  const [isFetching, setFetching] = useTransition();
+  const {
+    data: user,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: ["userWithAccount", String(userId)],
+    queryFn: () => getUserWithAccount(String(userId)),
+    retry: false,
+  });
+
   useEffect(() => {
-    async function fetchUserWithAccount() {
-      const { data, error } = await getUserWithAccount(String(userId));
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      setUser(data);
+    if (error) {
+      toast.error(error.message);
     }
-    if (!user) {
-      setFetching(fetchUserWithAccount);
-    }
-  }, [user, setUser, userId]);
+  }, [error]);
 
   if (isFetching) {
     return <Loader />;
@@ -50,7 +51,7 @@ function UserPage() {
 
 const UserCard = ({ user }: { user: IUserWithAccount }) => {
   return (
-    <Card className="max-w-md mx-auto shadow-lg rounded-lg border border-gray-200 bg-white">
+    <Card className="max-w-7xl mx-auto shadow-lg rounded-lg border border-gray-200 bg-white">
       <CardHeader className="flex items-center gap-4 p-4 border-b border-gray-100">
         <Image
           alt={user.fullName}
@@ -66,7 +67,9 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
         <div className="space-y-4 text-gray-800">
           <p className="flex justify-between border-b border-gray-200 pb-2">
             <strong className="text-gray-700">Id:</strong>
-            <span className="font-medium text-gray-900">{String(user._id)}</span>
+            <span className="font-medium text-gray-900">
+              {String(user._id)}
+            </span>
           </p>
           <p className="flex justify-between border-b border-gray-200 pb-2">
             <strong className="text-gray-700">Username:</strong>

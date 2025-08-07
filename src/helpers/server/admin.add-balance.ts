@@ -66,5 +66,20 @@ async function updateAccountBalance(
   await userAccount.save({ validateBeforeSave: false });
   return { updateType, account: userAccount };
 }
+async function getBalanceRequestDetailsById(reqId: string) {
+  if (!isValidObjectId(reqId)) {
+    throw new ApiError("Invalid request id", 400);
+  }
+  await connectDB();
+  const request = await AddBalanceRequest.findById(reqId)
+    .populate("user", "fullName email")
+    .populate("verifiedBy", "fullName email");
+  if (!request) {
+    throw new ApiError("Request not found", 404);
+  }
+  return request;
+}
 
-export { verifyBalanceRequest, updateAccountBalance };
+
+
+export { verifyBalanceRequest, updateAccountBalance,getBalanceRequestDetailsById };
