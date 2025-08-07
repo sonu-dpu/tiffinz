@@ -14,7 +14,7 @@ import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 function LoginForm() {
@@ -29,11 +29,14 @@ function LoginForm() {
   const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams()
+  
   useEffect(()=>{
+    const redirectPath = searchParams.get("redirect") || "/dashboard"
     if(user){
-      router.push("/dashboard")
+      router.push(redirectPath)
     }
-  },[user, router])
+  },[user, router, searchParams])
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -56,6 +59,7 @@ function LoginForm() {
       toast.success("Login Success")
       console.log("Login successful:", user);
       dispatch(login(user));
+      router.push("/dashboard")
     });
   };
   return (

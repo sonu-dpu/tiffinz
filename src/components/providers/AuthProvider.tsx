@@ -6,16 +6,15 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const currentUser = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const pathname = usePathname();
-
-  const publicRoutes = ["/login", "/register"];
+  const publicRoutes = ["/login", "/register", "/"];
   const isPublicRoute = publicRoutes.includes(pathname);
-
+  const router = useRouter()
   const {
     data: user,
     error,
@@ -24,17 +23,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
     retry: false,
-// Skip if already available
+    // enabled: !currentUser
   });
 
   useEffect(() => {
     if (user && !currentUser) {
       dispatch(setUser(user));
     }
-    if (error && currentUser && !isPublicRoute) {
-      alert(error.message);
-    }
   }, [user, error, currentUser, dispatch, isPublicRoute]);
+
+  useEffect(()=>{
+    if(!isLoading && !currentUser){
+      router.push(`/login?redirect=${pathname}`)
+    }
+  },[currentUser, user, router, isLoading, pathname])
 
   if (error && !isPublicRoute) {
     return <p>{error.message}</p>;

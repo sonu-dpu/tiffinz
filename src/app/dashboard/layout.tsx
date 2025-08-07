@@ -3,8 +3,6 @@ import BottomNav from "@/components/navbar/BottomNav";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/hooks/reduxHooks";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
 
 function DashboardLayout({
   children,
@@ -12,12 +10,6 @@ function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = useAppSelector((state) => state.auth.user);
-  const router = useRouter();
-  useEffect(()=>{
-    if(!currentUser){
-      router.push("/login")
-    }
-  },[currentUser, router])
   return (
     <>
       <AppSidebar currentUserRole={currentUser?.role} />
