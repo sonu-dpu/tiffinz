@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 
-const publicRoutes = ["/", "/login", "/register", "/refresh-session"]; // add your actual public routes
+const publicRoutes = ["/", "/login", "/register", "/refresh-session", "/logout"]; // add your actual public routes
 const validProtectedRoutes = [
   "/dashboard",
   "/dashboard/users",
@@ -19,7 +19,7 @@ const validProtectedRoutes = [
 ]; // add your actual valid protected routes
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const currentUser = useAppSelector((state) => state.auth.user);
+  const currentUser = useAppSelector((state) =>state.auth.user);
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const router = useRouter();

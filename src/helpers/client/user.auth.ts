@@ -80,8 +80,7 @@ async function logoutUser(): Promise<boolean> {
       throw new Error("Logout failed");
     }
   } catch (error) {
-    console.error("Logout error:", error);
-    return false;
+    throw new Error(handleError(error, "logout error").message)
   }
 }
 
