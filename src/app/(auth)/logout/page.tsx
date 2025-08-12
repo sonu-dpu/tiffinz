@@ -25,11 +25,10 @@ const LogoutPage = () => {
 
       if (logoutSuccess) {
         toast.success('Logout successful')
+        redirect("/login")
       } else {
         toast.error('Logout failed')
       }
-
-      redirect('/login')
     }
   }, [isFetched, logoutSuccess, dispatch])
 
