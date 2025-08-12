@@ -39,7 +39,7 @@ export default function BottomNav({ role }: BottomNavProps) {
   const navItems = role === "ADMIN" ? adminNav : userNav;
 
   return (
-    <nav  className="fixed bottom-0 z-50 w-full border-t bg-accent shadow-sm ">
+    <nav  className="fixed bottom-0 z-50 w-full border-t bg-background shadow-sm ">
       <ul className="flex justify-around items-center py-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
