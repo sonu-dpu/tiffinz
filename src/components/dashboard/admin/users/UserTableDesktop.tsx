@@ -1,40 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { IUser } from "@/models/user.model";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import React, { useMemo, useState} from "react";
+import { Button } from "@/components/ui/button";
+import { IUser } from "@/models/user.model";
 
-interface UserTableProps {
+
+interface Props {
   users: IUser[];
-  onVerify?: (user: IUser) => Promise<void>;
+  onVerify?: (user: IUser) => void;
   onDelete?: (user: IUser) => void;
 }
 
-export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete }) => {
-  const [search, setSearch] = useState("");
-  const filteredUsers = useMemo(() => {
-    const s = search.trim().toLowerCase();
-    if (!s) return users;
-    return users.filter((user) =>
-      user.username?.toLowerCase().includes(s) ||
-      user._id?.toString().toLowerCase().includes(s) ||
-      user.email?.toLowerCase().includes(s) ||
-      user.phone?.toLowerCase().includes(s)
-    );
-  }, [users, search]);
-
+export const UserTableDesktop: React.FC<Props> = ({ users, onVerify, onDelete }) => {
   return (
-    <div className="p-4">
-      <div className="mb-4 flex">
-        <Input
-          type="text"
-          placeholder="Search by username, id, email, phone..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-      <div className="overflow-x-auto">
+    <div className="overflow-x-auto hidden md:block">
       <table className="max-w-full bg-white border border-gray-200 rounded-lg">
         <thead>
           <tr>
@@ -50,18 +30,20 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete 
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <tr key={user._id?.toString()} className="text-center hover:bg-gray-50">
               <td className="px-4 py-2 border-b">
                 <Image
                   src={"/profileAvatar.png"}
-                  alt={user.username}
+                  alt={user.username || ""}
                   width={32}
                   height={32}
                   className="w-8 h-8 rounded-full mx-auto"
                 />
               </td>
-              <td className="px-4 py-2 border-b"><Link href={"/dashboard/users/"+user._id}> {user.username}</Link></td>
+              <td className="px-4 py-2 border-b">
+                <Link href={`/dashboard/users/${user._id}`}>{user.username}</Link>
+              </td>
               <td className="px-4 py-2 border-b">{user.fullName}</td>
               <td className="px-4 py-2 border-b">{user.email || "-"}</td>
               <td className="px-4 py-2 border-b">{user.phone}</td>
@@ -78,11 +60,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete 
               </td>
               <td className="px-4 py-2 border-b space-x-2">
                 {onVerify && !user.isVerified && (
-                  <Button
-                    onClick={()=>onVerify(user)}
-                  >
-                    Verify
-                  </Button>
+                  <Button onClick={() => onVerify(user)}>Verify</Button>
                 )}
                 {onDelete && (
                   <Button
@@ -97,10 +75,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onVerify, onDelete 
           ))}
         </tbody>
       </table>
-      </div>
-      {filteredUsers.length === 0 && (
-        <div className="text-center text-gray-500 py-8">No users found.</div>
-      )}
     </div>
   );
 };
