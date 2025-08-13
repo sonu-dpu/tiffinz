@@ -7,28 +7,41 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-  if (pathname.startsWith("/api/users/register") || pathname.startsWith("/api/user/logout")) {
+
+  if (pathname.startsWith("/dashboard")) {
+    console.log("inside dashboard pathname", pathname);
+    if (!token) {
+      return NextResponse.redirect(
+        new URL(`/login?redirect=${pathname.substring(1)}`, req.url)
+      );
+    }
+  }
+
+  if (
+    pathname.startsWith("/api/users/register") ||
+    pathname.startsWith("/api/user/logout")
+  ) {
     return response;
   }
   if (pathname.startsWith("/api/users/login")) {
     return response;
   }
-  if( pathname.startsWith("/api/refresh-tokens") && refreshToken) {
+  if (pathname.startsWith("/api/refresh-tokens") && refreshToken) {
     return response;
   }
   if (pathname.startsWith("/api")) {
     console.log("inside /api pathname", pathname);
     if (!token) {
-      if(refreshToken){
+      if (refreshToken) {
         console.log("refresh token found, but access token not found");
-        return NextResponse.redirect(new URL("/api/refresh-tokens", req.url));
+        return NextResponse.redirect(new URL("/refresh-session", req.url));
       }
       return ApiResponse.error("Authentication required", 401);
     }
-    
+
     const { payload, error } = await verifyJWT(token);
-    if(pathname.startsWith("/api/refresh-tokens") && refreshToken && error){
-        return response;
+    if (pathname.startsWith("/api/refresh-tokens") && refreshToken && error) {
+      return response;
     }
     if (error || !payload?._id) {
       return ApiResponse.error("Auhentication required", 401);
@@ -38,12 +51,6 @@ export async function middleware(req: NextRequest) {
     console.log("payload", payload);
   }
 
-  if (pathname.startsWith("/dashboard")) {
-    console.log("inside dashboard pathname", pathname);
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-  }
   // if(pathname.startsWith("/login") && !token) {
   //   return NextResponse.redirect(new URL("/login", req.url));
   // }

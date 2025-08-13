@@ -14,7 +14,7 @@ import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 function LoginForm() {
@@ -34,9 +34,9 @@ function LoginForm() {
   useEffect(()=>{
     const redirectPath = searchParams.get("redirect") || "/dashboard"
     if(user){
-      router.push(redirectPath)
+      redirect(redirectPath)
     }
-  },[user, router, searchParams])
+  },[user, searchParams])
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
