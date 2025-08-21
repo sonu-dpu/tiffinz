@@ -14,10 +14,11 @@ import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 function LoginForm() {
+  const { user,isLoggedIn } = useAppSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -26,17 +27,16 @@ function LoginForm() {
   const [isLoggingIn, startLoggingIn] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [errorResponse, setErrorResponse] = useState("");
-  const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams()
   
   useEffect(()=>{
     const redirectPath = searchParams.get("redirect") || "/dashboard"
-    if(user){
-      redirect(redirectPath)
+    if(user && isLoggedIn){
+      router.push(redirectPath)
     }
-  },[user, searchParams])
+  },[user, searchParams, isLoggedIn, router])
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -59,7 +59,7 @@ function LoginForm() {
       toast.success("Login Success")
       console.log("Login successful:", user);
       dispatch(login(user));
-      router.push("/dashboard")
+      // router.push("/dashboard")
     });
   };
   return (

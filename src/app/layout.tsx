@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/providers";
 import { Toaster } from "@/components/ui/sonner";
+import InstallPrompt from "@/components/ui/pwa-install-button";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           {children}
         </Providers>
         <Toaster position="top-right" />
+        <InstallPrompt/>
       </body>
     </html>
   );
