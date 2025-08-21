@@ -1,6 +1,9 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getBalanceRequestDetailsById } from "@/helpers/client/add-balance";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getBalanceRequestDetailsById,
+  verifyBalanceRequest,
+} from "@/helpers/client/add-balance";
 import Loader from "@/components/ui/Loader";
 import {
   Card,
@@ -10,15 +13,22 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
+import LoaderButton from "@/components/ui/loader-button";
+import { PaymentStatus } from "@/constants/enum";
 
 type BalanceRequestCardProps = {
   reqId?: string;
 };
 
 function BalanceRequestCard({ reqId }: BalanceRequestCardProps) {
+  const queryClient = useQueryClient();
+  const [currentAction, setCurrentAction] = React.useState<
+    "approve" | "reject" | null
+  >(null);
+
   const {
     data: request,
     isFetching,
@@ -28,6 +38,26 @@ function BalanceRequestCard({ reqId }: BalanceRequestCardProps) {
     queryFn: () => getBalanceRequestDetailsById(reqId || ""),
     enabled: !!reqId,
     retry: false,
+  });
+
+  const mutation = useMutation({
+    mutationFn: (action: "approve" | "reject") =>
+      verifyBalanceRequest(reqId || "", action),
+    onSuccess: (_, variables) => {
+      toast.success(
+        `Request ${
+          variables === "approve" ? "approved" : "rejected"
+        } successfully`
+      );
+      queryClient.invalidateQueries({
+        queryKey: ["balanceRequestDetails", reqId],
+      });
+      setCurrentAction(null);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong");
+      setCurrentAction(null);
+    },
   });
 
   if (isFetching) return <Loader />;
@@ -68,8 +98,8 @@ function BalanceRequestCard({ reqId }: BalanceRequestCardProps) {
           >
             {request?.paymentScreenshot && (
               <Image
-              width={500}
-              height={300}
+                width={500}
+                height={300}
                 src={request.paymentScreenshot}
                 alt="Payment Screenshot"
                 className="rounded-md w-full max-h-64 object-contain border"
@@ -78,11 +108,34 @@ function BalanceRequestCard({ reqId }: BalanceRequestCardProps) {
           </Link>
         </div>
       </CardContent>
-
-      <CardFooter className="flex justify-end gap-2">
-        <Button variant="destructive">Reject</Button>
-        <Button variant="default">Approve</Button>
-      </CardFooter>
+      {request.status === PaymentStatus.pending && (
+        <CardFooter className="flex justify-end gap-2">
+          <LoaderButton
+            variant="destructive"
+            fallbackText="Rejecting..."
+            isLoading={mutation.isPending && currentAction === "reject"}
+            disabled={mutation.isPending}
+            onClick={() => {
+              setCurrentAction("reject");
+              mutation.mutate("reject");
+            }}
+          >
+            Reject
+          </LoaderButton>
+          <LoaderButton
+            fallbackText="Approving..."
+            variant="default"
+            isLoading={mutation.isPending && currentAction === "approve"}
+            disabled={mutation.isPending}
+            onClick={() => {
+              setCurrentAction("approve");
+              mutation.mutate("approve");
+            }}
+          >
+            Approve
+          </LoaderButton>
+        </CardFooter>
+      )}
     </Card>
   );
 }

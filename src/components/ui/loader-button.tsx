@@ -1,13 +1,16 @@
 import React from "react";
-import { Button } from "./button";
+import { Button, buttonVariants } from "./button";
 import { Loader2 } from "lucide-react";
+import { VariantProps } from "class-variance-authority";
+
 
 export default function LoaderButton({
   isLoading = false,
   fallbackText = "",
   children,
   className = "",
-}: {
+  ...props
+}: React.ComponentProps<"button"> &   VariantProps<typeof buttonVariants> & {
   isLoading: boolean;
   fallbackText: string;
   children: React.ReactNode;
@@ -20,7 +23,7 @@ export default function LoaderButton({
     </>
   );
   return (
-    <Button className={className} disabled={isLoading}>
+    <Button className={className} disabled={isLoading} {...props}>
       {isLoading ? loading : children}
     </Button>
   );

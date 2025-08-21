@@ -64,7 +64,27 @@ async function getBalanceRequestDetailsById(
     throw new Error(handleError(error, "getBalanceRequestDetailsById").message);
   }
 }
+async function verifyBalanceRequest(
+  id: string,
+  action: "approve" | "reject"
+): Promise<unknown> {
+  try {
+    const response = await axios.patch(
+      `/api/admin/add-balance/${id}/verify${action === "reject" ? "?reject=true" : ""}`
+    );
+
+    if (response.status !== 200) {
+      const error = response.data.error || "Failed to verify balance request";
+      throw new Error(error);
+    }
+
+    return response.data.data; // ✅ return only data
+  } catch (error) {
+
+    throw new Error(handleError(error, "").message);
+  }
+}
 
 
 
-export { addBalanceRequest, getAllBalanceRequests, getBalanceRequestDetailsById };
+export { addBalanceRequest, getAllBalanceRequests, getBalanceRequestDetailsById, verifyBalanceRequest };

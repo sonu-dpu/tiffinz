@@ -1,5 +1,6 @@
 "use client";
 import BottomNav from "@/components/navbar/BottomNav";
+// import Navbar from "@/components/navbar/TopNav";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/hooks/reduxHooks";
@@ -13,10 +14,13 @@ function DashboardLayout({
   return (
     <>
       <AppSidebar currentUserRole={currentUser?.role} />
-      <main className="max-w-full w-full p-2 mx-auto">
-        <SidebarTrigger />
-        <div className="container mx-auto">{children}</div>
-      </main>
+      <div className="w-full">
+        {/* <Navbar /> */}
+        <SidebarTrigger/>
+        <main className="max-w-full w-full mx-auto">
+          <div className="container mx-auto px-2">{children}</div>
+        </main>
+      </div>
       {currentUser && <BottomNav role={currentUser?.role} />}
     </>
   );

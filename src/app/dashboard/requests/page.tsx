@@ -1,5 +1,5 @@
 
-import AddBalnaceRequests from '@/components/dashboard/add-balance/AddBalnaceRequests'
+import AddBalnaceRequests from '@/components/dashboard/admin/requests/AddBalnaceRequests'
 import React from 'react'
 
 function BalanceRequestsPage() {
