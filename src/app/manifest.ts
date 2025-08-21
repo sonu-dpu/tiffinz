@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Next.js App",
+    name: "Tiffinz",
     short_name: "Next.js App",
     description: "Next.js App",
     start_url: "/",
@@ -11,9 +11,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#fff",
     icons: [
       {
-        src: "/favicon.ico",
+        src: "/icon.png",
         sizes: "any",
-        type: "image/x-icon",
+        type: "image/png",
       },
     ],
     screenshots: [
