@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Tiffinz",
     short_name: "Next.js App",
     description: "Next.js App",
-    start_url: "/",
+    start_url: "/dashboard",
     display: "standalone",
     background_color: "#fff",
     theme_color: "#fff",
@@ -19,13 +19,13 @@ export default function manifest(): MetadataRoute.Manifest {
     screenshots: [
       {
         src: "/screenshots/home-desktop.png",
-        sizes: "1280x720",
+        sizes: "2560x1440",
         type: "image/png",
         form_factor: "wide"   
       },
       {
         src: "/screenshots/home-mobile.png",
-        sizes: "375x667",
+        sizes: "750x1334",
         type: "image/png",
         form_factor: "narrow" 
       }
