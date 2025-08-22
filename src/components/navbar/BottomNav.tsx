@@ -3,7 +3,10 @@
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils"; // Optional utility for merging classNames
 import { Home, User, CreditCard, Settings, List, Users, BarChart2, Receipt } from "lucide-react";
+// import { UserRole } from "@/constants/enum";
+import { useAppSelector } from "@/hooks/reduxHooks";
 import { UserRole } from "@/constants/enum";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 interface NavItem {
@@ -12,11 +15,11 @@ interface NavItem {
   path: string;
 }
 
-interface BottomNavProps {
-  role: UserRole;
-}
+// interface BottomNavProps {
+//   role?: UserRole;
+// }
 
-export default function BottomNav({ role }: BottomNavProps) {
+export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -35,9 +38,15 @@ export default function BottomNav({ role }: BottomNavProps) {
     { label: "Analytics", icon: <BarChart2 size={20} />, path: "/dashboard/analytics" },
     { label: "Settings", icon: <Settings size={20} />, path: "/dashboard/settings" },
   ];
+  const currentUser = useAppSelector((state)=>state.auth.user)
+  const role = currentUser?.role
+  const isMobile = useIsMobile()
+  const navItems = role === UserRole.admin ? adminNav : userNav;
+  if(pathname.startsWith("/login") || pathname.startsWith("/register") || pathname==="/") return null;
 
-  const navItems = role === "ADMIN" ? adminNav : userNav;
-
+  if(!isMobile){
+    return null;
+  }
   return (
     <nav  className="fixed bottom-0 z-50 w-full border-t bg-background shadow-sm ">
       <ul className="flex justify-around items-center py-2">

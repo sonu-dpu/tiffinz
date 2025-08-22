@@ -24,6 +24,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@/constants/enum";
 import LogoutButton from "../auth/Logout";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 interface ISidebarItem {
   title: string;
@@ -75,16 +76,13 @@ const sidebarItems: ISidebarItem[] = [
   },
 ];
 
-export function AppSidebar({
-  currentUserRole,
-}: {
-  currentUserRole: UserRole | undefined;
-}) {
+export function AppSidebar() {
   const pathname = usePathname();
 
   // console.log('currentUser', currentUser);
+  const currentUserRole = useAppSelector((state)=>state.auth.user?.role)
 
-  if (pathname === "/login" || pathname === "/register") {
+  if (!pathname.startsWith("/dashboard")) {
     return null; // Don't render the sidebar on login or register pages.
   }
 

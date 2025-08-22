@@ -13,27 +13,22 @@ import { useQuery } from "@tanstack/react-query";
 
 function AccountCard() {
   const [account, setAccount] = useState<IAccountWithUser | null>(null);
-  const [errors, setErrors] = useState<null | string>(null);
   const {data, error} = useQuery({
     queryKey: ["currentUserAccount"],
     queryFn: getCurrentUserAccount,
     retry: false,
   })
   useEffect(() => {
-    if (error) {
-      setErrors(error.message);
-    }
     if (data) {
-      setErrors("");
       setAccount(data as IAccountWithUser);
     }
-  }, [error, data]);
+  }, [data]);
 
-  if (errors) {
+  if (error) {
     return (
       <Card>
         <CardContent>
-        <p>{errors}, wait for admin to verify your account, and check back later</p>
+        <p>{error.message}, wait for admin to verify your account, and check back later</p>
 
         </CardContent>
       </Card>

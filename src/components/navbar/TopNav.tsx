@@ -21,10 +21,10 @@ const Navbar = () => {
 
   const title = titles[pathname] || "Tiffinz";
 
-  const isRootPage = pathname === "/dashboard";
-
+  const isRootPage = pathname.startsWith("/dashboard");
+  if(!isRootPage) return null
   return (
-    <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
+    <header className=" top-0 z-50 bg-white border-b fixed w-full">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Side: Back or Menu */}
         {isRootPage ? (
