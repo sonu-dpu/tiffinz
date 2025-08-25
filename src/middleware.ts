@@ -9,11 +9,12 @@ export async function middleware(req: NextRequest) {
   const response = NextResponse.next();
 
   if (pathname.startsWith("/dashboard")) {
-    console.log("inside dashboard pathname", pathname);
+    // console.log("inside dashboard pathname", pathname);
     if (!token) {
-      return NextResponse.redirect(
-        new URL(`/login?redirect=${pathname.substring(1)}`, req.url)
-      );
+      if(refreshToken){
+        return NextResponse.redirect(new URL(`/refresh-session?redirect=${pathname.substring(1)}`, req.url));
+      }
+      return NextResponse.redirect(new URL(`/login?redirect=${pathname.substring(1)}`, req.url));
     }
   }
 
