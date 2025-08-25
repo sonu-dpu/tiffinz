@@ -1,4 +1,3 @@
-"use client";
 import { SidebarProvider } from "../ui/sidebar";
 import AuthProvider from "./AuthProvider";
 import QueryProvider from "./QueryProvider";
