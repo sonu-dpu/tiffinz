@@ -32,7 +32,7 @@ async function getUsers(): Promise<IUser[]> {
 
     return users;
   } catch (error) {
-    throw handleError(error, "users"); // Let React Query handle the error
+    throw handleError(error, "users").message;
   }
 }
 
