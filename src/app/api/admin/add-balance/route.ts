@@ -1,22 +1,38 @@
-import { UserRole } from "@/constants/enum";
+import { PaymentStatus, UserRole } from "@/constants/enum";
 import AddBalanceRequest from "@/models/addBalanceRequest.model";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
 
+type FilterType = {
+  status?: PaymentStatus;
+};
 export const GET = withAuth(
-  async () => {
-    // const searchParams = req.nextUrl.searchParams;
-    // const status = searchParams.get("status");
-    // const match:Record<keyof AddBalanceRequestInput, string> = {};
-    // if(status){
-    //     match.status = status;
-    // }
-    const requests = await AddBalanceRequest.find().populate({path:"user", select:"-password"});
-    if (!requests) {
-      return ApiResponse.error("no requests found", 404);
+  async (req) => {
+    const searchParams = req.nextUrl.searchParams;
+    const status = searchParams.get("status") as PaymentStatus | null;
+    const countOnly = searchParams.get("count") === "true";
+
+    const filter: FilterType = {};
+    if (status && Object.values(PaymentStatus).includes(status)) {
+      filter.status = status;
+    }
+    if (countOnly) {
+      const count = await AddBalanceRequest.countDocuments(filter);
+      return ApiResponse.success(
+        "Count fetched successfully",
+        { count, status },
+        200
+      );
+    }
+    const requests = await AddBalanceRequest.find(filter).populate({
+      path: "user",
+      select: "-password",
+    });
+    if (!requests || requests.length === 0) {
+      return ApiResponse.error("No requests found", 404);
     }
     return ApiResponse.success(
-      "Fetched equest successfully",
+      "Fetched requests successfully",
       { requests },
       200
     );
@@ -25,4 +41,3 @@ export const GET = withAuth(
     requiredRole: UserRole.admin,
   }
 );
-

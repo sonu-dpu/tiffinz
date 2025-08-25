@@ -1,3 +1,4 @@
+import { PaymentStatus } from "@/constants/enum";
 import { handleError } from "@/lib/handleError";
 import { IAddBalanceRequest } from "@/models/addBalanceRequest.model";
 import { IUser } from "@/models/user.model";
@@ -86,5 +87,25 @@ async function verifyBalanceRequest(
 }
 
 
+type GetRequestsOptions = {
+  status?: PaymentStatus;
+  count?: boolean;
+};
 
-export { addBalanceRequest, getAllBalanceRequests, getBalanceRequestDetailsById, verifyBalanceRequest };
+async function getRequests(options: GetRequestsOptions = {}) {
+  try {
+    const params = new URLSearchParams();
+
+    if (options.status) params.append("status", options.status);
+    if (options.count) params.append("count", "true");
+
+    const resp = await axios.get(`/api/admin/add-balance?${params.toString()}`);
+
+    return resp.data?.data;
+  } catch (error) {
+    throw new Error(handleError(error, "get requests").message);
+  }
+}
+
+
+export { addBalanceRequest, getAllBalanceRequests, getBalanceRequestDetailsById, verifyBalanceRequest, getRequests };
