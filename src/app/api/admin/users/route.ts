@@ -7,22 +7,19 @@ import { withAuth } from "@/utils/withAuth"
 export const GET = withAuth(async (req) => {
     const searchParams = req.nextUrl.searchParams;
     const options: GetUserOptions = {};
-    const isActive = searchParams.get("isActive");
-    if (isActive !== null) {
-      options.isActive = isActive === "true";
-    }
     const isVerified = searchParams.get("verified");
+    const role = searchParams.get("role") as UserRole | null;
+    const countOnly = searchParams.get("count");
     if (isVerified !== null) {
       options.isVerified = isVerified === "true";
     }
-    const role = searchParams.get("role");
-    if (role && Object.values(UserRole).includes(role as UserRole)) {
-      options.role = role as UserRole;
+    if(role) options.role=role;
+
+    const users = await getAllUsers(options, countOnly==="true");
+
+    if(countOnly){
+      return ApiResponse.success("Fetched user count success", {users})
     }
-    // console.log("options", options);
-
-    const users = await getAllUsers(options);
-
     if (!users || users.length === 0) {
       return ApiResponse.error("No users found", 404);
     }

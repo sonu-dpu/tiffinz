@@ -12,13 +12,14 @@ import {
 import { Button } from "../ui/button";
 import { loginUserWithPhone } from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 function LoginForm() {
-  const { user,isLoggedIn } = useAppSelector((state) => state.auth);
+  const { user,isLoggedIn } = useCurrentUser();
   const {
     register,
     handleSubmit,

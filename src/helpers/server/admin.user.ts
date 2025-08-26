@@ -1,8 +1,8 @@
 import { UserRole } from "@/constants/enum";
-import User, { IUser } from "@/models/user.model";
+import User from "@/models/user.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
-import mongoose ,{ isValidObjectId} from "mongoose";
+import mongoose ,{ isValidObjectId, PipelineStage} from "mongoose";
 import { createAccount } from "./admin.accounts";
 
 export interface GetUserOptions {
@@ -11,18 +11,21 @@ export interface GetUserOptions {
   role?: UserRole;
 }
 
-async function getAllUsers(options?: GetUserOptions) {
+async function getAllUsers(options?: GetUserOptions, countOnly:boolean=false) {
   await connectDB();
   console.log("matcherQuery", options);
-  const users: IUser[] = await User.aggregate([
+  const pipeline:PipelineStage[] = [
     {
-      $match: { ...options },
-    },
-    {
-      $unset: ["password"],
-    },
-  ]);
-  return users;
+      $match:{...options}
+    }
+  ];
+  if(countOnly){
+    pipeline.push({$count:"count"})
+  }else{
+    pipeline.push({$unset:["password"]})
+  }
+  const users = await User.aggregate(pipeline);
+  return countOnly ? users[0] : users 
 }
 
 async function getUserById(userId: string) {

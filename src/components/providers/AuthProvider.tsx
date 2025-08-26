@@ -1,12 +1,14 @@
 "use client";
 
 import { getCurrentUser } from "@/helpers/client/user.auth";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const publicRoutes = ["/", "/login", "/register", "/refresh-session", "/logout"]; // add your actual public routes
 const validProtectedRoutes = [
@@ -16,10 +18,10 @@ const validProtectedRoutes = [
   "/dashboard/account",
   "/dashboard/requests",
   "/dashboard/add-balance",
-]; // add your actual valid protected routes
+]; 
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const currentUser = useAppSelector((state) =>state.auth.user);
+  const {user:currentUser} = useCurrentUser()
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const router = useRouter();
@@ -49,7 +51,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && isFetched && !user && !currentUser && !isPublicRoute) {
-      const safeRedirect = validProtectedRoutes.includes(pathname)
+      const safeRedirect = validProtectedRoutes.find((value)=>value.startsWith(pathname))
         ? pathname
         : "/dashboard";
 
@@ -66,7 +68,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   if (!isPublicRoute && !isValidRoute) {
-    return <p>404 | Page not found</p>; // or use a custom 404 component
+    return <p>404 | Page not found</p>;
   }
 
   if (isLoading && !currentUser && !isPublicRoute) {
@@ -74,7 +76,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   if (error && !currentUser && !isPublicRoute) {
-    return <p>{error.message}</p>;
+    toast.error(error.message)
+    return null;
   }
 
   return <>{children}</>;
