@@ -5,13 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { logout } from "@/store/authSlice";
 import { logoutUser } from "@/helpers/client/user.auth";
-import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import Loader from "@/components/ui/Loader";
+import { redirect } from "next/navigation";
 
 const LogoutPage = () => {
   const dispatch = useAppDispatch();
-
   const { data: logoutSuccess, isFetched } = useQuery({
     queryKey: ["logoutUser"],
     queryFn: logoutUser,
@@ -23,12 +22,9 @@ const LogoutPage = () => {
   useEffect(() => {
     dispatch(logout());
     if (isFetched) {
-      if (logoutSuccess) {
-        toast.success("Logout successful");
-        redirect("/login");
-      } else {
-        toast.error("Logout failed");
-      }
+      const message =  logoutSuccess ? "Logout successful" : "User already logged out";
+      toast.success(message)
+      redirect("/login")
     }
   }, [isFetched, logoutSuccess, dispatch]);
 

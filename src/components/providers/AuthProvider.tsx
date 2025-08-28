@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
-import { usePathname, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const publicRoutes = ["/", "/login", "/register", "/refresh-session", "/logout"]; // add your actual public routes
@@ -21,7 +21,7 @@ const validProtectedRoutes = [
 ]; 
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const {user:currentUser} = useCurrentUser()
+  const {user:currentUser, isLoggedIn} = useCurrentUser();
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const router = useRouter();
@@ -40,22 +40,23 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
     retry: false,
-    enabled: !currentUser,
+    enabled: !currentUser && pathname!=="/logout" && pathname!=="/refresh-session",
   });
 
   useEffect(() => {
-    if (user && !currentUser) {
+    // console.log('pathname', pathname)
+    if (user && !currentUser && isFetched && !error) {
       dispatch(setUser(user));
     }
-  }, [user, currentUser, dispatch]);
+  }, [user, currentUser, dispatch, isFetched, pathname, error, isLoggedIn]);
 
   useEffect(() => {
-    if (!isLoading && isFetched && !user && !currentUser && !isPublicRoute) {
+
+    if (!isLoading && isFetched && !user && !currentUser && !isPublicRoute && !isLoggedIn) {
       const safeRedirect = validProtectedRoutes.find((value)=>value.startsWith(pathname))
         ? pathname
         : "/dashboard";
-
-      router.push(`/login?redirect=${safeRedirect}`);
+      redirect(`/login?redirect=${safeRedirect}`);
     }
   }, [
     isLoading,
@@ -65,6 +66,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     router,
     isFetched,
     user,
+    isLoggedIn
   ]);
 
   if (!isPublicRoute && !isValidRoute) {
