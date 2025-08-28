@@ -10,13 +10,23 @@ interface IUsersResponse<T> {
     message: string;
   } | null;
 }
-
+export type GetUsersOptions = {
+  user?:string,
+  count?:boolean,
+  isVerified?:boolean,
+  query?:string,
+}
 interface IUserWithAccount extends IUser {
   account: IAccount | null;
 }
-async function getUsers(): Promise<IUser[]> {
+async function getUsers(options:GetUsersOptions) {
+
   try {
-    const res = await axios.get("/api/admin/users/", {
+    const params = new URLSearchParams();
+    if(options.count) params.append("count", "true");
+    if(options.isVerified!=null) params.append("verified", options.isVerified?"true":"false")
+    if(options.query?.trim()) params.append("query", options.query.trim())
+    const res = await axios.get(`/api/admin/users?${params.toString()}`, {
       headers: { Accept: "application/json" },
     });
 
@@ -37,7 +47,7 @@ async function getUsers(): Promise<IUser[]> {
 }
 
 
-async function verifyUser(userId: string): Promise<helperResponse> {
+async function verifyUser(userId: string): Promise<helperResponse<IUser>> {
   try {
     const resp = await axios.patch(`/api/admin/users/${userId}/verify`);
     const { user } = resp.data.data;

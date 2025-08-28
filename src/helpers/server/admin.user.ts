@@ -13,7 +13,7 @@ export interface GetUserOptions {
 
 async function getAllUsers(options?: GetUserOptions, countOnly:boolean=false) {
   await connectDB();
-  console.log("matcherQuery", options);
+  console.log("matcherQuery", options, countOnly);
   const pipeline:PipelineStage[] = [
     {
       $match:{...options}
@@ -25,7 +25,11 @@ async function getAllUsers(options?: GetUserOptions, countOnly:boolean=false) {
     pipeline.push({$unset:["password"]})
   }
   const users = await User.aggregate(pipeline);
-  return countOnly ? users[0] : users 
+  if(countOnly){
+    return users.length > 0 ? users[0] : {count:0};
+  }
+
+  return users
 }
 
 async function getUserById(userId: string) {
