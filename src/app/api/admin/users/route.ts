@@ -15,14 +15,15 @@ export const GET = withAuth(async (req) => {
     }
     if(role) options.role=role;
 
+    
     const users = await getAllUsers(options, countOnly==="true");
 
-    if(countOnly){
+    if(countOnly==="true"){
       return ApiResponse.success("Fetched user count success", {users})
     }
-    if (!users || users.length === 0) {
-      return ApiResponse.error("No users found", 404);
-    }
+    // if (!users || users.length === 0) {
+    //   return ApiResponse.error("No users found", 404);
+    // }
     return ApiResponse.success("Fetched users successfully", { users }, 200);
   },
 
