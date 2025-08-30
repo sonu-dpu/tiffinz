@@ -83,13 +83,13 @@ userSchema.methods.generateAccessToken = async function (): Promise<string> {
   const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET!);
 
   const token = await new SignJWT({
-    _id: this._id.toString(), // ensure it's a string
+    _id: this._id.toString(), 
     username: this.username,
     role: this.role,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1d")
+    .setExpirationTime("15m") 
     .sign(secret);
 
   return token;

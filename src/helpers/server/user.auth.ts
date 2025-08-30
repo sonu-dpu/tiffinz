@@ -103,7 +103,6 @@ const cookieFlags = {
   sameSite: true,
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  maxAge: 60 * 60 * 24 * 7, // 7 days
 };
 
 async function createUserSession(userId: string) {
@@ -130,8 +129,8 @@ async function createUserSession(userId: string) {
   // Set cookies
   const response = ApiResponse.success("User logged in successfully", { user });
   response.cookies
-    .set("accessToken", accessToken, cookieFlags)
-    .set("refreshToken", refreshToken, cookieFlags);
+    .set("accessToken", accessToken, {...cookieFlags, maxAge: 60 * 15})
+    .set("refreshToken", refreshToken, {...cookieFlags, maxAge: 60 * 60 * 24 * 7});
 
   return response;
 }
