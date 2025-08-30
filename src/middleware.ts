@@ -7,7 +7,14 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-
+  console.log('accessToken', token)
+  if(!pathname.startsWith("/api") && !token){
+    console.log('token not found')
+    console.log('pathname', pathname)
+    if(refreshToken){
+      return NextResponse.redirect(new URL(`/refresh-session?redirect=${pathname.substring(1)}`, req.url));
+    }
+  }
   if (pathname.startsWith("/dashboard")) {
     // console.log("inside dashboard pathname", pathname);
     if (!token) {
@@ -33,10 +40,6 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     console.log("inside /api pathname", pathname);
     if (!token) {
-      if (refreshToken) {
-        console.log("refresh token found, but access token not found");
-        return NextResponse.redirect(new URL("/refresh-session", req.url));
-      }
       return ApiResponse.error("Authentication required", 401);
     }
 
@@ -59,5 +62,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/(.*)", "/dashboard", "/dashboard/:path"],
+  matcher: ["/api/(.*)", "/dashboard", "/dashboard/:path", "/"],
 };

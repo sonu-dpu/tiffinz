@@ -26,6 +26,7 @@ export async function verifyJWT(
     if (error instanceof Error) {
       errorMessage = error.message;
     }
+    console.log('JWT Error', errorMessage)
     return { payload: null, error: errorMessage };
   }
 }
