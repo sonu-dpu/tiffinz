@@ -42,7 +42,14 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     retry: false,
     enabled: !currentUser && pathname!=="/logout" && pathname!=="/refresh-session",
   });
-
+  // useEffect(()=>{
+  //   if(pathname.startsWith("/login") && isLoading){
+  //     toast.loading("Logging in..")
+  //   }
+  //   if(pathname.startsWith("/refresh-session")){
+  //     toast.loading("Refreshing Session")
+  //   }
+  // },[pathname, isLoading])
   useEffect(() => {
     // console.log('pathname', pathname)
     if (user && !currentUser && isFetched && !error) {
