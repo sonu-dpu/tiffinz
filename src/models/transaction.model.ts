@@ -1,5 +1,6 @@
 import { TransactionType } from "@/constants/enum";
-import mongoose, { model, models, Schema } from "mongoose";
+import mongoose, { AggregatePaginateModel, model, models, Schema } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface ITransaction  {
   _id?: mongoose.Types.ObjectId;
@@ -13,7 +14,9 @@ interface ITransaction  {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
+interface TransactionModel extends AggregatePaginateModel<ITransaction> {
+  _sample?:string
+}
 const transactionSchema = new Schema<ITransaction>(
   {
     amount: {
@@ -49,9 +52,9 @@ const transactionSchema = new Schema<ITransaction>(
   },
   { timestamps: true }
 );
-
+transactionSchema.plugin(mongooseAggregatePaginate)
 const Transaction =
-  models?.Transaction || model<ITransaction>("Transaction", transactionSchema);
+  models?.Transaction as TransactionModel|| model<ITransaction>("Transaction", transactionSchema);
 
 export type { ITransaction };
 export default Transaction;
