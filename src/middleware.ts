@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-  console.log('accessToken', token)
+
   if(!pathname.startsWith("/api") && !token){
     console.log('token not found')
     console.log('pathname', pathname)

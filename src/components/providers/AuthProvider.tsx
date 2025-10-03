@@ -63,7 +63,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       const safeRedirect = validProtectedRoutes.find((value)=>value.startsWith(pathname))
         ? pathname
         : "/dashboard";
-      redirect(`/login?redirect=${safeRedirect}`);
+      redirect(`/login?redirect=${encodeURIComponent(safeRedirect)}`);
     }
   }, [
     isLoading,
