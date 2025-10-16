@@ -14,6 +14,16 @@ async function getAllTransactions() {
   }
 }
 
+async function getTransactionById(transactionId: string) {
+  try {
+    const resp = await axios.get(`/api/admin/transactions/${transactionId}`);
+    const data = resp.data?.data?.transaction;
 
+    return data
+  } catch (error) {
+    const message = handleError(error, "get transaction by id").message;
+    throw new Error(message);
+  }
+}
 
-export {getAllTransactions}
+export {getAllTransactions, getTransactionById}

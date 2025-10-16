@@ -2,12 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import { TransactionType } from "@/constants/enum";
 import { ITransaction } from "@/models/transaction.model";
-import { MinusIcon, Plus, PlusIcon } from "lucide-react";
+import { MinusIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
 function TransactionsCard({ transaction }: { transaction: ITransaction }) {
@@ -18,7 +17,7 @@ function TransactionsCard({ transaction }: { transaction: ITransaction }) {
       <CardContent className="">
         <div className="flex justify-between">
           <div>
-            <CardTitle className="text">{transaction.user?.username}</CardTitle>
+            <CardTitle className="text">username</CardTitle>
             <div className="text-xs pt-2 text-muted-foreground">
               <p >
                 Trsanction Id : {String(transaction._id)}
