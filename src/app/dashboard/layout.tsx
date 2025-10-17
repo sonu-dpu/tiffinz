@@ -13,7 +13,7 @@ function DashboardLayout({
       <div className="w-full">
         <SidebarTrigger/>
         <main className="max-w-full w-full mx-auto pt-10 pb-10">
-          <div className="container mx-auto px-2">{children}</div>
+          <div className="container mx-auto px-2 pb-10">{children}</div>
         </main>
       </div>
   
