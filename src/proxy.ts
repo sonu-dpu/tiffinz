@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { ApiResponse } from "./utils/ApiResponse";
 import { verifyJWT } from "./utils/verifyJWT";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-
+  console.log('running proxy')
   if(!pathname.startsWith("/api") && !token){
     console.log('token not found')
     console.log('pathname', pathname)
