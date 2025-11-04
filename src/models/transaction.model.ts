@@ -1,6 +1,7 @@
 import { TransactionType } from "@/constants/enum";
 import mongoose, { AggregatePaginateModel, model, models, Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+import { IUser } from "./user.model";
 
 interface ITransaction  {
   _id?: mongoose.Types.ObjectId;
@@ -55,6 +56,8 @@ const transactionSchema = new Schema<ITransaction>(
 transactionSchema.plugin(mongooseAggregatePaginate)
 const Transaction =
   models?.Transaction as TransactionModel|| model<ITransaction>("Transaction", transactionSchema);
-
-export type { ITransaction };
+type ITransactionWithUser = ITransaction & {
+  user:IUser
+}
+export type { ITransaction, ITransactionWithUser };
 export default Transaction;
