@@ -1,7 +1,6 @@
 "use client";
 
 import { IUser } from "@/models/user.model";
-import React from "react";
 import {
   Card,
   CardContent,
@@ -25,7 +24,7 @@ function AdminDashboard({ user }: { user: IUser }) {
     <div>
       <div>Welcome {user.fullName}</div>
       <div className="flex flex-wrap gap-2 items-start justify-center">
-        <RequestCountCard></RequestCountCard>
+        <RequestCountCard/>
         <UsersCountCard/>
         <ExampleCharts />
       </div>
@@ -42,6 +41,7 @@ export function RequestCountCard() {
   const { data, error, isFetching } = useQuery({
     queryKey: ["getPendingRequestsCount", PaymentStatus.pending],
     queryFn: () => getRequestsCount(PaymentStatus.pending),
+    refetchOnWindowFocus:false
   });
 
   return (
@@ -74,6 +74,7 @@ export function UsersCountCard(){
   const { data, error, isFetching } = useQuery({
     queryKey: ["getUnVerifiedUsers",false],
     queryFn: () => getUsersCount(false),
+    refetchOnWindowFocus:false
   });
   const dispatch = useAppDispatch();
   return <Card className="w-full max-w-sm rounded-2xl shadow-md">
