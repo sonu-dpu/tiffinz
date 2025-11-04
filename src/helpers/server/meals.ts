@@ -5,6 +5,8 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { UpdateMealInput } from "@/zod/meals.schema";
 import { MealLogSchemaInputType } from "@/zod/mealLog.schema";
 import MealLog from "@/models/mealLogs.model";
+import { MealType } from "@/constants/enum";
+
 //DELETE
 async function deleteMealById(id: string) {
   if (!isValidObjectId(id)) {
@@ -43,9 +45,22 @@ async function deleteMealByIds(ids: string[]): Promise<number> {
 }
 
 //GET
-async function getAllMeals() {
+
+export interface GetAllMealsOptions {
+  isActive?: boolean;
+  mealType?: MealType;
+  searchQuery?: string;
+}
+async function getAllMeals(searchOptions: GetAllMealsOptions) {
   await connectDB();
-  const meals = await Meal.find();
+  const options = {
+    ...(searchOptions.isActive !== undefined && { isActive: searchOptions.isActive }),
+    ...(searchOptions.mealType && { type: searchOptions.mealType }),
+    ...(searchOptions.searchQuery && { description: searchOptions.searchQuery}),
+  };
+  console.log("options", options);
+
+  const meals = await Meal.find(options);
   return meals;
 }
 
@@ -297,7 +312,7 @@ async function getAllMealLogs(
   options: paginationParams = { page: 1, limit: 10 }
 ) {
   const match = {} as Record<string, unknown>;
-  const {page=1, limit=10} = options
+  const { page = 1, limit = 10 } = options;
   if (query.userId) {
     if (!isValidObjectId(query?.userId)) {
       throw new ApiError("Invalid userId", 400);
@@ -318,11 +333,11 @@ async function getAllMealLogs(
   }
   await connectDB();
   const mealLogs = await MealLog.find(match)
-    .populate({path:"user", select:"username fullName email"})
+    .populate({ path: "user", select: "username fullName email" })
     .populate("meal")
     .populate("extras.extras")
-    .skip( (page-1) * limit)
-    .limit(limit)
+    .skip((page - 1) * limit)
+    .limit(limit);
   if (mealLogs.length === 0) {
     throw new ApiError("No meal logs found", 400);
   }
