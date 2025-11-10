@@ -22,7 +22,7 @@ import { IMeal } from "@/models/meal.model";
 import { IUser } from "@/models/user.model";
 import { useQuery } from "@tanstack/react-query";
 import { FC } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValue, useForm } from "react-hook-form";
 
 function RecordMealPage() {
   const selectedUser = useAppSelector((state) => state.users.selectedUser);
@@ -58,7 +58,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     refetchOnWindowFocus:false
   });
   const {register, handleSubmit} = useForm()
-  const handleFormSubmit = (data)=>{
+  const handleFormSubmit = (data:FieldValue<{meal:string, user:string}>)=>{
     console.log('data', data)
   }
   if (isFetching) {
