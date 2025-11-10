@@ -9,14 +9,8 @@ export async function proxy(req: NextRequest) {
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
   console.log("running proxy", pathname);
-  // if (!pathname.startsWith("/api") && !token) {
-  //   console.log("token not found");
-  //   if (refreshToken) {
-  //     return await refreshUserSession(refreshToken, response);
-  //   }
-  // }
+
   if (pathname.startsWith("/dashboard")) {
-    // console.log("inside dashboard pathname", pathname);
     if (!token) {
       if (refreshToken) {
         return await refreshUserSession(refreshToken, response);
