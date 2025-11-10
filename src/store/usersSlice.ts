@@ -4,10 +4,12 @@ import { createSlice } from "@reduxjs/toolkit";
 interface IIntialState {
   users: IUser[] | null;
   errors?: string | null;
+  selectedUser: IUser | null
 }
 const initialState: IIntialState = {
   users: null,
   errors: null,
+  selectedUser: null,
 };
 const usersSlice = createSlice({
   name: "users",
@@ -26,8 +28,11 @@ const usersSlice = createSlice({
     setErrors: (state, action) => {
       state.errors = action.payload;
     },
+    setSelectedUser:(state, action)=>{
+      state.selectedUser = action.payload
+    }
   },
 });
 
-export const { setUsers, setErrors, updateUser } = usersSlice.actions;
+export const { setUsers, setErrors, updateUser, setSelectedUser} = usersSlice.actions;
 export default usersSlice.reducer;

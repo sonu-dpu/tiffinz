@@ -55,7 +55,7 @@ export default function BottomNav() {
     {
       label: "Analytics",
       icon: <BarChart2 size={20} />,
-      path: "/dashboard/analytics",
+      path: "/dashboard/meals/add",
     },
     // {
     //   label: "Settings",

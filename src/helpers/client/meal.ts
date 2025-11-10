@@ -1,7 +1,7 @@
 import { MealType } from "@/constants/enum";
 import { handleError } from "@/lib/handleError";
 import axios from "axios";
-interface GetAllMealsOptions {
+export interface GetAllMealsOptions {
   isActive?: boolean;
   type?: MealType | "ALL";
   searchQuery?: string;
