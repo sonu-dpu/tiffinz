@@ -11,7 +11,7 @@ function AddBalancePage() {
         </CardHeader>
         <CardContent>
 
-            <AddBalanceForm></AddBalanceForm>
+            <AddBalanceForm/>
         </CardContent>
       </Card>
     </div>

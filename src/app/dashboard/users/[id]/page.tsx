@@ -1,5 +1,6 @@
 "use client";
 import { AddBalanceForm } from "@/components/dashboard";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,11 +14,12 @@ import {
   getUserWithAccount,
   IUserWithAccount,
 } from "@/helpers/client/admin.users";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import { setSelectedUser } from "@/store/usersSlice";
 import { useQuery } from "@tanstack/react-query";
 import { PlusCircleIcon } from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 function UserPage() {
@@ -29,27 +31,26 @@ function UserPage() {
   } = useQuery({
     queryKey: ["userWithAccount", String(userId)],
     queryFn: () => getUserWithAccount(String(userId)),
-    retry: false,
+    refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message);
-    }
-  }, [error]);
-
+  if (error) {
+    toast.error(error.message);
+  }
   if (isFetching) {
     return <Loader />;
   } else if (user) {
-    return (
-      <>
-        <UserCard user={user} />
-      </>
-    );
+    return <UserCard user={user} />;
   }
 }
 
 const UserCard = ({ user }: { user: IUserWithAccount }) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const selectUserForMealRecord = () => {
+    dispatch(setSelectedUser(user));
+    router.push(`./${user._id}/meals/mark`);
+  };
   return (
     <Card className="max-w-7xl mx-auto shadow-lg rounded-lg border border-gray-200 bg-white">
       <CardHeader className="flex items-center gap-4 p-4 border-b border-gray-100">
@@ -132,6 +133,8 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
         >
           <AddBalanceForm className="border-none" />
         </WithDrawer>
+
+        <Button onClick={selectUserForMealRecord}>Record Meal</Button>
       </CardFooter>
     </Card>
   );
