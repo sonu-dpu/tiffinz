@@ -6,6 +6,8 @@ import { ApiError } from "@/utils/apiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 import connectDB from "@/utils/dbConnect";
 import generateRefreshAndAccessToken from "@/utils/generateTokens";
+import { handleError } from "@/utils/handleError";
+import { verifyJWT } from "@/utils/verifyJWT";
 
 import {
   ILoginCredentials,
@@ -13,7 +15,7 @@ import {
   loginWithPhoneSchema,
   loginWithUsernameSchema,
 } from "@/zod/user.login.schema";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function registerUser(userData: IUser) {
   // Check if user exists
@@ -118,19 +120,24 @@ async function createUserSession(userId: string) {
     { user: userId },
     { refreshToken },
     { upsert: true, new: true }
-  );
+  ).select("-password");
 
   if (!userSession) {
     throw new ApiError("Session creation failed", 500);
   }
 
-  const user = await User.findById(userId).select("-password");
+  // const user = await User.findById(userId).select("-password");
 
   // Set cookies
-  const response = ApiResponse.success("User logged in successfully", { user });
+  const response = ApiResponse.success("User logged in successfully", {
+    user: userSession,
+  });
   response.cookies
-    .set("accessToken", accessToken, {...cookieFlags, maxAge: 60 * 15})
-    .set("refreshToken", refreshToken, {...cookieFlags, maxAge: 60 * 60 * 24 * 7});
+    .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
+    .set("refreshToken", refreshToken, {
+      ...cookieFlags,
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
   return response;
 }
@@ -156,4 +163,54 @@ async function logoutUser(req: NextRequest) {
   return res;
 }
 
-export { logoutUser, createUserSession, loginOptions, loginUser };
+async function refreshUserSession(
+  refreshToken: string,
+  response: NextResponse
+) {
+  try {
+    const { payload, error } = await verifyJWT(refreshToken, "refresh");
+    if (error) {
+      console.error("Error while verifying the refreshToken", error);
+      throw new ApiError("Session expired, login again", 400);
+    }
+    const userId = payload?._id as string;
+    console.log('userId', userId)
+    if (!userId) {
+      console.error("userId not found in the payload");
+      throw new ApiError("Session expired");
+    }
+    const { accessToken, refreshToken: newRefreshToken } =
+      await generateRefreshAndAccessToken(userId);
+
+    if (!accessToken || !newRefreshToken) {
+      throw new ApiError("Failed to generate tokens", 500);
+    }
+
+    const userSession = await Session.findOneAndUpdate(
+      { user: userId },
+      { refreshToken: newRefreshToken },
+      { upsert: true, new: true }
+    );
+    console.log('userSession', userSession)
+    if (!userSession) {
+      throw new ApiError("Session creation failed", 500);
+    }
+    response.cookies
+      .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
+      .set("refreshToken", newRefreshToken, {
+        ...cookieFlags,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    return response;
+  } catch (error) {
+    console.log('Error while refreshing the user session error', error)
+    return handleError(error)
+  }
+}
+export {
+  logoutUser,
+  createUserSession,
+  loginOptions,
+  loginUser,
+  refreshUserSession,
+};

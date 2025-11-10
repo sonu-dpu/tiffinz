@@ -1,27 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiResponse } from "./utils/ApiResponse";
 import { verifyJWT } from "./utils/verifyJWT";
+import { refreshUserSession } from "./helpers/server/user.auth";
 
 export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const token = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
   const response = NextResponse.next();
-  console.log('running proxy')
-  if(!pathname.startsWith("/api") && !token){
-    console.log('token not found')
-    console.log('pathname', pathname)
-    if(refreshToken){
-      return NextResponse.redirect(new URL(`/refresh-session?redirect=${pathname.substring(1)}`, req.url));
-    }
-  }
+  console.log("running proxy", pathname);
+  // if (!pathname.startsWith("/api") && !token) {
+  //   console.log("token not found");
+  //   if (refreshToken) {
+  //     return await refreshUserSession(refreshToken, response);
+  //   }
+  // }
   if (pathname.startsWith("/dashboard")) {
     // console.log("inside dashboard pathname", pathname);
     if (!token) {
-      if(refreshToken){
-        return NextResponse.redirect(new URL(`/refresh-session?redirect=${pathname.substring(1)}`, req.url));
+      if (refreshToken) {
+        return await refreshUserSession(refreshToken, response);
       }
-      return NextResponse.redirect(new URL(`/login?redirect=${pathname.substring(1)}`, req.url));
+      return NextResponse.redirect(
+        new URL(`/login?redirect=${pathname.substring(1)}`, req.url)
+      );
     }
   }
 
@@ -40,13 +42,13 @@ export async function proxy(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     console.log("inside /api pathname", pathname);
     if (!token) {
+      if (refreshToken) {
+        return await refreshUserSession(refreshToken, response);
+      }
       return ApiResponse.error("Authentication required", 401);
     }
 
     const { payload, error } = await verifyJWT(token);
-    if (pathname.startsWith("/api/refresh-tokens") && refreshToken && error) {
-      return response;
-    }
     if (error || !payload?._id) {
       return ApiResponse.error("Auhentication required", 401);
     }
