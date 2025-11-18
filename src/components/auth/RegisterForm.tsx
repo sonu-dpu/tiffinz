@@ -126,7 +126,7 @@ function RegisterForm() {
       </CardContent>
       <CardFooter>
         <div className="text-center w-full text-muted-foreground">
-          Already registered? <Link href='/register' className="underline">Login</Link>
+          Already registered? <Link href='/login' className="underline">Login</Link>
         </div>
       </CardFooter>
     </Card>
