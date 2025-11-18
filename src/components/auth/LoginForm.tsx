@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useTransition } from "react";
 import LoaderButton from "../ui/loader-button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import { EyeClosed, LucideEye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import Link from "next/link";
 
 function LoginForm() {
   const { user,isLoggedIn } = useCurrentUser();
@@ -108,6 +109,11 @@ function LoginForm() {
           </LoaderButton>
         </form>
       </CardContent>
+      <CardFooter>
+        <div className="text-center w-full text-muted-foreground">
+          Don't have account? <Link href='/register' className="underline">Register</Link>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
