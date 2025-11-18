@@ -6,10 +6,11 @@ import { useForm } from "react-hook-form";
 import LoaderButton from "../ui/loader-button";
 import { Input } from "../ui/input";
 import { registerUser } from "@/helpers/client/user.auth";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
+import Link from "next/link";
 
 
 
@@ -104,7 +105,7 @@ function RegisterForm() {
           <Input
             label="Confirm Password"
             type="Password"
-            placeholder="confirm your password"
+            placeholder="Confirm your password"
             {...register("confirmPassword")}
             errorMessage={errors.confirmPassword?.message}
           />
@@ -123,6 +124,11 @@ function RegisterForm() {
           </LoaderButton>
         </form>
       </CardContent>
+      <CardFooter>
+        <div className="text-center w-full text-muted-foreground">
+          Already registered? <Link href='/register' className="underline">Login</Link>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
