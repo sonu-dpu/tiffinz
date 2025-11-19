@@ -29,9 +29,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="">
       <body
-        className={`${geistSans.className} ${geistMono.variable} antialiased bg-accent`}
+        className={`${geistSans.className} ${geistMono.variable} antialiased bg-gray-100 dark:bg-black`}
       >
         <Providers>
           <Navbar />

@@ -47,7 +47,7 @@ export function RequestCountCard() {
   return (
     <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-gray-800">
+        <CardTitle className="text-lg font-semibold">
           Pending Requests
         </CardTitle>
       </CardHeader>
@@ -79,7 +79,7 @@ export function UsersCountCard(){
   const dispatch = useAppDispatch();
   return <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-gray-800">
+        <CardTitle className="text-lg font-semibold">
           Unverified Users
         </CardTitle>
       </CardHeader>

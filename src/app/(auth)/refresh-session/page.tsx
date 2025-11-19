@@ -5,7 +5,7 @@ import { login } from "@/store/authSlice";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import React, { useEffect} from "react";
+import { useEffect} from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
@@ -27,7 +27,10 @@ function RefreshPage() {
       toast.error("Failed to refresh session: " + error.message);
       router.push("/login");
     }
-  }, [user, error, dispatch, router]);
+  }, [user, error, dispatch, router, isFetching]);
+  if(error){
+    toast.error(error.message)
+  }
   if (isFetching) {
     return <Loader />;
   }

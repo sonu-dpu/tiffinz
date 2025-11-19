@@ -52,8 +52,8 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
     router.push(`./${user._id}/meals/mark`);
   };
   return (
-    <Card className="max-w-7xl mx-auto shadow-lg rounded-lg border border-gray-200 bg-white">
-      <CardHeader className="flex items-center gap-4 p-4 border-b border-gray-100">
+    <Card className="max-w-7xl mx-auto shadow-lg rounded-lg">
+      <CardHeader className="flex items-center gap-4 p-4 border-b">
         <Image
           alt={user.fullName}
           src={user.avatar || "/profileAvatar.png"}
@@ -64,36 +64,36 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
         <CardTitle className="text-xl font-semibold">{user.fullName}</CardTitle>
       </CardHeader>
 
-      <CardContent className="p-4 space-y-3 text-sm text-gray-700">
-        <div className="space-y-4 text-gray-800">
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Id:</strong>
-            <span className="font-medium text-gray-900">
+      <CardContent className="p-4 space-y-3 text-sm ">
+        <div className="space-y-4">
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="">Id:</strong>
+            <span className="font-medium text-accent-foreground ">
               {String(user._id)}
             </span>
           </p>
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Username:</strong>
-            <span className="font-medium text-gray-900">{user.username}</span>
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="text-accent-foreground">Username:</strong>
+            <span className="font-medium text-accent-foreground">{user.username}</span>
           </p>
 
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Email:</strong>
-            <span className="font-medium text-gray-900">{user.email}</span>
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="text-accent-foreground">Email:</strong>
+            <span className="font-medium text-accent-foreground">{user.email}</span>
           </p>
 
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Phone:</strong>
-            <span className="font-medium text-gray-900">{user.phone}</span>
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="text-accent-foreground">Phone:</strong>
+            <span className="font-medium text-accent-foreground">{user.phone}</span>
           </p>
 
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Role:</strong>
-            <span className="font-medium text-gray-900">{user.role}</span>
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="text-accent-foreground">Role:</strong>
+            <span className="font-medium text-accent-foreground">{user.role}</span>
           </p>
 
-          <p className="flex justify-between border-b border-gray-200 pb-2">
-            <strong className="text-gray-700">Verified:</strong>
+          <p className="flex justify-between border-b  pb-2">
+            <strong className="text-accent-foreground">Verified:</strong>
             <span
               className={
                 user.isVerified
@@ -106,7 +106,7 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
           </p>
 
           <p className="flex justify-between">
-            <strong className="text-gray-700">Account Balance:</strong>
+            <strong className="text-accent-foreground">Account Balance:</strong>
             <span className="font-semibold text-indigo-600">
               {user.account?.balance?.toLocaleString("en-IN", {
                 style: "currency",
