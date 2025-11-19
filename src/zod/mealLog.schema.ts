@@ -15,5 +15,13 @@ const mealLogSchemaInput = z.object({
   description: z.string().optional(),
 });
 
-export type MealLogSchemaInputType = z.infer<typeof mealLogSchemaInput>;
-export { mealLogSchemaInput };
+const mealLogSchemaForAdminClient = mealLogSchemaInput.extend({
+  user: z.string(),
+  meal: z.string().min(24,"Invalid meal id").max(24, "Invalid meal id"),
+}).omit({
+  date:true
+})
+type MealLogSchemaInputType = z.infer<typeof mealLogSchemaInput>;
+type mealLogSchemaForAdminClientType = z.infer<typeof mealLogSchemaForAdminClient>;
+export type {MealLogSchemaInputType, mealLogSchemaForAdminClientType}
+export { mealLogSchemaInput, mealLogSchemaForAdminClient};
