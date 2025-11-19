@@ -126,11 +126,11 @@ async function createUserSession(userId: string) {
     throw new ApiError("Session creation failed", 500);
   }
 
-  // const user = await User.findById(userId).select("-password");
+  const user = await User.findById(userId).select("-password");
 
   // Set cookies
   const response = ApiResponse.success("User logged in successfully", {
-    user: userSession,
+    user,
   });
   response.cookies
     .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
