@@ -37,7 +37,7 @@ async function verifyBalanceRequest(
  *
  * @param userId - The ID of the user whose account balance will be updated.
  * @param amount - Amount to add (positive) or deduct (negative).
- * @param accountId - (Optional) The specific account ID to update. If not provided, the user's default account is used.
+ * @param accountId - (Optional) The specific account ID to update. If not provided, the user's id will be used for finding the account.
  * @returns An object containing the type of transaction performed (`credit` or `debit`) and the updated account.
  * @throws {ApiError} If the provided userId or accountId is invalid, or if the user account is not found.
  */
