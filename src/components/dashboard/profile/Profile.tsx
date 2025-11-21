@@ -2,6 +2,8 @@ import Loader from "@/components/ui/Loader";
 import { IUser } from "@/models/user.model";
 import Image from "next/image";
 import React from "react";
+import AccountCard from "../accounts/AccountCard";
+import UserTransactions from "../transactions/UserTransactions";
 
 function Profile({ user }: { user: IUser | null }) {
 
@@ -10,19 +12,9 @@ function Profile({ user }: { user: IUser | null }) {
   }
   return (
     <div>
-      <div className="w-full bg-red-200 h-[200px] flex justify-center">
-        <div className="profile-img">
-          <Image
-            alt="profile"
-            src={"/profileAvatar.png"}
-            width={100}
-            height={100}
-          />
-        </div>
-        <div>
-          <div> data :{user?.fullName}</div>
-        </div>
-      </div>
+
+     <AccountCard/>
+     <UserTransactions/>
     </div>
   );
 }

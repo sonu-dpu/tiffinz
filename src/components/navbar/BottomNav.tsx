@@ -11,6 +11,8 @@ import {
   Users,
   BarChart2,
   Receipt,
+  Wallet,
+  UserCircle,
 } from "lucide-react";
 // import { UserRole } from "@/constants/enum";
 import { useAppSelector } from "@/hooks/reduxHooks";
@@ -27,20 +29,17 @@ interface NavItem {
 //   role?: UserRole;
 // }
 
-export default function BottomNav() {
-  const pathname = usePathname();
-  const router = useRouter();
-
   const userNav: NavItem[] = [
-    { label: "Meals", icon: <Home size={20} />, path: "/dashboard" },
-    { label: "Account", icon: <User size={20} />, path: "/dashboard/account" },
+    { label: "Home", icon: <Home size={20} />, path: "/dashboard" },
+    // { label: "Account", icon: <User size={20} />, path: "/dashboard/account" },
     {
-      label: "Add Balance",
-      icon: <CreditCard size={20} />,
+      label: "Wallet",
+      icon: <Wallet size={20} />,
       path: "/dashboard/add-balance",
     },
-    { label: "My Meals", icon: <List size={20} />, path: "/my-meals" },
-    { label: "Settings", icon: <Settings size={20} />, path: "/settings" },
+    {label:"Profile", icon:<UserCircle size={20}/>, path:"/dashboard/profile"}
+    // { label: "My Meals", icon: <List size={20} />, path: "/my-meals" },
+    // { label: "Settings", icon: <Settings size={20} />, path: "/settings" },
   ];
 
   const adminNav: NavItem[] = [
@@ -63,6 +62,10 @@ export default function BottomNav() {
     //   path: "/dashboard/settings",
     // },
   ];
+
+export default function BottomNav() {
+  const pathname = usePathname();
+  const router = useRouter();
   const currentUser = useAppSelector((state) => state.auth.user);
   const role = currentUser?.role;
   const isMobile = useIsMobile();
@@ -92,7 +95,7 @@ export default function BottomNav() {
               )}
             >
               {item.icon}
-              <span className="text-[11px] mt-1 select-none">{item.label}</span>
+              <span className="text-[10px] mt-1 select-none">{item.label}</span>
             </li>
           );
         })}
