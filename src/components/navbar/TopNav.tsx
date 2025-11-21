@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
+import { ModeToggle } from "../ui/theme-toggle";
 
 const Navbar = () => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const Navbar = () => {
   const isRootPage = pathname.startsWith("/dashboard");
   if(!isRootPage) return null
   return (
-    <header className="bg-sidebar top-0 z-50  border-b fixed w-full">
+    <header className="bg-background top-0 z-50  border-b fixed w-full">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Side: Back or Menu */}
         {isRootPage ? (
@@ -39,7 +40,10 @@ const Navbar = () => {
         <h1 className="text-lg font-semibold">{title}</h1>
 
         {/* Right Side: Empty placeholder for balance, profile, etc. */}
-        <div className="w-8" />
+        <div className="w-8">
+          <ModeToggle/>
+        </div>
+
       </div>
     </header>
   );
