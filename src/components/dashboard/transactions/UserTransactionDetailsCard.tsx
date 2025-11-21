@@ -23,8 +23,7 @@ function UserTransactionDetailsCard({transactionId}:{transactionId:string}) {
         return <Loader />;
       }
       console.log("data", transaction);
-      const isCredit = transaction.type === TransactionType
-    .credit;
+      const isCredit = transaction.type === TransactionType.credit;
       const amount = `${isCredit ? "+" : "- "} ${formatToIndianCurrency(
         transaction.amount
       )}`;

@@ -1,6 +1,7 @@
 import Transaction, { ITransaction } from "@/models/transaction.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
+import { PaginateOptions, Types } from "mongoose";
 import { isValidObjectId } from "mongoose";
 async function createTransaction(transactionDoc: ITransaction) {
   if (!isValidObjectId(transactionDoc.account)) {
@@ -36,8 +37,10 @@ async function getTransactionById({
     _id: transactionId,
     ...(userId && { user: userId }),
   };
-  const transaction = await Transaction.findById(query)
-    .populate({path:"user", select:"-password"})
+  const transaction = await Transaction.findById(query).populate({
+    path: "user",
+    select: "-password",
+  });
 
   if (!transaction) {
     throw new ApiError("Transaction not found", 404);
@@ -45,4 +48,15 @@ async function getTransactionById({
   return transaction;
 }
 
-export { createTransaction, getTransactionById };
+async function getUserTransactions(userId: string, options:PaginateOptions) {
+  if (!isValidObjectId(userId)) {
+    throw new ApiError("Invalid User id");
+  }
+  await connectDB();
+  const transactions = await Transaction.aggregatePaginate([
+    { $match: { user: new Types.ObjectId(userId) } },
+  ],  {...options, customLabels:{docs:"transactions"}});
+  return transactions;
+}
+
+export { createTransaction, getTransactionById, getUserTransactions };
