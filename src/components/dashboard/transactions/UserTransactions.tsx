@@ -1,7 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loader from "@/components/ui/Loader";
-import { Separator } from "@/components/ui/separator";
 import { TransactionType } from "@/constants/enum";
 import { getUserTransactions } from "@/helpers/client/user.transactions";
 import { formatToIndianCurrency } from "@/lib/utils";
@@ -10,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 function UserTransactions() {
   const [page, setPage] = useState(1);
@@ -30,11 +30,11 @@ function UserTransactions() {
   }
   const transactions = response.transactions;
   return (
-    <Card className="w-full max-w-md mx-auto border-0 bg-transparent shadow-none">
+    <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
       <CardHeader>
         <CardTitle>Transactions</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0 mt-0 border-t">
         {transactions.map((transaction: ITransaction) => (
           <TransactionItem
             key={String(transaction._id)}
@@ -52,8 +52,8 @@ export function TransactionItem({
   transaction: ITransaction;
 }) {
   return (
-    <div className="flex flex-col gap-1 py-2">
-      <div className="flex justify-between items-center">
+    <Link href={`/dashboard/transactions/${transaction._id}`}>
+      <div className="flex justify-between items-center p-4 hover:bg-accent duration-100 border-b">
         <span
           className={`font-medium ${
             transaction.type === TransactionType.credit
@@ -69,9 +69,7 @@ export function TransactionItem({
           {new Date(String(transaction.createdAt)).toLocaleString()}
         </span>
       </div>
-
-      <Separator />
-    </div>
+    </Link>
   );
 }
 export default UserTransactions;

@@ -11,7 +11,15 @@ async function getUserTransactions(options?: { page?: number }) {
     throw new Error("Failed to fetch user transactions");
   }
 }
+async function getUserTransactionById(transactionId: string) {
+  try {
+    const resp = await axios.get(`/api/users/transactions/${transactionId}`); 
+    return resp.data?.data.transaction;
+  } catch (error) {
+    console.log('error', error)
+    throw new Error("Failed to fetch transaction details");
+  }
+}
 
 
-
-export { getUserTransactions };
+export { getUserTransactions, getUserTransactionById };
