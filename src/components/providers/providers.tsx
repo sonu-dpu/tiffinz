@@ -9,12 +9,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
       <StoreProvider>
         <QueryProvider>
           <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              // disableTransitionOnChange
-            >
+            <ThemeProvider>
               <SidebarProvider>{children}</SidebarProvider>
             </ThemeProvider>
           </AuthProvider>
