@@ -7,7 +7,7 @@ import { getCurrentUserAccount } from "@/helpers/client/user.account";
 
 import { IAccountWithUser } from "@/models/account.model";
 import { ArrowLeftRight, PlusCircleIcon } from "lucide-react";
-import React, {useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import AddBalanceForm from "../add-balance/AddBalanceForm";
 import { useQuery } from "@tanstack/react-query";
 
@@ -35,7 +35,7 @@ function AccountCard() {
     );
   } else if (account) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full md:max-w-md mx-auto">
         <AccountCardContent account={account}></AccountCardContent>
         <ActionButtons/>
       </Card>
