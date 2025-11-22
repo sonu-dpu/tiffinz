@@ -35,7 +35,7 @@ const transactionSchema = new Schema<ITransaction>(
     },
     mealLog: {
       type: Schema.Types.ObjectId,
-      ref: "MealLogs",
+      ref: "MealLog",
     },
     user: {
       type: Schema.Types.ObjectId,
