@@ -8,9 +8,9 @@ function ProfilePage() {
 const user = useAppSelector((state)=>state.auth.user);
   if(!user) return null
   return (
-    <div>
+    <>
         <Profile user={user} />
-    </div>
+    </>
   )
 }
 
