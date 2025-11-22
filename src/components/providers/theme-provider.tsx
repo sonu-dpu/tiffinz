@@ -22,7 +22,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       ).matches;
       setTheme(prefersDark ? "dark" : "light");
     }
-    document.documentElement.setAttribute("class", theme);
   }, []);
   useEffect(() => {
     document.documentElement.setAttribute("class", theme);
