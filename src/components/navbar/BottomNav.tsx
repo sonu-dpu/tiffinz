@@ -35,7 +35,7 @@ interface NavItem {
     {
       label: "Wallet",
       icon: <Wallet size={20} />,
-      path: "/dashboard/add-balance",
+      path: "/dashboard/wallet",
     },
     {label:"Profile", icon:<UserCircle size={20}/>, path:"/dashboard/profile"}
     // { label: "My Meals", icon: <List size={20} />, path: "/my-meals" },
