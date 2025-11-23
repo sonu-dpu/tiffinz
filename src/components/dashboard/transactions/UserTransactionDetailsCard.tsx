@@ -8,9 +8,10 @@ import { getTransactionById } from "@/helpers/client/admin.transactions";
 import { getUserTransactionById } from "@/helpers/client/user.transactions";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 import { cn, formatToIndianCurrency } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Separator } from "@radix-ui/react-select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck } from "lucide-react";
 
@@ -54,7 +55,7 @@ function UserTransactionDetailsCard({
         </p>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="space-y-6">
         {/* User Info */}
         {userRole === UserRole.admin && (
           <>
@@ -96,6 +97,9 @@ function UserTransactionDetailsCard({
         )}
         {/* Transaction Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
+          <div className="space-y-1 text-xs text-muted-foreground">
+            <p>{getDateAndTimeString(transaction.createdAt)}</p>
+          </div>
           <div>
             <span className="font-medium text-muted-foreground">Amount:</span>
             <p className={cn("text-lg font-bold")}>{amount}</p>
@@ -108,25 +112,28 @@ function UserTransactionDetailsCard({
             </p>
           </div>
 
-          <div>
-            <span className="font-medium text-muted-foreground">Account:</span>
-            <p className="text-foreground">{String(transaction.account)}</p>
-          </div>
+          {userRole === UserRole.admin && (
+            <>
+              <div>
+                <span className="font-medium text-muted-foreground">
+                  User ID:
+                </span>
+                <p className="text-foreground">
+                  {String(transaction.user._id)}
+                </p>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">
+                  Account:
+                </span>
+                <p className="text-foreground">{String(transaction.account)}</p>
+              </div>
+            </>
+          )}
         </div>
 
         <Separator />
         {transaction.isMeal && <Badge>Meal Transaction</Badge>}
-        {/* Meta Info */}
-        <div className="space-y-1 text-xs text-muted-foreground">
-          <p>
-            <span className="font-medium">Created:</span>{" "}
-            {new Date(transaction.createdAt).toLocaleString()}
-          </p>
-          <p>
-            <span className="font-medium">Updated:</span>{" "}
-            {new Date(transaction.updatedAt).toLocaleString()}
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

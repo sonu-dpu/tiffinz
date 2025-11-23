@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IUser } from "@/models/user.model";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 
 
 interface Props {
@@ -56,7 +57,7 @@ export const UserTableDesktop: React.FC<Props> = ({ users, onVerify, onDelete })
                 )}
               </td>
               <td className="px-4 py-2 border-b">
-                {new Date(String(user.createdAt)).toLocaleDateString()}
+                {getDateAndTimeString(user.createdAt!)}
               </td>
               <td className="px-4 py-2 border-b space-x-2">
                 {onVerify && !user.isVerified && (

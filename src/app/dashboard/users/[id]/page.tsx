@@ -15,6 +15,7 @@ import {
   IUserWithAccount,
 } from "@/helpers/client/admin.users";
 import { useAppDispatch } from "@/hooks/reduxHooks";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 import { setSelectedUser } from "@/store/usersSlice";
 import { useQuery } from "@tanstack/react-query";
 import { PlusCircleIcon } from "lucide-react";
@@ -118,11 +119,11 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
 
         <p>
           <strong>Account Created At:</strong>{" "}
-          {new Date(String(user.account?.createdAt)).toLocaleDateString()}
+          {getDateAndTimeString(String(user.account?.createdAt))}
         </p>
         <p>
           <strong>Account Updated At:</strong>{" "}
-          {new Date(String(user.account?.updatedAt)).toLocaleDateString()}
+          {getDateAndTimeString(String(user.account?.updatedAt))}
         </p>
       </CardContent>
 

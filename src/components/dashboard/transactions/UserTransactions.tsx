@@ -10,6 +10,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { get } from "http";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 
 function UserTransactions() {
   const [page, setPage] = useState(1);
@@ -66,7 +68,7 @@ export function TransactionItem({
         </span>
         {transaction.isMeal && <Badge>Meal</Badge>}
         <span className="text-xs text-muted-foreground">
-          {new Date(String(transaction.createdAt)).toLocaleString()}
+          {getDateAndTimeString(transaction.createdAt!)}
         </span>
       </div>
     </Link>

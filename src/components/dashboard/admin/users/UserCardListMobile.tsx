@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IUser } from "@/models/user.model";
 import { Badge } from "@/components/ui/badge";
 import { Verified, X } from "lucide-react";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 
 
 interface Props {
@@ -48,7 +49,7 @@ export const UserCardListMobile: React.FC<Props> = ({ users, onVerify, onDelete 
             </p>
             <p>
               <strong>Created:</strong>{" "}
-              {new Date(String(user.createdAt)).toLocaleDateString()}
+              {getDateAndTimeString(String(user.createdAt))}
             </p>
             <div className="flex gap-2 pt-2">
               {onVerify && !user.isVerified && (

@@ -5,13 +5,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TransactionType } from "@/constants/enum";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 import { formatToIndianCurrency } from "@/lib/utils";
 import { ITransactionWithUser } from "@/models/transaction.model";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
 function TransactionsCard({ transaction }:{transaction: ITransactionWithUser}) {
   const transactionType = transaction.type == TransactionType.credit;
-  const date = new Date(String(transaction?.createdAt)).toString().slice(0, 24);
+  const date = getDateAndTimeString(transaction.createdAt!);
   const amount = formatToIndianCurrency(transaction.amount)
   return (
     <Card>

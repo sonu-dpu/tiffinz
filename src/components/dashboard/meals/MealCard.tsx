@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 
 function MealCard({
   meal,
@@ -30,7 +31,7 @@ function MealCard({
         </p>
         <p>
           <small>
-            Created at: {new Date(String(meal.createdAt)).toLocaleString()}
+            Created at: {getDateAndTimeString(meal.createdAt!)}
           </small>
         </p>
         {
