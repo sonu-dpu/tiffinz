@@ -37,7 +37,7 @@ async function getTransactionById({
     _id: transactionId,
     ...(userId && { user: userId }),
   };
-  const transaction = await Transaction.findById(query).populate("mealLog");
+  const transaction = await Transaction.findOne(query).populate("mealLog");
   if(!userId){
     await transaction?.populate({path:"user", select:"-password"});
   }
