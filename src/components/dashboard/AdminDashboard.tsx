@@ -21,8 +21,10 @@ import { setUsers } from "@/store/usersSlice";
 
 function AdminDashboard({ user }: { user: IUser }) {
   return (
-    <div>
-      <div>Welcome {user.fullName}</div>
+    <div className="px-2 pt-6">
+      <h1 className="text-2xl font-semibold mb-4">
+          Welcome, {user.fullName}!
+        </h1>
       <div className="flex flex-wrap gap-2 items-start justify-center">
         <RequestCountCard/>
         <UsersCountCard/>

@@ -1,11 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IUser } from "@/models/user.model";
 import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
-
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import { useRouter } from "next/navigation";
 
 interface Props {
   users: IUser[];
@@ -13,69 +20,91 @@ interface Props {
   onDelete?: (user: IUser) => void;
 }
 
-export const UserTableDesktop: React.FC<Props> = ({ users, onVerify, onDelete }) => {
+export const UserTableDesktop: React.FC<Props> = ({
+  users,
+  onVerify,
+  onDelete,
+}) => {
+  const router = useRouter();
+  const handleRowClick = (userId: string, e: React.MouseEvent<HTMLTableRowElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("button")) {
+      return; // Prevent navigation if a button was clicked
+    }
+    router.push(`/dashboard/users/${userId}`);
+  };
   return (
     <div className="overflow-x-auto hidden md:block">
-      <table className="max-w-full bg-white border border-gray-200 rounded-lg">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border-b">Avatar</th>
-            <th className="px-4 py-2 border-b">Username</th>
-            <th className="px-4 py-2 border-b">Full Name</th>
-            <th className="px-4 py-2 border-b">Email</th>
-            <th className="px-4 py-2 border-b">Phone</th>
-            <th className="px-4 py-2 border-b">Role</th>
-            <th className="px-4 py-2 border-b">Verified</th>
-            <th className="px-4 py-2 border-b">Created</th>
-            <th className="px-4 py-2 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table className="rounded-lg max-w-full">
+        <TableHeader>
+          <TableRow className="text-center">
+            <TableHead>Avatar</TableHead>
+            <TableHead>Username</TableHead>
+            <TableHead>Full Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Verified</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
           {users.map((user) => (
-            <tr key={user._id?.toString()} className="text-center hover:bg-gray-50">
-              <td className="px-4 py-2 border-b">
+            <TableRow
+              key={String(user._id)}
+              onClick={(e) => handleRowClick(String(user._id), e)}
+              className="text-center cursor-pointer"
+            >
+              <TableCell>
                 <Image
-                  src={"/profileAvatar.png"}
+                  src={user.avatar || "/profileAvatar.png"}
                   alt={user.username || ""}
                   width={32}
                   height={32}
                   className="w-8 h-8 rounded-full mx-auto"
                 />
-              </td>
-              <td className="px-4 py-2 border-b">
-                <Link href={`/dashboard/users/${user._id}`}>{user.username}</Link>
-              </td>
-              <td className="px-4 py-2 border-b">{user.fullName}</td>
-              <td className="px-4 py-2 border-b">{user.email || "-"}</td>
-              <td className="px-4 py-2 border-b">{user.phone}</td>
-              <td className="px-4 py-2 border-b">{user.role}</td>
-              <td className="px-4 py-2 border-b">
+              </TableCell>
+
+              <TableCell>{user.username}</TableCell>
+
+              <TableCell>{user.fullName}</TableCell>
+              <TableCell>{user.email || "-"}</TableCell>
+              <TableCell>{user.phone}</TableCell>
+              <TableCell>{user.role}</TableCell>
+
+              <TableCell>
                 {user.isVerified ? (
                   <span className="text-green-600 font-semibold">Yes</span>
                 ) : (
                   <span className="text-red-500 font-semibold">No</span>
                 )}
-              </td>
-              <td className="px-4 py-2 border-b">
-                {getDateAndTimeString(user.createdAt!)}
-              </td>
-              <td className="px-4 py-2 border-b space-x-2">
+              </TableCell>
+
+              <TableCell>{getDateAndTimeString(user.createdAt!)}</TableCell>
+
+              <TableCell className="space-x-2">
                 {onVerify && !user.isVerified && (
-                  <Button onClick={() => onVerify(user)}>Verify</Button>
+                  <Button size="sm" onClick={() => onVerify(user)}>
+                    Verify
+                  </Button>
                 )}
+
                 {onDelete && (
                   <Button
-                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"
+                    size="sm"
+                    variant="destructive"
                     onClick={() => onDelete(user)}
                   >
                     Delete
                   </Button>
                 )}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
