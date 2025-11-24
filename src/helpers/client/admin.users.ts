@@ -11,21 +11,21 @@ interface IUsersResponse<T> {
   } | null;
 }
 export type GetUsersOptions = {
-  user?:string,
-  count?:boolean,
-  isVerified?:boolean,
-  query?:string,
-}
+  user?: string;
+  count?: boolean;
+  isVerified?: boolean;
+  query?: string;
+};
 interface IUserWithAccount extends IUser {
   account: IAccount | null;
 }
-async function getUsers(options:GetUsersOptions) {
-
+async function getUsers(options: GetUsersOptions) {
   try {
     const params = new URLSearchParams();
-    if(options.count) params.append("count", "true");
-    if(options.isVerified!=null) params.append("verified", options.isVerified?"true":"false")
-    if(options.query?.trim()) params.append("query", options.query.trim())
+    if (options.count) params.append("count", "true");
+    if (options.isVerified != null)
+      params.append("verified", options.isVerified ? "true" : "false");
+    if (options.query?.trim()) params.append("query", options.query.trim());
     const res = await axios.get(`/api/admin/users?${params.toString()}`, {
       headers: { Accept: "application/json" },
     });
@@ -46,7 +46,6 @@ async function getUsers(options:GetUsersOptions) {
   }
 }
 
-
 async function verifyUser(userId: string): Promise<helperResponse<IUser>> {
   try {
     const resp = await axios.patch(`/api/admin/users/${userId}/verify`);
@@ -57,21 +56,26 @@ async function verifyUser(userId: string): Promise<helperResponse<IUser>> {
   }
 }
 
-async function getUserWithAccount(
-  userId: string
-): Promise<IUserWithAccount> {
+async function getUserWithAccount(userId: string): Promise<IUserWithAccount> {
+  return getUserById(userId, { full: true }) as Promise<IUserWithAccount>;
+}
+async function getUserById(
+  userId: string,
+  options?: { full: boolean }
+): Promise<IUser> {
   try {
     if (!userId.trim()) {
       throw new Error("User id not passed");
     }
-    const resp = await axios.get(`/api/admin/users/${userId}?full=true`);
+    const resp = await axios.get(`/api/admin/users/${userId}`, {
+      params: { full: options?.full },
+    });
     const data = resp.data?.data?.user;
-    return data
+    return data;
   } catch (error) {
-    console.log('error', error)
-    throw new  Error(handleError(error, "get user with account").message)
+    console.log("error", error);
+    throw new Error(handleError(error, "get user by id").message);
   }
 }
-
-export { getUsers, verifyUser, getUserWithAccount};
+export { getUsers, verifyUser, getUserWithAccount, getUserById};
 export type { IUsersResponse, IUserWithAccount };

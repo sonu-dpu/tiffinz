@@ -10,32 +10,51 @@ import {
   // CardAction,
   CardFooter,
 } from "@/components/ui/card";
+import DialogWrapper from "@/components/ui/dialog-wrapper";
 import { Input } from "@/components/ui/input";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { DailyMealFor, MealType } from "@/constants/enum";
+import { markMealTakenByUser } from "@/helpers/client/admin.meals";
+import { getUserById } from "@/helpers/client/admin.users";
 import { getAllMeals, GetAllMealsOptions } from "@/helpers/client/meal";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { formatToIndianCurrency } from "@/lib/utils";
 import { IMeal } from "@/models/meal.model";
 import { IUser } from "@/models/user.model";
+import { setSelectedUser } from "@/store/usersSlice";
 import {
   mealLogSchemaForAdminClient,
   mealLogSchemaForAdminClientType,
 } from "@/zod/mealLog.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { FC } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 function RecordMealPage() {
+  const { id: userId } = useParams();
   const selectedUser = useAppSelector((state) => state.users.selectedUser);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (userId && String(selectedUser?._id) !== String(userId)) {
+      getUserById(String(userId)).then((user) => {
+        dispatch(setSelectedUser(user));
+      });
+    }
+  }, [userId, dispatch]);
+
   if (!selectedUser) {
-    return <div>No user selected</div>;
+    return <div>Loading user...</div>;
   }
   return (
-    <Card>
+    <Card className="max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Record Meal</CardTitle>
         <CardDescription>for {selectedUser.fullName}</CardDescription>
@@ -53,7 +72,12 @@ function RecordMealPage() {
 
 const options: GetAllMealsOptions = {
   isActive: true,
-  type: MealType.regular,
+  // type: MealType.regular,
+};
+
+type MealExtrasTypes = {
+  mealId: string;
+  quantity: number;
 };
 const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
   const { data, error, isFetching } = useQuery({
@@ -67,20 +91,45 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(mealLogSchemaForAdminClient) });
-  const handleFormSubmit = (formData: mealLogSchemaForAdminClientType) => {
+  const router = useRouter();
+  const [open, setOpen] = useState(true);
+  const [mealExtras, setMealExtras] = useState<MealExtrasTypes[]>([]);
+  const handleFormSubmit = async (
+    formData: mealLogSchemaForAdminClientType
+  ) => {
     setValue("user", String(user?._id));
     console.log("data", formData);
+    markMealTakenByUser(formData)
+      .then((res) => {
+        console.log("meal marked", res);
+        router.push(`/dashboard/users/${user._id}/meals`);
+        toast.success("Meal marked successfully");
+      })
+      .catch((err) => {
+        toast.error("Error marking meal: " + err.message);
+        console.error("error marking meal", err.message);
+      });
   };
   if (isFetching) {
     <div>Loading..</div>;
   }
+
   if (error) {
     return <div>{error.message}</div>;
   }
   const meals = data?.meals ?? [];
+  const baseMeals = useMemo(() => {
+    return meals.filter((meal: IMeal) => meal.type !== MealType.extras);
+  }, [meals]);
+  const extras = useMemo(() => {
+    return meals.filter((meal: IMeal) => meal.type === MealType.extras);
+  }, [meals]);
   console.log("errors", errors);
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="grid grid-cols-1 gap-2">
+    <form
+      onSubmit={handleSubmit(handleFormSubmit)}
+      className="grid grid-cols-1 gap-2"
+    >
       {/* {String(user._id)} */}
       <Input
         label="User"
@@ -90,10 +139,12 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
         errorMessage={errors.user?.message}
       />
       <div>
-        <label htmlFor="meal">Meal</label>
+        <label htmlFor="meal">Base Meal</label>
         <NativeSelect id="meal" className="max-w-fit" {...register("meal")}>
-          <NativeSelectOption className="w-full" value="">Select Meal</NativeSelectOption>
-          {meals.map((meal: IMeal) => (
+          <NativeSelectOption className="w-full" value="">
+            Select Base Meal
+          </NativeSelectOption>
+          {baseMeals.map((meal: IMeal) => (
             <NativeSelectOption key={String(meal._id)} value={String(meal._id)}>
               {meal.name} — {meal.type.toLowerCase()}
             </NativeSelectOption>
@@ -115,8 +166,50 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
           ))}
         </NativeSelect>
       </div>
-      <Button>Submit</Button>
+      <DialogWrapper
+        trigger={true}
+        title="Add Extras"
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <AddMealExtrasForm extrasItems={extras} />
+      </DialogWrapper>
+      <Button type="submit">Submit</Button>
     </form>
   );
 };
+
+const AddMealExtrasForm = ({ extrasItems }: { extrasItems: IMeal[] }) => {
+  return (
+    <div className="space-y-4 p-4 rounded-md ">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium">Select Extra Meal</label>
+
+        <NativeSelect className="w-full">
+          <NativeSelectOption value="">Choose a meal...</NativeSelectOption>
+
+          {extrasItems.map((meal: IMeal) => (
+            <NativeSelectOption key={String(meal._id)} value={String(meal._id)}>
+              {meal.name} — {formatToIndianCurrency(meal.price)}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Input
+          type="number"
+          label="quantity"
+          defaultValue={1}
+          min={1}
+          className="w-24"
+        />
+      </div>
+      <Button type="button" variant="default">
+        Add Extra
+      </Button>
+    </div>
+  );
+};
+
 export default RecordMealPage;
