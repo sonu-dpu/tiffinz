@@ -127,7 +127,7 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
         </p>
       </CardContent>
 
-      <CardFooter className="p-4 border-t border-gray-100">
+      <CardFooter className="p-4 border-t border-gray-100 flex gap-2">
         <WithDrawer
           drawerTriggerText="Add Balance"
           drawerTriggerIcon={<PlusCircleIcon className="w-4 h-4" />}
