@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
   return (
     <div
-      className="group/native-select relative w-fit has-[select:disabled]:opacity-50"
+      className="group/native-select relative w-full has-[select:disabled]:opacity-50"
       data-slot="native-select-wrapper"
     >
       <select
@@ -29,7 +29,7 @@ function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
 }
 
 function NativeSelectOption({ ...props }: React.ComponentProps<"option">) {
-  return <option data-slot="native-select-option" {...props} />
+  return <option className="dark:text-muted border-none outline-none" data-slot="native-select-option" {...props} />
 }
 
 function NativeSelectOptGroup({
@@ -39,7 +39,7 @@ function NativeSelectOptGroup({
   return (
     <optgroup
       data-slot="native-select-optgroup"
-      className={cn(className)}
+      className={cn(className, "dark:text-muted-foreground")}
       {...props}
     />
   )

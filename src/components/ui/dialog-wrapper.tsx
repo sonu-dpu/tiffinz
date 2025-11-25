@@ -15,7 +15,7 @@ type DialogWrapperProps = {
   open: boolean;
   title: string;
   onOpenChange: (open: boolean) => void;
-  trigger: boolean;
+  trigger?: boolean;
 };
 
 function DialogWrapper({
