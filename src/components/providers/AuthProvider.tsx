@@ -1,6 +1,6 @@
 "use client";
 
-import { getCurrentUser } from "@/helpers/client/user.auth";
+import { getCurrentUser, refreshUserSession } from "@/helpers/client/user.auth";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ const validProtectedRoutes = [
   "/dashboard/add-balance",
 ]; 
 
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const {user:currentUser, isLoggedIn} = useCurrentUser();
   const dispatch = useAppDispatch();
@@ -38,7 +39,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     isFetched,
   } = useQuery({
     queryKey: ["currentUser"],
-    queryFn: getCurrentUser,
+    queryFn: getCurrentUserOrRefresh,
     retry: false,
     enabled: !currentUser && pathname!=="/logout" && pathname!=="/refresh-session",
   });
@@ -80,7 +81,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     return <p>404 | Page not found</p>;
   }
 
-  if (isLoading && !currentUser && !isPublicRoute) {
+  if (isLoading && !currentUser) {
     return <Loader />;
   }
 
@@ -92,4 +93,16 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+async function getCurrentUserOrRefresh() {
+  try {
+    const user = await getCurrentUser();
+    return user;
+  } catch (error) {
+    const refreshResponse = await refreshUserSession();
+    if (refreshResponse) {
+      return refreshResponse;
+    }
+    throw error;
+  }
+}
 export default AuthProvider;
