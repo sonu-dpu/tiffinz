@@ -78,6 +78,7 @@ async function markMealTakenAndUpdateAccountBalance(
     };
     const transaction = await createTransaction(transactionDoc);
     return {
+      transactionId: transaction._id,
       userAccount,
       mealLog,
       transaction,

@@ -37,9 +37,12 @@ async function getTransactionById({
     _id: transactionId,
     ...(userId && { user: userId }),
   };
-  const transaction = await Transaction.findOne(query).populate("mealLog");
-  if(!userId){
-    await transaction?.populate({path:"user", select:"-password"});
+  const transaction = await Transaction.findOne(query)
+    .populate("mealLog")
+    .populate({ path: "mealLog", populate: { path: "meal"} })
+    .populate({ path: "mealLog", populate: { path: "extras.extras" } });
+  if (!userId) {
+    await transaction?.populate({ path: "user", select: "-password" });
   }
 
   if (!transaction) {
@@ -48,17 +51,16 @@ async function getTransactionById({
   return transaction;
 }
 
-async function getUserTransactions(userId: string, options:PaginateOptions) {
+async function getUserTransactions(userId: string, options: PaginateOptions) {
   if (!isValidObjectId(userId)) {
     throw new ApiError("Invalid User id");
   }
   await connectDB();
-  const transactions = await Transaction.aggregatePaginate([
-    { $match: { user: new Types.ObjectId(userId) } },
-  ],  {...options, customLabels:{docs:"transactions"}});
+  const transactions = await Transaction.aggregatePaginate(
+    [{ $match: { user: new Types.ObjectId(userId) } }],
+    { ...options, customLabels: { docs: "transactions" } }
+  );
   return transactions;
 }
-
-
 
 export { createTransaction, getTransactionById, getUserTransactions };
