@@ -26,7 +26,7 @@ export const POST = withAuth<MealOrderParamsByAdmin>(
 
     return ApiResponse.success(
       `Meal marked as taken successfully for user ${userId}`,
-      { mealLog: response }
+      response 
     );
   },
   { requiredRole: UserRole.admin }
