@@ -110,7 +110,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
       try {
         const response = await markMealTakenByUser({ ...formData, extras: extrasPayload });
         toast.success("Meal recorded successfully");
-        router.push("/dashboard/users");
+        router.push(`/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`);
         console.log('response', response)
       } catch (err) {
         console.error("Error while marking meal ", err)
