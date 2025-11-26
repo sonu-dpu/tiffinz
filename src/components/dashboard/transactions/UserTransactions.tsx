@@ -10,17 +10,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { get } from "http";
 import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 function UserTransactions() {
+  const {user} = useCurrentUser();
   const [page, setPage] = useState(1);
   const {
     data: response,
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["getUserTransactions"],
+    queryKey: ["getUserTransactions", page, user?._id],
     queryFn: () => getUserTransactions({ page }),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -59,7 +60,7 @@ export function TransactionItem({
         <span
           className={`font-medium ${
             transaction.type === TransactionType.credit
-              ? "text-green-300"
+              ? "text-green-600 dark:text-green-400"
               : "text-red-400"
           }`}
         >
