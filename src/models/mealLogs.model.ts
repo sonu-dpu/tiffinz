@@ -115,5 +115,5 @@ mealLogSchema.pre("save", async function (next) {
 
 mealLogSchema.plugin(mongooseAggregatePaginate)
 const MealLog = (models?.MealLog as MealLogModel ) || model<IMealLog>("MealLog", mealLogSchema);
-export type { IMealLog, IMealExtras, MealLogModel };
+export type { IMealLog, IMealExtras, MealLogModel, IMealExtrasWithMeal };
 export default MealLog;
