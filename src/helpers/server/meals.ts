@@ -280,7 +280,7 @@ async function getAllMealLogsAggregate(
         },
       },
       {
-        $unset: ["user", "mealId", "populatedExtras"],
+        $unset: ["user", "meal", "populatedExtras"],
       },
       {
         $addFields: {
