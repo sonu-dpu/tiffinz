@@ -99,7 +99,7 @@ async function getTransactionWithPopuplatedFields(
         ]
       : []),
     {
-      $lookup: {  
+      $lookup: {
         from: "meallogs",
         localField: "mealLog",
         foreignField: "_id",
@@ -116,26 +116,101 @@ async function getTransactionWithPopuplatedFields(
           {
             $lookup: {
               from: "meals",
-              localField: "extras.extras",
-              foreignField: "_id",
-              as: "populatedExtras",
+              let: { extrasArr: "$extras" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $in: ["$_id", "$$extrasArr.extras"],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    name: 1,
+                    price: 1,
+                  },
+                },
+              ],
+              as: "populated",
             },
           },
           {
-            $addFields:{
-              extras:{
-                $map:{
+            $addFields: {
+              extras: {
+                $map: {
                   input: "$extras",
                   as: "extraItem",
-                  in:{
+                  in: {
                     quantity: "$$extraItem.quantity",
+                    details: {
+                      $first: {
+                        $filter: {
+                          input: "$populated",
+                          as: "populatedItem",
+                          cond: {
+                            $eq: ["$$populatedItem._id", "$$extraItem.extras"],
+                          },
+                        },
+                      },
+                    },
                   },
                 },
-              }
+              },
+              meal: { $first: "$meal" },
+            },
+          },
+          {
+            $addFields: {
+              priceBreakdown: {
+                basePrice: "$meal.price",
+                extrasTotal: {
+                  $first: {
+                    $map: {
+                      input: "$extras",
+                      as: "extraItem",
+                      in: {
+                        $multiply: [
+                          "$$extraItem.quantity",
+                          "$$extraItem.details.price",
+                        ],
+                      },
+                    },
+                  },
+                },
+                total: "$totalAmount",
+              },
+            },
+          },
+          {
+            $unset: "populated",
+          },
+        ],
+      },
+    },
+    {
+      $lookup:{
+        from:"users",
+        localField:"user",
+        foreignField:"_id",
+        as:"user",
+        pipeline:[
+          {
+            $project:{
+              fullName:1,
+              email:1,
+              role:1,
+              username:1,
+              phone:1
             }
           }
-          
-        ],
+        ]
+      }
+    },
+    {
+      $addFields: {
+        mealLog: { $first: "$mealLog" },
+        user:{ $first:"$user" }
       },
     },
   ];
@@ -146,4 +221,9 @@ async function getTransactionWithPopuplatedFields(
   return transaction[0];
 }
 
-export { createTransaction, getTransactionById, getUserTransactions, getTransactionWithPopuplatedFields };
+export {
+  createTransaction,
+  getTransactionById,
+  getUserTransactions,
+  getTransactionWithPopuplatedFields,
+};

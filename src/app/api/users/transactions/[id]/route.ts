@@ -2,7 +2,7 @@ import { UserRole } from "@/constants/enum";
 import { ApiError } from "@/utils/apiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
-import { getTransactionById as getUserTransactionById } from "@/helpers/server/transactions";
+import { getTransactionWithPopuplatedFields } from "@/helpers/server/transactions";
 type GetTransactionIdParams = {
   id: string;
 };
@@ -20,7 +20,10 @@ export const GET = withAuth<GetTransactionIdParams>(
       throw new ApiError("Provide a valid transaction id");
     }
 
-    const transaction = await getUserTransactionById(transactionId, userId);
+    const transaction = await getTransactionWithPopuplatedFields(
+      transactionId,
+      userId
+    );
 
     return ApiResponse.success("Transaction fetched successfully", {
       transaction,

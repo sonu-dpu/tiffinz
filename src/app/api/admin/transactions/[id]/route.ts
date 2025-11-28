@@ -13,8 +13,8 @@ export const GET = withAuth<GetTransactionIdParams>(async (req, context)=>{
     throw new ApiError("Provide a valid transaction id");
   }
 
-  const transaction = await getTransactionById(transactionId);
-  // const transaction = await getTransactionWithPopuplatedFields(transactionId)
+  // const transaction = await getTransactionById(transactionId);
+  const transaction = await getTransactionWithPopuplatedFields(transactionId)
 
   return ApiResponse.success("Transaction fetched successfully", {transaction})
 
