@@ -1,5 +1,5 @@
 import { IMeal } from "@/models/meal.model";
-import { IMealExtrasWithMeal, IMealLog } from "@/models/mealLogs.model";
+import { IMealLog } from "@/models/mealLogs.model";
 import { IUser } from "@/models/user.model";
 
 export type helperResponse<T=unknown> = {
@@ -9,10 +9,24 @@ export type helperResponse<T=unknown> = {
     message: string;
   } | null;
 };
+export type ExtraMealType={
+      _id:string,
+      name:string,
+      price:number,
+      description:string
+}
 
 // meal log with meal details
-export type MealLogWithMealDetails = IMealLog & {
+export type MealLogPopulatedType = Omit<IMealLog, "extras"> & {
   meal:IMeal;
   user:IUser;
-  extras?:IMealExtrasWithMeal[]
+  extras?:{
+    quantity:number,
+    details:ExtraMealType
+  }[],
+  priceBreakdown:{
+    baseAmount:number,
+    extrasTotal?:number,
+    total:number,
+  }
 }
