@@ -90,8 +90,9 @@ export default function BottomNav() {
               key={item.label}
               onClick={() => router.push(item.path)}
               className={cn(
-                "flex my-2 max-w-[60px] w-full p-1 flex-col items-center text-xs text-accent-foreground cursor-pointer transition-all border border-transparent rounded-md duration-150",
-                isActive && " bg-primary/10 text-foreground rounded-lg"
+                "flex my-2 max-w-[60px] w-full p-1 flex-col items-center text-xs cursor-pointer transition-all border border-transparent rounded-md duration-150",
+                "text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                isActive && "  text-green-700 rounded-lg"
               )}
             >
               {item.icon}
