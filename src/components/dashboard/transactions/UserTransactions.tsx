@@ -14,7 +14,7 @@ import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 function UserTransactions() {
-  const {user} = useCurrentUser();
+  const { user } = useCurrentUser();
   const [page, setPage] = useState(1);
   const {
     data: response,
@@ -57,20 +57,24 @@ export function TransactionItem({
   return (
     <Link href={`/dashboard/transactions/${transaction._id}`}>
       <div className="flex justify-between items-center p-4 hover:bg-accent duration-100 border-b">
-        <span
-          className={`font-medium ${
-            transaction.type === TransactionType.credit
-              ? "text-green-600 dark:text-green-400"
-              : "text-red-400"
-          }`}
-        >
-          {transaction.type === TransactionType.credit ? "+" : "-"}{" "}
-          {formatToIndianCurrency(transaction.amount)}
-        </span>
-        {transaction.isMeal && <Badge>Meal</Badge>}
-        <span className="text-xs text-muted-foreground">
-          {getDateAndTimeString(transaction.createdAt!)}
-        </span>
+        <div className="flex gap-1 flex-col justify-center">
+          {transaction.isMeal && <Badge>Meal</Badge>}
+          <span className="text-xs text-muted-foreground bg-accent px-2 py-1 rounded-xl">
+            {getDateAndTimeString(transaction.createdAt!)}
+          </span>
+        </div>
+        <div>
+          <span
+            className={`font-medium ${
+              transaction.type === TransactionType.credit
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-400"
+            }`}
+          >
+            {transaction.type === TransactionType.credit ? "+" : "-"}{" "}
+            {formatToIndianCurrency(transaction.amount)}
+          </span>
+        </div>
       </div>
     </Link>
   );
