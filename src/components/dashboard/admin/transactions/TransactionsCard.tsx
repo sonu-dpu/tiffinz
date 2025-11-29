@@ -22,7 +22,7 @@ function TransactionsCard({ transaction }:{transaction: ITransactionWithUser}) {
             <CardTitle className="text">{transaction.user.fullName}</CardTitle>
             <div className="text-xs pt-2 text-muted-foreground">
               <p >
-                Trsanction Id : {String(transaction._id)}
+                Transaction Id : {String(transaction._id)}
               </p>
               <p className="text-xs">{date}</p>
             </div>
