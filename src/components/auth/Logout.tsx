@@ -17,7 +17,7 @@ import { redirect } from "next/navigation";
 function LogoutButton() {
   return (
     <Drawer>
-      <DrawerTrigger className="flex justify-center gap-2 border p-2">
+      <DrawerTrigger className="flex justify-center gap-2 border p-2 w-full">
         <LogOutIcon />
         Logout{" "}
       </DrawerTrigger>
