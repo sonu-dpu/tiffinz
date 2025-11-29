@@ -33,12 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} ${geistMono.variable} antialiased bg-background`}
       >
-        <Providers>
-          <Navbar />
-          <AppSidebar />
-          {children}
-          <BottomNav />
-        </Providers>
+        <Providers>{children}</Providers>
         <Toaster position="top-right" />
         <InstallPrompt />
       </body>

@@ -1,22 +1,23 @@
-
-import { SidebarTrigger } from "@/components/ui/sidebar";
-
+import BottomNav from "@/components/navbar/BottomNav";
+import Navbar from "@/components/navbar/TopNav";
+import { AppSidebar } from "@/components/ui/app-sidebar";
 
 function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>){
+}>) {
   return (
     <>
-      {/* <AppSidebar currentUserRole={currentUser?.role} /> */}
-      <div className="w-full">
-        <SidebarTrigger/>
-        <main className="max-w-full w-full mx-auto pt-10 pb-10">
+      <AppSidebar />
+      <div className="max-w-full w-full relative">
+        <Navbar />
+        {/* <SidebarTrigger/> */}
+        <main className="max-w-full w-full mx-auto pt-16 md:pt-0 pb-10">
           <div className="container mx-auto px-2 pb-10">{children}</div>
         </main>
       </div>
-  
+      <BottomNav />
     </>
   );
 }

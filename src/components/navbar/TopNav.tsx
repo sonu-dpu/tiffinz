@@ -25,7 +25,7 @@ const Navbar = () => {
   const isRootPage = pathname.startsWith("/dashboard");
   if(!isRootPage) return null
   return (
-    <header className="bg-background top-0 z-50  border-b fixed w-full">
+    <header className="bg-background z-50  border-b fixed md:sticky top-0 left-0 right-0">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Side: Back or Menu */}
         {isRootPage ? (
