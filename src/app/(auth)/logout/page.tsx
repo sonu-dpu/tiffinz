@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { logout } from "@/store/authSlice";
@@ -8,8 +8,10 @@ import { logoutUser } from "@/helpers/client/user.auth";
 import { toast } from "sonner";
 import Loader from "@/components/ui/Loader";
 import { redirect } from "next/navigation";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const LogoutPage = () => {
+  const { isLoggedIn } = useCurrentUser();
   const dispatch = useAppDispatch();
   const { data: logoutSuccess, isFetched } = useQuery({
     queryKey: ["logoutUser"],
@@ -17,16 +19,16 @@ const LogoutPage = () => {
     refetchOnWindowFocus: false,
     retry: false,
   });
-
-
   useEffect(() => {
-    dispatch(logout());
     if (isFetched) {
-      const message =  logoutSuccess ? "Logout successful" : "User already logged out";
+      dispatch(logout());
+       const message =  logoutSuccess ? "Logout successful" : "User already logged out";
       toast.success(message)
+    }
+    if (!isLoggedIn) {
       redirect("/login")
     }
-  }, [isFetched, logoutSuccess, dispatch]);
+  }, [isFetched, dispatch, isLoggedIn]);
 
   return <Loader />;
 };
