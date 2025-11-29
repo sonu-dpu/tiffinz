@@ -16,7 +16,7 @@ export const GET = withAuth(
       }
     }
     const transactions = await getAllTransactions({paginateOptions});
-    return ApiResponse.success("Get transactions success", {transactions}, 200);
+    return ApiResponse.success("Get transactions success", transactions, 200);
   },
   {
     requiredRole: UserRole.admin,
