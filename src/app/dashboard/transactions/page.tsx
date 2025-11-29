@@ -1,17 +1,21 @@
 "use client";
-
-import TransactionsCard from "@/components/dashboard/admin/transactions/TransactionsCard";
+import { TransactionItem } from "@/components/dashboard/transactions/UserTransactions";
 import Loader from "@/components/ui/Loader";
+import { UserRole } from "@/constants/enum";
 import { getAllTransactions } from "@/helpers/client/admin.transactions";
+import { getUserTransactions } from "@/helpers/client/user.transactions";
+
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { ITransactionWithUser } from "@/models/transaction.model";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { toast } from "sonner";
 
 function TransactionsPage() {
+  const {userRole} = useCurrentUser();
+  const queryFn = userRole === UserRole.admin ? getAllTransactions : getUserTransactions
   const { data, error, isFetching } = useQuery({
     queryKey: ["getAllTransactionsAdmin"],
-    queryFn: getAllTransactions,
+    queryFn:()=>queryFn({page:0}),
     enabled: true,
   });
   if (error) {
@@ -21,14 +25,12 @@ function TransactionsPage() {
   if (isFetching) {
     return <Loader />;
   }
-  const transactionDocs = data?.transactions?.docs;
+  const transactionDocs = data?.transactions;
 
   return (
-    <div className="flex justify-center gap-2 flex-col max-w-[600px] mx-auto">
+    <div className="flex justify-center flex-col max-w-[600px] mx-auto">
       {transactionDocs.map((transaction: ITransactionWithUser) => (
-        <Link href={`./transactions/${transaction._id}`} key={String(transaction._id)}>
-          <TransactionsCard transaction={transaction}  />
-        </Link>
+          <TransactionItem transaction={transaction} key={String(transaction._id)}  />
       ))}
     </div>
   );
