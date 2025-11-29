@@ -2,6 +2,7 @@
 import {
   BadgeIndianRupee,
   Home,
+  LucideOctagon,
   PlusCircleIcon,
   Search,
   Settings,
@@ -80,15 +81,19 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   // console.log('currentUser', currentUser);
-  const currentUserRole = useAppSelector((state)=>state.auth.user?.role)
+  const currentUserRole = useAppSelector((state) => state.auth.user?.role);
 
   if (!pathname.startsWith("/dashboard")) {
-    return null; // Don't render the sidebar on login or register pages.
+    return null; 
   }
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>Tiffinz</SidebarHeader>
+      <SidebarHeader>
+        <SidebarMenuButton> <LucideOctagon />
+          <span className="text-lg font-semibold text-foreground">Tiffinz</span>
+        </SidebarMenuButton>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -129,15 +134,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem className="w-full"> 
-                <SidebarMenuButton className="w-full"asChild>
+              <SidebarMenuItem className="w-full">
+                <SidebarMenuButton className="w-full" asChild>
                   <LogoutButton />
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      
       </SidebarFooter>
     </Sidebar>
   );
