@@ -4,7 +4,7 @@ import {
   Home,
   LucideOctagon,
   PlusCircleIcon,
-  Search,
+  // Search,
   Settings,
   User,
 } from "lucide-react";
@@ -53,28 +53,28 @@ const sidebarItems: ISidebarItem[] = [
     url: "/dashboard/transactions",
     icon: BadgeIndianRupee,
   },
-  {
-    title: "Accounts",
-    url: "/accounts",
-    icon: Search,
-  },
-  {
-    title: "Add Balance",
-    url: "/dashboard/add-balance",
-    icon: PlusCircleIcon,
-    onlyForUser: true, // Only for regular users
-  },
+  // {
+  //   title: "Accounts",
+  //   url: "/accounts",
+  //   icon: Search,
+  // },
+  // {
+  //   title: "Add Balance",
+  //   url: "/dashboard/add-balance",
+  //   icon: PlusCircleIcon,
+  //   onlyForUser: true, // Only for regular users
+  // },
   {
     title: "Add Balance Request",
     url: "/dashboard/requests",
     icon: PlusCircleIcon,
     onlyForAdmin: true,
   },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
+  // {
+  //   title: "Settings",
+  //   url: "/dashboard/settings",
+  //   icon: Settings,
+  // },
 ];
 
 export function AppSidebar() {
