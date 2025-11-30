@@ -8,6 +8,7 @@ import { getUserTransactions } from "@/helpers/client/user.transactions";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { ITransactionWithUser } from "@/models/transaction.model";
 import { useQuery } from "@tanstack/react-query";
+import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 function TransactionsPage() {
@@ -26,7 +27,9 @@ function TransactionsPage() {
     return <Loader />;
   }
   const transactionDocs = data?.transactions;
-
+  if (!transactionDocs.length) {
+    return <div className="text-center text-muted-foreground flex justify-center gap-2"><AlertCircle/> No transactions found</div>;
+  }
   return (
     <div className="flex justify-center flex-col max-w-[600px] mx-auto">
       {transactionDocs.map((transaction: ITransactionWithUser) => (

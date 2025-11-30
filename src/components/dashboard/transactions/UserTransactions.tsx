@@ -39,7 +39,11 @@ function UserTransactions() {
   } else if (error) {
     toast.error(error.message);
   }
+
   const transactions = response.transactions;
+  if(transactions.length==0){
+    return null
+  }
   return (
     <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
       <CardHeader>
