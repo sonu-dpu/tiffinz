@@ -15,9 +15,10 @@ import {
   loginWithPhoneSchema,
   loginWithUsernameSchema,
 } from "@/zod/user.login.schema";
+import { CreateUserByAdminInput } from "@/zod/user.schema";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function registerUser(userData: IUser) {
+async function doesUserAlreadyExist(userData: IUser | CreateUserByAdminInput) {
   // Check if user exists
   const orConditions: Array<Record<string, string>> = [
     { phone: userData.phone },
@@ -34,9 +35,24 @@ export async function registerUser(userData: IUser) {
       existingUser?.email && existingUser.email === userData.email
         ? "Email"
         : "Phone/Username";
-    throw new ApiError(`User with ${credential} already registered`, 409);
+    return {
+      error: `User with ${credential} already registered`,
+      exists: true,
+    };
   }
 
+  return { error: null, exists: false };
+}
+
+export async function registerUser(userData: IUser) {
+  // Check if user exists
+  const { error, exists } = await doesUserAlreadyExist(userData);
+  if (exists) {
+    throw new ApiError(
+      error || "User registered with same credentials already",
+      409
+    );
+  }
   const newUser: IUser = {
     username: userData.username,
     fullName: userData.fullName,
@@ -47,7 +63,7 @@ export async function registerUser(userData: IUser) {
     isVerified: userData.role === UserRole.admin,
     ...(userData.email && { email: userData.email }),
   };
-
+  await connectDB();
   const userDoc = await User.create(newUser);
   const createdUser = await User.findById(userDoc._id).select("-password");
   if (!createdUser) {
@@ -174,7 +190,7 @@ async function refreshUserSession(
       throw new ApiError("Session expired, login again", 400);
     }
     const userId = payload?._id as string;
-    console.log('userId', userId)
+    console.log("userId", userId);
     if (!userId) {
       console.error("userId not found in the payload");
       throw new ApiError("Session expired");
@@ -191,7 +207,7 @@ async function refreshUserSession(
       { refreshToken: newRefreshToken },
       { upsert: true, new: true }
     );
-    console.log('userSession', userSession)
+    console.log("userSession", userSession);
     if (!userSession) {
       throw new ApiError("Session creation failed", 500);
     }
@@ -203,8 +219,8 @@ async function refreshUserSession(
       });
     return response;
   } catch (error) {
-    console.log('Error while refreshing the user session error', error)
-    return handleError(error)
+    console.log("Error while refreshing the user session error", error);
+    return handleError(error);
   }
 }
 export {
@@ -213,4 +229,5 @@ export {
   loginOptions,
   loginUser,
   refreshUserSession,
+  doesUserAlreadyExist
 };
