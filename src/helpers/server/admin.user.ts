@@ -4,11 +4,47 @@ import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
 import mongoose ,{ isValidObjectId, PipelineStage} from "mongoose";
 import { createAccount } from "./admin.accounts";
+import { CreateUserByAdminInput } from "@/zod/user.schema";
+import { doesUserAlreadyExist } from "./user.auth";
 
 export interface GetUserOptions {
   isActive?: boolean;
   isVerified?: boolean;
   role?: UserRole;
+}
+function generatePassword(length:number){
+  // generate a random password
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return password;
+}
+async function createUserByAdmin(userData: CreateUserByAdminInput) {
+  const { error, exists } = await doesUserAlreadyExist(userData);
+  if (exists) {
+    throw new ApiError(
+      error || "User registered with same credentials already",
+      409
+    );
+  }
+  
+  await connectDB();
+  let password = userData.password ?? generatePassword(10);
+  const userDoc = {
+    ...userData,
+    password,
+    isVerified:true,
+  }
+  const user = await User.create(userDoc);
+  await createAccount(user._id);
+  if(!user){
+    throw new ApiError("Failed to create user", 500);
+  }
+  user.password = password;
+
+  return user;
 }
 
 async function getAllUsers(options?: GetUserOptions, countOnly:boolean=false) {
@@ -127,4 +163,4 @@ async function verifyUser(userId: string) {
   }
   return {verifiedUser, userAccount}
 }
-export { getUserById, getUserByIdWithAccount, getAllUsers, verifyUsers, verifyUser};
+export { getUserById, getUserByIdWithAccount, getAllUsers, verifyUsers, verifyUser, createUserByAdmin};

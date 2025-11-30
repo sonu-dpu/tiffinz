@@ -25,6 +25,12 @@ export const registerUserSchema = userSchema
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
-// Type inference (optional but useful)
+
+export const createUserByAdminSchema = userSchema.omit({ adminSecret: true}).extend({
+  password: z.string().optional(),
+  adminSecret: z.string().optional(),
+});
+
+export type CreateUserByAdminInput = z.infer<typeof createUserByAdminSchema>;
 export type UserInput = z.infer<typeof userSchema>;
 export type RegisterFormInput = z.infer<typeof registerUserSchema>
