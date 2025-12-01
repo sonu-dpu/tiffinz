@@ -1,4 +1,5 @@
 import { mealLogSchemaForAdminClientType } from "@/zod/mealLog.schema";
+import { MealInput } from "@/zod/meals.schema";
 import axios from "axios";
 
 async function markMealTakenByUser(data: mealLogSchemaForAdminClientType) {
@@ -13,5 +14,16 @@ async function markMealTakenByUser(data: mealLogSchemaForAdminClientType) {
     throw new Error("Error marking meal as taken: " + String(error));
   }
 }
-
-export { markMealTakenByUser };
+async function addNewMeal(data: MealInput){
+  try {
+    const resp = await axios.post("/api/admin/meals/", data);
+    console.log('resp', resp)
+    if(!resp.data?.success){
+      throw new Error("Failed to create meal")
+    }
+    return resp.data?.data;
+  } catch (error) {
+    throw new Error("Error: addNewMeal " + String(error));
+  }
+}
+export { markMealTakenByUser, addNewMeal };
