@@ -31,7 +31,7 @@ function MealsContainer() {
     return <Loader />;
   }
   const meals = data?.meals;
-  if (meals.length > 0) {
+  if (meals.length ==0) {
     return (
       <div className="container mx-auto my-4">
         <h1 className="font-bold py-2">Meals </h1>
@@ -43,18 +43,39 @@ function MealsContainer() {
 
         {isAdmin && (
           <div className="fixed right-4 bottom-24 md:bottom-10">
-            <Button asChild className="rounded-full w-10 h-10">
-              <Link href={"/dashboard/meals/add"}>
-                <Plus className="w-full h-full"></Plus>
-              </Link>
-            </Button>
+            <AddNewMealButton />
           </div>
         )}
       </div>
     );
   }
 
-  return <div>No Meals</div>;
+  return (
+    <div>
+      <div className="container mx-auto my-4">
+        <h1 className="font-bold py-2">Meals </h1>
+        <div className=" w-full grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 justify-center md:px-4 ">
+          <div className="text-center">No meals found</div>
+        {isAdmin && (
+          <div className="fixed right-4 bottom-24 md:bottom-10">
+          <AddNewMealButton />
+          </div>
+          )}
+        </div>
+      </div>
+      
+    </div>
+  );
+}
+
+function AddNewMealButton() {
+  return (
+    <Button asChild size={"icon"} className=" w-10 h-10">
+      <Link href={"/dashboard/meals/add"}>
+        <Plus className="w-full h-full"></Plus>
+      </Link>
+    </Button>
+  );
 }
 
 export default MealsContainer;
