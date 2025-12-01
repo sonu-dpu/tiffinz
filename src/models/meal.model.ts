@@ -29,7 +29,7 @@ const mealSchema = new Schema<IMeal>(
     },
     isActive:{
       type:Boolean,
-      default:false,
+      default:true,
     },
     description: {
       type: String,
