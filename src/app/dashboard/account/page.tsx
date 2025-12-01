@@ -1,4 +1,4 @@
-import { AccountCard } from "@/components/dashboard";
+import AccountCard from "@/components/dashboard/wallet/AccountCard";
 
 import React from "react";
 function AccountPage() {
