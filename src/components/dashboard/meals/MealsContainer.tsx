@@ -31,7 +31,7 @@ function MealsContainer() {
     return <Loader />;
   }
   const meals = data?.meals;
-  if (meals.length ==0) {
+  if (meals.length > 0) {
     return (
       <div className="container mx-auto my-4">
         <h1 className="font-bold py-2">Meals </h1>
