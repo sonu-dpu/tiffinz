@@ -132,7 +132,7 @@ const UserCard = ({ user }: { user: IUserWithAccount }) => {
           drawerTriggerText="Add Balance"
           drawerTriggerIcon={<PlusCircleIcon className="w-4 h-4" />}
         >
-          <AddBalanceForm className="bg-transparent border-none w-md mx-auto" />
+          <AddBalanceForm className="bg-transparent border-none w-md mx-auto  " />
         </WithDrawer>
 
         <Button onClick={selectUserForMealRecord}>Record Meal</Button>
