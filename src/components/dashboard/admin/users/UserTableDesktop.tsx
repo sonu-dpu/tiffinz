@@ -13,6 +13,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
   users: IUser[];
@@ -55,16 +57,18 @@ export const UserTableDesktop: React.FC<Props> = ({
             <TableRow
               key={String(user._id)}
               onClick={(e) => handleRowClick(String(user._id), e)}
-              className="text-center cursor-pointer"
+              className="cursor-pointer"
             >
               <TableCell>
-                <Image
-                  src={user.avatar || "/profileAvatar.png"}
-                  alt={user.username || ""}
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-full mx-auto"
-                />
+              <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+            <AvatarImage
+              src={user.avatar || undefined}
+              alt={user.fullName}
+            />
+            <AvatarFallback className="text-md font-bold">
+              {user.fullName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
               </TableCell>
 
               <TableCell>{user.username}</TableCell>
@@ -75,11 +79,9 @@ export const UserTableDesktop: React.FC<Props> = ({
               <TableCell>{user.role}</TableCell>
 
               <TableCell>
-                {user.isVerified ? (
-                  <span className="text-green-600 font-semibold">Yes</span>
-                ) : (
-                  <span className="text-red-500 font-semibold">No</span>
-                )}
+                <Badge variant={user.isVerified ? "secondary" : "destructive"}>
+                  {user.isVerified ? "Verified" : "Not Verified"}
+                </Badge>
               </TableCell>
 
               <TableCell>{getDateAndTimeString(user.createdAt!)}</TableCell>

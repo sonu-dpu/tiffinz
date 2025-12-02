@@ -1,26 +1,11 @@
 "use client";
-import AddBalanceForm from "@/components/dashboard/admin/accounts/AddBalanceForm";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import UserDetailsCard from "@/components/dashboard/admin/users/UserDetailsCard";
 import Loader from "@/components/ui/Loader";
-import WithDrawer from "@/components/ui/withDrawer";
 import {
-  getUserWithAccount,
-  IUserWithAccount,
+  getUserWithAccount
 } from "@/helpers/client/admin.users";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
-import { setSelectedUser } from "@/store/usersSlice";
 import { useQuery } from "@tanstack/react-query";
-import { PlusCircleIcon } from "lucide-react";
-import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 
 function UserPage() {
@@ -41,104 +26,10 @@ function UserPage() {
   if (isFetching) {
     return <Loader />;
   } else if (user) {
-    return <UserCard user={user} />;
+    return <UserDetailsCard user={user} />;
   }
 }
 
-const UserCard = ({ user }: { user: IUserWithAccount }) => {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const selectUserForMealRecord = () => {
-    dispatch(setSelectedUser(user));
-    router.push(`./${user._id}/meals/mark`);
-  };
-  return (
-    <Card className="max-w-7xl mx-auto shadow-lg rounded-lg">
-      <CardHeader className="flex items-center gap-4 p-4 border-b">
-        <Image
-          alt={user.fullName}
-          src={user.avatar || "/profileAvatar.png"}
-          width={64}
-          height={64}
-          className="rounded-full object-cover border"
-        />
-        <CardTitle className="text-xl font-semibold">{user.fullName}</CardTitle>
-      </CardHeader>
 
-      <CardContent className="p-4 space-y-3 text-sm ">
-        <div className="space-y-4">
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="">Id:</strong>
-            <span className="font-medium text-accent-foreground ">
-              {String(user._id)}
-            </span>
-          </p>
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="text-accent-foreground">Username:</strong>
-            <span className="font-medium text-accent-foreground">{user.username}</span>
-          </p>
-
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="text-accent-foreground">Email:</strong>
-            <span className="font-medium text-accent-foreground">{user.email}</span>
-          </p>
-
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="text-accent-foreground">Phone:</strong>
-            <span className="font-medium text-accent-foreground">{user.phone}</span>
-          </p>
-
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="text-accent-foreground">Role:</strong>
-            <span className="font-medium text-accent-foreground">{user.role}</span>
-          </p>
-
-          <p className="flex justify-between border-b  pb-2">
-            <strong className="text-accent-foreground">Verified:</strong>
-            <span
-              className={
-                user.isVerified
-                  ? "text-green-600 font-semibold"
-                  : "text-red-500 font-semibold"
-              }
-            >
-              {user.isVerified ? "Yes" : "No"}
-            </span>
-          </p>
-
-          <p className="flex justify-between">
-            <strong className="text-accent-foreground">Account Balance:</strong>
-            <span className="font-semibold text-indigo-600">
-              {user.account?.balance?.toLocaleString("en-IN", {
-                style: "currency",
-                currency: "INR",
-              }) ?? "₹0.00"}
-            </span>
-          </p>
-        </div>
-
-        <p>
-          <strong>Account Created At:</strong>{" "}
-          {getDateAndTimeString(String(user.account?.createdAt))}
-        </p>
-        <p>
-          <strong>Account Updated At:</strong>{" "}
-          {getDateAndTimeString(String(user.account?.updatedAt))}
-        </p>
-      </CardContent>
-
-      <CardFooter className="p-4 border-t border-gray-100 flex gap-2">
-        <WithDrawer
-          drawerTriggerText="Add Balance"
-          drawerTriggerIcon={<PlusCircleIcon className="w-4 h-4" />}
-        >
-          <AddBalanceForm className="bg-transparent border-none max-w-md mx-auto  " />
-        </WithDrawer>
-
-        <Button onClick={selectUserForMealRecord}>Record Meal</Button>
-      </CardFooter>
-    </Card>
-  );
-};
 
 export default UserPage;
