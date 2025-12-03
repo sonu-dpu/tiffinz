@@ -11,12 +11,13 @@ const addBalanceToUserAccount = withAuth<{ id: string }>(
   async (req, context) => {
     const { id: userId } = await context.params;
     const body = await req.json();
-    const { amount, type, accountId } = body;
+    const { amount, type, accountId, description } = body;
     const document: UpdateUserAccountBalanceParams = {
       amount,
       type,
       accountId,
       userId,
+      description
     };
     const parseResult = UpdateUserAccountBalanceSchema.safeParse(document);
     if (parseResult.success === false) {

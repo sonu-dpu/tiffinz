@@ -38,7 +38,7 @@ async function createAccount(userId: string) {
 }
 
 async function updateUserAccountBalance(data:UpdateUserAccountBalanceParams) {
-  const {amount, accountId, userId, type} = data;
+  const {amount, accountId, userId, type, description} = data;
   if(!userId && !accountId){
     throw new ApiError("Either userId or accountId is required", 400);
   }
@@ -68,7 +68,8 @@ async function updateUserAccountBalance(data:UpdateUserAccountBalanceParams) {
     type,
     account: account._id,
     user: account.user,
-    isMeal:false
+    isMeal:false,
+    ...(description && {description})
   });
   return {transaction};
 }

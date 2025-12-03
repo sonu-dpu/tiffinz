@@ -7,7 +7,8 @@ export async function addBalanceToUserAccount(data:UpdateUserAccountBalanceParam
     const payload = {
       amount:data.amount,
       type:data.type,
-      ...(data.accountId && {accountId:data.accountId})
+      ...(data.accountId && {accountId:data.accountId}),
+      ...(data.description && {description:data.description}),
     }
     const response = await axios.patch(`/api/admin/users/${data.userId}/account`, payload);
 

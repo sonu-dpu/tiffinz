@@ -6,6 +6,7 @@ export const UpdateUserAccountBalanceSchema = z.object({
   accountId: z.string().optional(),
   userId: z.string().optional(),
   type: z.enum(TransactionType),
+  description: z.string().optional(),
 });
 
 export type UpdateUserAccountBalanceParams = z.infer<

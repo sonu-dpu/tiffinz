@@ -3,19 +3,22 @@
 import { useForm } from "react-hook-form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import LoaderButton  from "@/components/ui/loader-button";
+import LoaderButton from "@/components/ui/loader-button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { TransactionType } from "@/constants/enum";
-import { addBalanceToUserAccount } from  "@/helpers/client/admin.accounts";
+import { addBalanceToUserAccount } from "@/helpers/client/admin.accounts";
+import { Textarea } from "@/components/ui/textarea";
+import { description } from "@/components/example-chart";
 type AddBalanceInput = {
   amount: number;
+  description?: string;
 };
 
 export default function AddBalanceForm({ className }: { className?: string }) {
-  const {id: userId} = useParams();
-  const router = useRouter()
+  const { id: userId } = useParams();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -28,13 +31,13 @@ export default function AddBalanceForm({ className }: { className?: string }) {
     try {
       console.log("Submitting:", data);
       const document = {
+        ...data,
         amount: data.amount,
         userId: userId as string,
-        type:TransactionType.credit,
+        type: TransactionType.credit,
       };
-      // TODO: call your API here
-      const {transaction} = await addBalanceToUserAccount(document);
-      router.push(`/dashboard/transactions/${transaction._id}`)
+      const { transaction } = await addBalanceToUserAccount(document);
+      router.push(`/dashboard/transactions/${transaction._id}`);
       toast.success("Balance updated!");
       reset();
     } catch (error) {
@@ -52,7 +55,6 @@ export default function AddBalanceForm({ className }: { className?: string }) {
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
           {/* Amount */}
           <div className="space-y-2">
             <Input
@@ -61,10 +63,24 @@ export default function AddBalanceForm({ className }: { className?: string }) {
                 required: "Amount is required",
                 setValueAs: (v) => Number(v),
                 min: { value: 1, message: "Amount must be greater than 0" },
+                max: { value: 5000, message: "Amount must be less than 5000" },
               })}
               label="Amount"
               placeholder="Enter amount"
               errorMessage={errors.amount?.message}
+            />
+          </div>
+          {/* Description */}
+          <div className="flex flex-col space-y-2">
+            <label htmlFor="description" className="text-muted-foreground text-sm font-medium w-full text-left">
+              Description (optional)
+            </label>
+            <Textarea
+            id="description"
+              {...register("description", {
+                required: false,
+              })}
+              placeholder="Enter short description"
             />
           </div>
 
@@ -80,9 +96,7 @@ export default function AddBalanceForm({ className }: { className?: string }) {
 
         {/* Root level form error */}
         {errors.root && (
-          <div className="mt-4 text-red-600 text-sm">
-            {errors.root.message}
-          </div>
+          <div className="mt-4 text-red-600 text-sm">{errors.root.message}</div>
         )}
       </CardContent>
     </Card>
