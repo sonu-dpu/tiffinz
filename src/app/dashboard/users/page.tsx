@@ -5,7 +5,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { setUsers } from "@/store/usersSlice";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
-import { getUsers, GetUsersOptions, verifyUser } from "@/helpers/client/admin.users";
+import {
+  getUsers,
+  GetUsersOptions,
+  verifyUser,
+} from "@/helpers/client/admin.users";
 import Loader from "@/components/ui/Loader";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -13,22 +17,26 @@ import { UserTableDesktop } from "@/components/dashboard/admin/users/UserTableDe
 import { UserCardListMobile } from "@/components/dashboard/admin/users/UserCardListMobile";
 import { useSearchParams } from "next/navigation";
 
-
 export default function UsersPage() {
   const currentUser = useAppSelector((state) => state.auth.user);
   const { users } = useAppSelector((state) => state.users);
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const isVerified = searchParams.get("verified");
-  const options:GetUsersOptions = {}
-  if(isVerified?.trim()){
-    options.isVerified = isVerified ==="true"
-    console.log('isVerified', isVerified)
+  const options: GetUsersOptions = {};
+  if (isVerified?.trim()) {
+    options.isVerified = isVerified === "true";
+    console.log("isVerified", isVerified);
   }
-  const { data: usersData, error, isLoading, isFetched } = useQuery({
+  const {
+    data: usersData,
+    error,
+    isLoading,
+    isFetched,
+  } = useQuery({
     queryKey: ["getUsers", options],
-    queryFn:()=>getUsers(options),
-    enabled:!users && currentUser?.role === UserRole.admin,
+    queryFn: () => getUsers(options),
+    enabled: !users && currentUser?.role === UserRole.admin,
   });
 
   async function handleVerifyUser(userId: string) {
@@ -41,9 +49,6 @@ export default function UsersPage() {
       toast.success("User verified successfully");
     }
   }
-  useEffect(()=>{
-
-  },)
   useEffect(() => {
     if (usersData && !users && isFetched) {
       dispatch(setUsers(usersData));
@@ -57,12 +62,11 @@ export default function UsersPage() {
     return (users || []).filter(
       (user) =>
         user.username?.toLowerCase().includes(s) ||
-      user.fullName?.toLowerCase().includes(s) ||
+        user.fullName?.toLowerCase().includes(s) ||
         user._id?.toString().toLowerCase().includes(s) ||
         user.email?.toLowerCase().includes(s) ||
-        user.phone?.toLowerCase().includes(s) 
+        user.phone?.toLowerCase().includes(s)
     );
-
   }, [users, search]);
 
   // --- Role Protection ---
@@ -82,7 +86,7 @@ export default function UsersPage() {
     return <div>{error?.message}</div>;
   } else if (!users) {
     return <div>Failed to fetch users</div>;
-  } 
+  }
 
   // --- Main Render ---
   return (
