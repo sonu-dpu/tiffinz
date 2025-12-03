@@ -26,4 +26,13 @@ async function addNewMeal(data: MealInput){
     throw new Error("Error: addNewMeal " + String(error));
   }
 }
-export { markMealTakenByUser, addNewMeal };
+
+async function deleteMealById(mealId:string) {
+  try {
+    const resp = await axios.delete(`/api/admin/meals/${mealId}`);
+    return resp.data;
+  } catch (error) {
+    throw new Error("Error: deleteMeal " + String(error));
+  }
+}
+export { markMealTakenByUser, addNewMeal, deleteMealById };
