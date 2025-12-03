@@ -1,3 +1,4 @@
+"use client"
 import { IMeal } from "@/models/meal.model";
 import {
   Card,
@@ -20,6 +21,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { WithAlert } from "@/components/WithAlert";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { UserRole } from "@/constants/enum";
 function MealCard({
   meal,
   listOnly = false,
@@ -27,6 +30,7 @@ function MealCard({
   meal: IMeal;
   listOnly?: boolean;
 }) {
+  const {userRole} = useCurrentUser();
   return (
     <Link href={`/dashboard/meals/${meal._id}`}>
       <Card>
@@ -35,7 +39,9 @@ function MealCard({
             {meal.name} - {meal.type}
           </CardTitle>
           <CardAction>
-            <MealActionMenu />
+            {
+              userRole===UserRole.admin && <MealActionMenu />
+            }
           </CardAction>
           <Badge color={meal.isActive ? "green" : "red"}>
             {meal.isActive ? "Active" : "Inactive"}
