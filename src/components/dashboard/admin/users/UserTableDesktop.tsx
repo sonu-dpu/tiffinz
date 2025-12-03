@@ -28,7 +28,10 @@ export const UserTableDesktop: React.FC<Props> = ({
   onDelete,
 }) => {
   const router = useRouter();
-  const handleRowClick = (userId: string, e: React.MouseEvent<HTMLTableRowElement>) => {
+  const handleRowClick = (
+    userId: string,
+    e: React.MouseEvent<HTMLTableRowElement>
+  ) => {
     const target = e.target as HTMLElement;
     if (target.closest("button")) {
       return; // Prevent navigation if a button was clicked
@@ -60,15 +63,15 @@ export const UserTableDesktop: React.FC<Props> = ({
               className="cursor-pointer"
             >
               <TableCell>
-              <Avatar className="h-10 w-10 rounded-full overflow-hidden">
-            <AvatarImage
-              src={user.avatar || undefined}
-              alt={user.fullName}
-            />
-            <AvatarFallback className="text-md font-bold">
-              {user.fullName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+                <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                  <AvatarImage
+                    src={user.avatar || undefined}
+                    alt={user.fullName}
+                  />
+                  <AvatarFallback className="text-md font-bold">
+                    {user.fullName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
               </TableCell>
 
               <TableCell>{user.username}</TableCell>
