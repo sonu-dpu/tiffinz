@@ -42,7 +42,7 @@ export function WithAlert({
         {children}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>
+          <AlertDialogAction onClick={onConfirm}>
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>
