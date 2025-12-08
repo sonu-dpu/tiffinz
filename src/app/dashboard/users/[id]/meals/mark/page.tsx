@@ -52,7 +52,7 @@ function RecordMealPage() {
         dispatch(setSelectedUser(user));
       });
     }
-  }, [userId, dispatch]);
+  }, [userId, dispatch, selectedUser]);
 
   if (!selectedUser) {
     return <div>Loading user...</div>;
@@ -93,7 +93,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors},
+    formState: { errors },
   } = useForm({ resolver: zodResolver(mealLogSchemaForAdminClient) });
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -105,33 +105,41 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     setValue("user", String(user?._id));
     console.log("data", formData);
     // transform local MealExtrasTypes (mealId, quantity) to the shape expected by the API ({ extras, quantity })
-    const extrasPayload = mealExtras.map((e) => ({ extras: e.mealId, quantity: e.quantity }));
+    const extrasPayload = mealExtras.map((e) => ({
+      extras: e.mealId,
+      quantity: e.quantity,
+    }));
     startTransition(async () => {
       try {
-        const response = await markMealTakenByUser({ ...formData, extras: extrasPayload });
+        const response = await markMealTakenByUser({
+          ...formData,
+          extras: extrasPayload,
+        });
         toast.success("Meal recorded successfully");
-        router.push(`/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`);
-        console.log('response', response)
+        router.push(
+          `/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`
+        );
+        console.log("response", response);
       } catch (err) {
-        console.error("Error while marking meal ", err)
+        console.error("Error while marking meal ", err);
         toast.error("Failed to record meal");
       }
-    })
+    });
   };
-  if (isFetching) {
-    <div>Loading..</div>;
-  }
 
-  if (error) {
-    return <div>{error.message}</div>;
-  }
-  const meals = data?.meals ?? [];
+  const meals = useMemo(() => data?.meals ?? [], [data?.meals]);
   const baseMeals = useMemo(() => {
     return meals.filter((meal: IMeal) => meal.type !== MealType.extras);
   }, [meals]);
   const extras = useMemo(() => {
     return meals.filter((meal: IMeal) => meal.type === MealType.extras);
   }, [meals]);
+  if (isFetching) {
+    <div>Loading..</div>;
+  }
+  if (error) {
+    return <div>{error.message}</div>;
+  }
   console.log("errors", errors);
   return (
     <form
@@ -227,7 +235,13 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
         </DialogWrapper>
       </div>
 
-      <LoaderButton fallbackText="Record..." isLoading={isLoading} type="submit">Record</LoaderButton>
+      <LoaderButton
+        fallbackText="Record..."
+        isLoading={isLoading}
+        type="submit"
+      >
+        Record
+      </LoaderButton>
     </form>
   );
 };
@@ -236,7 +250,7 @@ const AddMealExtrasForm = ({
   extrasItemsWithDetails,
   setMealExtras,
   mealsExtras,
-  setOpen
+  setOpen,
 }: {
   extrasItemsWithDetails: IMeal[];
   setMealExtras: React.Dispatch<React.SetStateAction<MealExtrasTypes[]>>;
