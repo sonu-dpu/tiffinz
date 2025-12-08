@@ -17,6 +17,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
+import { WithAlert } from "@/components/WithAlert";
 import { DailyMealFor, MealType } from "@/constants/enum";
 import { markMealTakenByUser } from "@/helpers/client/admin.meals";
 import { getUserById } from "@/helpers/client/admin.users";
@@ -36,7 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { FC, useEffect, useMemo, useState, useTransition } from "react";
+import React, { FC, useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -58,7 +59,7 @@ function RecordMealPage() {
     return <div>Loading user...</div>;
   }
   return (
-    <Card className="max-w-md mx-auto">
+    <Card className="max-w-md mx-auto bg-transparent border-none shadow-none">
       <CardHeader>
         <CardTitle>Record Meal</CardTitle>
         <CardDescription>for {selectedUser.fullName}</CardDescription>
@@ -93,13 +94,18 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(mealLogSchemaForAdminClient) });
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mealExtras, setMealExtras] = useState<MealExtrasTypes[]>([]);
   const [isLoading, startTransition] = useTransition();
-  const handleFormSubmit = async (
+  const [formData, setFormData] =
+    useState<mealLogSchemaForAdminClientType | null>(null);
+  if (formData) {
+    console.log("formData", formData);
+  }
+  const handleFormValidationAndSetFormData = async (
     formData: mealLogSchemaForAdminClientType
   ) => {
     setValue("user", String(user?._id));
@@ -109,12 +115,13 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
       extras: e.mealId,
       quantity: e.quantity,
     }));
+    setFormData({ ...formData, extras: extrasPayload });
+  };
+  const submitOnConfirmation = () => {
+    if (!formData) return;
     startTransition(async () => {
       try {
-        const response = await markMealTakenByUser({
-          ...formData,
-          extras: extrasPayload,
-        });
+        const response = await markMealTakenByUser(formData!);
         toast.success("Meal recorded successfully");
         router.push(
           `/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`
@@ -126,7 +133,6 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
       }
     });
   };
-
   const meals = useMemo(() => data?.meals ?? [], [data?.meals]);
   const baseMeals = useMemo(() => {
     return meals.filter((meal: IMeal) => meal.type !== MealType.extras);
@@ -134,115 +140,140 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
   const extras = useMemo(() => {
     return meals.filter((meal: IMeal) => meal.type === MealType.extras);
   }, [meals]);
+
   if (isFetching) {
     <div>Loading..</div>;
   }
   if (error) {
+    toast.error("Error loading meals");
     return <div>{error.message}</div>;
   }
-  console.log("errors", errors);
-  return (
-    <form
-      onSubmit={handleSubmit(handleFormSubmit)}
-      className="grid grid-cols-1 gap-2"
+  const submitButton = (
+    <LoaderButton
+      fallbackText="Record..."
+      isLoading={isLoading}
+      type="submit"
+      disabled={!isValid}
     >
-      {/* {String(user._id)} */}
-      <Input
-        label="User"
-        defaultValue={String(user._id)}
-        readOnly
-        {...register("user")}
-        errorMessage={errors.user?.message}
-      />
-      <div>
-        <label htmlFor="meal">Base Meal</label>
-        <NativeSelect id="meal" className="w-full" {...register("meal")}>
-          <NativeSelectOption className="w-full" value="">
-            Select Base Meal
-          </NativeSelectOption>
-          {baseMeals.map((meal: IMeal) => (
-            <NativeSelectOption key={String(meal._id)} value={String(meal._id)}>
-              {meal.name} — {meal.type.toLowerCase()}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-        {errors.meal && <p className="text-red-400">{errors.meal.message}</p>}
-      </div>
-
-      <div>
-        <label htmlFor="mealFor">Meal</label>
-        <NativeSelect className="w-full" id="mealFor" {...register("mealFor")}>
-          <NativeSelectOption value="" disabled>
-            Meal For
-          </NativeSelectOption>
-          {Object.values(DailyMealFor).map((item) => (
-            <NativeSelectOption key={item} value={item}>
-              {item.toLowerCase()}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-      </div>
-      {/* extras items will be displayed here */}
-      <div>
-        {mealExtras.length > 0 && (
-          <div className="space-y-1">
-            <label className="font-medium">Extras Added:</label>
-            <ul className="list-disc list-inside">
-              {mealExtras.map((extra, index) => {
-                const mealDetails = extras.find(
-                  (meal: IMeal) => String(meal._id) === extra.mealId
-                );
-                return (
-                  <li className="flex items-center justify-between" key={index}>
-                    {mealDetails ? mealDetails.name : "Unknown Meal"} -
-                    Quantity: {extra.quantity}{" "}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className=""
-                      onClick={() => {
-                        // remove this extra from mealExtras
-                        setMealExtras((prev) =>
-                          prev.filter((meal) => meal.mealId !== extra.mealId)
-                        );
-                      }}
-                    >
-                      <MinusCircle />
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-      </div>
-      <div className="flex justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          size={"sm"}
-          onClick={() => setOpen(true)}
-        >
-          <PlusCircle /> Extras
-        </Button>
-        <DialogWrapper title="Add Extras" open={open} onOpenChange={setOpen}>
-          <AddMealExtrasForm
-            extrasItemsWithDetails={extras}
-            setMealExtras={setMealExtras}
-            mealsExtras={mealExtras}
-            setOpen={setOpen}
-          />
-        </DialogWrapper>
-      </div>
-
-      <LoaderButton
-        fallbackText="Record..."
-        isLoading={isLoading}
-        type="submit"
+      Record
+    </LoaderButton>
+  );
+  return (
+    <>
+      <form
+        onSubmit={handleSubmit(handleFormValidationAndSetFormData)}
+        className="grid grid-cols-1 gap-2"
       >
-        Record
-      </LoaderButton>
-    </form>
+        {/* {String(user._id)} */}
+        <Input
+          label="User"
+          defaultValue={String(user._id)}
+          readOnly
+          {...register("user")}
+          errorMessage={errors.user?.message}
+        />
+        {/* Base meal select options */}
+        <div>
+          <label htmlFor="meal">Base Meal</label>
+          <NativeSelect id="meal" className="w-full" {...register("meal")}>
+            <NativeSelectOption className="w-full" value="">
+              Select Base Meal
+            </NativeSelectOption>
+            {baseMeals.map((meal: IMeal) => (
+              <NativeSelectOption
+                key={String(meal._id)}
+                value={String(meal._id)}
+              >
+                {meal.name} - {meal.type.toLowerCase()} -{" "}
+                {formatToIndianCurrency(meal.price)}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          {errors.meal && <p className="text-red-400">{errors.meal.message}</p>}
+        </div>
+        {/* Meal for select option */}
+        <div>
+          <label htmlFor="mealFor">Meal</label>
+          <NativeSelect
+            className="w-full"
+            id="mealFor"
+            {...register("mealFor")}
+          >
+            <NativeSelectOption value="" disabled>
+              Meal For
+            </NativeSelectOption>
+            {Object.values(DailyMealFor).map((item) => (
+              <NativeSelectOption key={item} value={item}>
+                {item.toLowerCase()}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </div>
+        {/* extras items*/}
+        <div>
+          {mealExtras.length > 0 && (
+            <div className="space-y-1">
+              <label className="font-medium">Extras Added:</label>
+              <ul className="list-disc list-inside">
+                {mealExtras.map((extra, index) => {
+                  const mealDetails = extras.find(
+                    (meal: IMeal) => String(meal._id) === extra.mealId
+                  );
+                  return (
+                    <li
+                      className="flex items-center justify-between"
+                      key={index}
+                    >
+                      {mealDetails ? mealDetails.name : "Unknown Meal"} -
+                      Quantity: {extra.quantity}{" "}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className=""
+                        onClick={() => {
+                          // remove this extra from mealExtras
+                          setMealExtras((prev) =>
+                            prev.filter((meal) => meal.mealId !== extra.mealId)
+                          );
+                        }}
+                      >
+                        <MinusCircle />
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
+        {/* extras add button */}
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size={"sm"}
+            onClick={() => setOpen(true)}
+          >
+            <PlusCircle /> Extras
+          </Button>
+          <DialogWrapper title="Add Extras" open={open} onOpenChange={setOpen}>
+            <AddMealExtrasForm
+              extrasItemsWithDetails={extras}
+              setMealExtras={setMealExtras}
+              mealsExtras={mealExtras}
+              setOpen={setOpen}
+            />
+          </DialogWrapper>
+        </div>
+        <WithAlert
+          title="Confirm Record Meal"
+          onConfirm={submitOnConfirmation}
+          trigger={submitButton}
+        >
+          <p>Recording meal for {user.fullName}</p>
+        </WithAlert>
+      </form>
+    </>
   );
 };
 

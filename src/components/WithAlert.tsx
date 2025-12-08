@@ -26,7 +26,7 @@ export function WithAlert({
   children: React.ReactNode;
   title: string;
   description?: React.ReactNode;
-  onConfirm?: () => void;
+  onConfirm?: () => void | Promise<void>;
 }) {
   return (
     <AlertDialog>
