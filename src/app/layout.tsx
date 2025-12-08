@@ -4,10 +4,6 @@ import "./globals.css";
 import { Providers } from "@/components/providers/providers";
 import { Toaster } from "@/components/ui/sonner";
 import InstallPrompt from "@/components/ui/pwa-install-button";
-import { AppSidebar } from "@/components/ui/app-sidebar";
-// import { UserRole } from "@/constants/enum";
-import BottomNav from "@/components/navbar/BottomNav";
-import Navbar from "@/components/navbar/TopNav";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
