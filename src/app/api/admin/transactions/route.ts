@@ -11,9 +11,6 @@ export const GET = withAuth(
       limit:Number(searchParams.get("limit") )|| 10,
       page:Number(searchParams.get("page") || 1),
       sort:{createdAt:-1}, 
-      customLabels:{
-        docs:"transactions",
-      }
     }
     const transactions = await getAllTransactions({paginateOptions});
     return ApiResponse.success("Get transactions success", transactions, 200);

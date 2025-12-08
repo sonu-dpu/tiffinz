@@ -1,9 +1,13 @@
 import { handleError } from "@/lib/handleError";
 import axios from "axios";
 
-async function getAllTransactions() {
+async function getAllTransactions({page}: {page:number}) {
   try {
-    const resp = await axios.get("/api/admin/transactions");
+    const resp = await axios.get("/api/admin/transactions", {
+      params:{
+        page,
+      }
+    });
     if(!resp.data?.success){
       throw new Error(resp.data?.message)
     }
