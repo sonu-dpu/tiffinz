@@ -52,7 +52,7 @@ async function getUserTransactions(userId: string, options: PaginateOptions) {
   await connectDB();
   const transactions = await Transaction.aggregatePaginate(
     [{ $match: { user: new Types.ObjectId(userId) } }],
-    { ...options, customLabels: { docs: "transactions" } }
+    { ...options }
   );
   return transactions;
 }
