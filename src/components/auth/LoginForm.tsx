@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useState, useTransition } from "react";
 import LoaderButton from "../ui/loader-button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +26,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import Link from "next/link";
 
 function LoginForm() {
-  const { user,isLoggedIn } = useCurrentUser();
+  const { user, isLoggedIn } = useCurrentUser();
   const {
     register,
     handleSubmit,
@@ -31,14 +37,14 @@ function LoginForm() {
   const [errorResponse, setErrorResponse] = useState("");
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const searchParams = useSearchParams()
-  
-  useEffect(()=>{
-    const redirectPath = searchParams.get("redirect") || "/dashboard"
-    if(user && isLoggedIn){
-      router.push(redirectPath)
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const redirectPath = searchParams.get("redirect") || "/dashboard";
+    if (user && isLoggedIn) {
+      router.replace(redirectPath);
     }
-  },[user, searchParams, isLoggedIn, router])
+  }, [user, searchParams, isLoggedIn, router]);
   const toggleShowPassword = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -58,7 +64,7 @@ function LoginForm() {
         toast.error("Login failed: " + error.message);
         return;
       }
-      toast.success("Login Success")
+      toast.success("Login Success");
       console.log("Login successful:", user);
       dispatch(login(user));
       // router.push("/dashboard")
@@ -92,7 +98,7 @@ function LoginForm() {
               type="button"
               onClick={toggleShowPassword}
             >
-              {showPassword ? <EyeClosed /> :<LucideEye />}
+              {showPassword ? <EyeClosed /> : <LucideEye />}
             </Button>
           </div>
           {errorResponse && (
@@ -111,7 +117,10 @@ function LoginForm() {
       </CardContent>
       <CardFooter>
         <div className="text-center w-full text-muted-foreground">
-          Don't have account? <Link href='/register' className="underline">Register</Link>
+          Don&apos;t have account?{" "}
+          <Link href="/register" className="underline">
+            Register
+          </Link>
         </div>
       </CardFooter>
     </Card>

@@ -7,10 +7,16 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-const publicRoutes = ["/", "/login", "/register", "/refresh-session", "/logout"]; // add your actual public routes
+const publicRoutes = [
+  "/",
+  "/login",
+  "/register",
+  "/refresh-session",
+  "/logout",
+]; // add your actual public routes
 const validProtectedRoutes = [
   "/dashboard",
   "/dashboard/users",
@@ -18,11 +24,10 @@ const validProtectedRoutes = [
   "/dashboard/account",
   "/dashboard/requests",
   "/dashboard/add-balance",
-]; 
-
+];
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const {user:currentUser, isLoggedIn} = useCurrentUser();
+  const { user: currentUser, isLoggedIn } = useCurrentUser();
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const router = useRouter();
@@ -41,7 +46,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["currentUser"],
     queryFn: getCurrentUserOrRefresh,
     retry: false,
-    enabled: !currentUser && pathname!=="/logout" && pathname!=="/refresh-session",
+    enabled:
+      !currentUser && pathname !== "/logout" && pathname !== "/refresh-session",
   });
   // useEffect(()=>{
   //   if(pathname.startsWith("/login") && isLoading){
@@ -59,12 +65,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, currentUser, dispatch, isFetched, pathname, error, isLoggedIn]);
 
   useEffect(() => {
-
-    if (!isLoading && isFetched && !user && !currentUser && !isPublicRoute && !isLoggedIn) {
-      const safeRedirect = validProtectedRoutes.find((value)=>value.startsWith(pathname))
+    if (
+      !isLoading &&
+      isFetched &&
+      !user &&
+      !currentUser &&
+      !isPublicRoute &&
+      !isLoggedIn
+    ) {
+      const safeRedirect = validProtectedRoutes.find((value) =>
+        value.startsWith(pathname)
+      )
         ? pathname
         : "/dashboard";
-      redirect(`/login?redirect=${encodeURIComponent(safeRedirect)}`);
+      router.replace(`/login?redirect=${encodeURIComponent(safeRedirect)}`);
     }
   }, [
     isLoading,
@@ -74,7 +88,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     router,
     isFetched,
     user,
-    isLoggedIn
+    isLoggedIn,
   ]);
 
   if (!isPublicRoute && !isValidRoute) {
@@ -86,7 +100,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   if (error && !currentUser && !isPublicRoute) {
-    toast.error(error.message)
+    toast.error(error.message);
     return null;
   }
 
