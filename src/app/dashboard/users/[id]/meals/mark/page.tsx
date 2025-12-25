@@ -84,6 +84,20 @@ type MealExtrasTypes = {
   mealId: string;
   quantity: number;
 };
+function getLocalDateTime() {
+  const now = new Date();
+
+  // Get date components in local time
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed
+  const day = now.getDate().toString().padStart(2, "0");
+
+  // Get time components in local time
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  // Construct the formatted string
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
   const { data, error, isFetching } = useQuery({
     queryKey: ["getAllMeals", options],
@@ -95,21 +109,22 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
     handleSubmit,
     setValue,
     formState: { errors, isValid },
-  } = useForm({ resolver: zodResolver(mealLogSchemaForAdminClient) });
+  } = useForm({
+    resolver: zodResolver(mealLogSchemaForAdminClient),
+    defaultValues: {
+      date: getLocalDateTime(),
+    },
+  });
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mealExtras, setMealExtras] = useState<MealExtrasTypes[]>([]);
   const [isLoading, startTransition] = useTransition();
   const [formData, setFormData] =
     useState<mealLogSchemaForAdminClientType | null>(null);
-  if (formData) {
-    console.log("formData", formData);
-  }
   const handleFormValidationAndSetFormData = async (
     formData: mealLogSchemaForAdminClientType
   ) => {
     setValue("user", String(user?._id));
-    console.log("data", formData);
     // transform local MealExtrasTypes (mealId, quantity) to the shape expected by the API ({ extras, quantity })
     const extrasPayload = mealExtras.map((e) => ({
       extras: e.mealId,
@@ -208,6 +223,13 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
               </NativeSelectOption>
             ))}
           </NativeSelect>
+        </div>
+        <div>
+          <Input
+            label="Tiffin taken date and time"
+            type="datetime-local"
+            {...register("date")}
+          />
         </div>
         {/* extras items*/}
         <div>
