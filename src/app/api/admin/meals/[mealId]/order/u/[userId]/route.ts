@@ -5,6 +5,11 @@ import { withAuth } from "@/utils/withAuth";
 import { mealLogSchemaInput } from "@/zod/mealLog.schema";
 
 type MealOrderParamsByAdmin = { mealId: string; userId: string };
+/**
+ * this is the admin only api route
+ * - responsible for marking the meal as taken
+ * - creates a meallog -> updates account -> transaction using the helper `markMealTakenAndUpdateAccountBalance()`
+ */
 export const POST = withAuth<MealOrderParamsByAdmin>(
   async (req, context, user) => {
     const { mealId, userId } = await context.params;
@@ -26,7 +31,7 @@ export const POST = withAuth<MealOrderParamsByAdmin>(
 
     return ApiResponse.success(
       `Meal marked as taken successfully for user ${userId}`,
-      response 
+      response
     );
   },
   { requiredRole: UserRole.admin }
