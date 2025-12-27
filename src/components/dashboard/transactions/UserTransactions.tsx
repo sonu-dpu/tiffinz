@@ -12,7 +12,6 @@ import { getUserTransactions } from "@/helpers/client/user.transactions";
 import { cn, formatToIndianCurrency } from "@/lib/utils";
 import { ITransaction } from "@/models/transaction.model";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -23,14 +22,13 @@ import { ArrowRight } from "lucide-react";
 
 function UserTransactions() {
   const { user } = useCurrentUser();
-  const [page, setPage] = useState(1);
   const {
     data: response,
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["getUserTransactions", page, user?._id],
-    queryFn: () => getUserTransactions({ page }),
+    queryKey: ["getUserTransactions", user?._id],
+    queryFn: () => getUserTransactions({ pageParam: 1 }),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -41,8 +39,8 @@ function UserTransactions() {
   }
 
   const transactions = response.transactions;
-  if(transactions.length==0){
-    return null
+  if (transactions.length == 0) {
+    return null;
   }
   return (
     <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
