@@ -38,8 +38,8 @@ function UserTransactions() {
     toast.error(error.message);
   }
 
-  const transactions = response.transactions;
-  if (transactions.length == 0) {
+  const transactions = response.docs;
+  if (transactions?.length == 0) {
     return null;
   }
   return (
