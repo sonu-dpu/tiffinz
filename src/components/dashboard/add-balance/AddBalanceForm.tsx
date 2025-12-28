@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import LoaderButton from "@/components/ui/loader-button";
 import { ImageKitFolder, PaymentMode } from "@/constants/enum";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -34,14 +34,13 @@ const addBalanceRequestSchemaClient = addBalanceRequestSchema.extend({
 function AddBalanceForm({ className = "" }: { className?: string }) {
   const [paymentMode, setPaymentMode] = useState<PaymentMode | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
-  const [isSubmiting, startSubmiting] = useTransition()
   const {
     handleSubmit,
     register,
     setValue,
     setError,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(addBalanceRequestSchemaClient),
   });
@@ -63,8 +62,6 @@ function AddBalanceForm({ className = "" }: { className?: string }) {
   };
   console.log("errors", errors);
   const onSubmit = async (formData: AddBalanceRequestInput) => {
-    // console.log("Form data submiting:", formData);
-
     // Validate payment screenshot for online payments
     if (paymentMode === PaymentMode.online && !fileUrl) {
       setError("paymentScreenshot", {
@@ -74,27 +71,23 @@ function AddBalanceForm({ className = "" }: { className?: string }) {
       console.error("Payment screenshot is required for online payments.");
       return;
     }
-
-    // Remove empty paymentScreenshot for cash payments
     if (
       paymentMode === PaymentMode.cash &&
       !formData.paymentScreenshot?.trim()
     ) {
       delete formData.paymentScreenshot;
     }
-    startSubmiting(async()=>makeAddBalanceRequest(formData))
+    await makeAddBalanceRequest(formData);
   };
 
-
-  async function makeAddBalanceRequest(formData:AddBalanceRequestInput) {
-        const { data, error } = await addBalanceRequest(formData);
+  async function makeAddBalanceRequest(formData: AddBalanceRequestInput) {
+    const { data, error } = await addBalanceRequest(formData);
     if (error) {
       toast.error(error.message || "Failed to add balance request");
       setError("root", {
         type: "manual",
         message: error.message || "Failed to add balance request",
       });
-      console.error("Error adding balance request:", error);
       return;
     }
     reset();
@@ -119,7 +112,7 @@ function AddBalanceForm({ className = "" }: { className?: string }) {
               className="w-full"
             />
 
-            <label className="block mb-2 text-sm font-medium text-gray-700 text-left">
+            <label className="block mb-2 text-sm font-medium text-accent-foreground text-left">
               Select Payment Mode
               <Select onValueChange={handleSelect}>
                 <SelectTrigger className=" w-full">
@@ -152,7 +145,7 @@ function AddBalanceForm({ className = "" }: { className?: string }) {
 
           <LoaderButton
             fallbackText="Adding..."
-            isLoading={isSubmiting}
+            isLoading={isSubmitting}
             className="min-w-[150px]"
           >
             Add Balance{" "}
