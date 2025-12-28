@@ -1,6 +1,5 @@
 "use client";
 import WithDrawer from "@/components/ui/withDrawer";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,29 +13,29 @@ import { getCurrentUserAccount } from "@/helpers/client/user.account";
 
 import { IAccountWithUser } from "@/models/account.model";
 import { PlusCircleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import AddBalanceForm from "../add-balance/AddBalanceForm";
 import { useQuery } from "@tanstack/react-query";
 import { formatToIndianCurrency } from "@/lib/utils";
+import { toast } from "sonner";
 
 function AccountCard() {
-  const [account, setAccount] = useState<IAccountWithUser | null>(null);
   const { data, error } = useQuery({
     queryKey: ["currentUserAccount"],
     queryFn: getCurrentUserAccount,
     retry: false,
   });
-  useEffect(() => {
-    if (data) {
-      setAccount(data as IAccountWithUser);
-    }
-  }, [data]);
+  const account = data as IAccountWithUser;
 
   if (error) {
+    toast.error(error.message);
     return (
       <Card>
         <CardContent>
-          <p>{error.message}</p>
+          <p>
+            {!account?.user.isVerified
+              ? "You are not yet verified by admin, wait for admin to verify your account"
+              : error.message}
+          </p>
         </CardContent>
       </Card>
     );
@@ -76,12 +75,8 @@ const ActionButtons = () => {
         drawerTriggerText="Add Balance"
         drawerTriggerIcon={<PlusCircleIcon />}
       >
-        <AddBalanceForm className="border-none shadow-none" />
+        <AddBalanceForm className="border-none shadow-none bg-transparent" />
       </WithDrawer>
-
-      {/* <Button variant={"outline"}>
-        <ArrowLeftRight></ArrowLeftRight> Transactions
-      </Button> */}
     </>
   );
 };
