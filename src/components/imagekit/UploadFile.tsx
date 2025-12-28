@@ -22,11 +22,11 @@ interface UploadFileProps extends React.HTMLAttributes<HTMLInputElement> {
 const UploadFile = ({
   folder,
   setFileUrl,
-  errorMessage="",
+  errorMessage = "",
   ...props
 }: UploadFileProps) => {
   // State to keep track of the current upload progress (percentage)
-    const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +77,7 @@ const UploadFile = ({
    * - Catches and processes errors accordingly.
    */
   const handleUpload = async () => {
-    console.log('handleUpload called');
+    console.log("handleUpload called");
     // Access the file input element using the ref
     const fileInput = fileInputRef.current;
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
@@ -101,7 +101,7 @@ const UploadFile = ({
     // Call the ImageKit SDK upload function with the required parameters and callbacks.
     try {
       console.log("Starting file upload:", file.name);
-      
+
       toast.dismiss();
       toast.loading(`Uploading ${progress}%`, {
         id: "upload-toast",
@@ -155,15 +155,15 @@ const UploadFile = ({
   return (
     <>
       {/* File input element using React ref */}
-      <label className="block mb-2 text-sm font-medium text-gray-700 text-left">
+      <label className="block mb-2 text-sm font-medium text-accent-foreground text-left">
         Upload File
-        <span className="text-xs text-gray-500">(Max size: 5MB)</span>
+        <span className="text-xs text-gray-500"> (Max size: 5MB)</span>
         <Input
           type="file"
           accept="image/*"
           ref={fileInputRef}
           onChange={handleUpload}
-          errorMessage= {errorMessage} // Display error message if provided
+          errorMessage={errorMessage} // Display error message if provided
           {...props}
         />
       </label>
