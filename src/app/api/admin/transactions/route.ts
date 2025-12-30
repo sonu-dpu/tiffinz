@@ -6,13 +6,19 @@ import { PaginateOptions } from "mongoose";
 
 export const GET = withAuth(
   async (req) => {
-    const searchParams = req.nextUrl.searchParams
-    const paginateOptions:PaginateOptions = {
-      limit:Number(searchParams.get("limit") )|| 10,
-      page:Number(searchParams.get("page") || 1),
-      sort:{createdAt:-1}, 
-    }
-    const transactions = await getAllTransactions({paginateOptions});
+    const searchParams = req.nextUrl.searchParams;
+    const paginateOptions: PaginateOptions = {
+      limit: Number(searchParams.get("limit")) || 10,
+      page: Number(searchParams.get("page") || 1),
+      sort: { createdAt: -1 },
+    };
+    const searchOptions = {
+      user: searchParams.get("user") || "",
+    };
+    const transactions = await getAllTransactions({
+      paginateOptions,
+      searchOptions,
+    });
     return ApiResponse.success("Get transactions success", transactions, 200);
   },
   {
