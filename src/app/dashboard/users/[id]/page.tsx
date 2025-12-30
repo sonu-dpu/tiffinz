@@ -1,9 +1,8 @@
 "use client";
+import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 import UserDetailsCard from "@/components/dashboard/admin/users/UserDetailsCard";
 import Loader from "@/components/ui/Loader";
-import {
-  getUserWithAccount
-} from "@/helpers/client/admin.users";
+import { getUserWithAccount } from "@/helpers/client/admin.users";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -26,10 +25,13 @@ function UserPage() {
   if (isFetching) {
     return <Loader />;
   } else if (user) {
-    return <UserDetailsCard user={user} />;
+    return (
+      <>
+        <UserDetailsCard user={user} />
+        <TransactionsByUserId userId={String(userId)} />
+      </>
+    );
   }
 }
-
-
 
 export default UserPage;

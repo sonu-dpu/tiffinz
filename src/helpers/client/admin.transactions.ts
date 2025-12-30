@@ -31,4 +31,18 @@ async function getTransactionById(transactionId: string) {
   }
 }
 
-export { getAllTransactions, getTransactionById };
+async function getTransactionsByUserId(userId: string) {
+  try {
+    const resp = await axios.get(`/api/admin/transactions`, {
+      params: { user: userId },
+    });
+    const data = resp.data?.data;
+
+    return data;
+  } catch (error) {
+    const message = handleError(error, "get transaction by id").message;
+    throw new Error(message);
+  }
+}
+
+export { getAllTransactions, getTransactionById, getTransactionsByUserId };
