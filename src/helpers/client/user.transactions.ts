@@ -1,6 +1,9 @@
 import axios from "axios";
 
-async function getUserTransactions(options?: { pageParam?: number }) {
+async function getUserTransactions(options?: {
+  pageParam?: number;
+  user?: string;
+}) {
   try {
     const resp = await axios.get(
       `/api/users/transactions?page=${options?.pageParam || 1}`

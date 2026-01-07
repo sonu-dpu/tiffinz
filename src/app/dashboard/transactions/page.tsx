@@ -9,16 +9,20 @@ import { getUserTransactions } from "@/helpers/client/user.transactions";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { ITransactionWithUser } from "@/models/transaction.model";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 
 function TransactionsPage() {
+  const searchParams = useSearchParams();
   const { userRole } = useCurrentUser();
+  const userId = searchParams.get("user") || "";
+
   const queryFn =
     userRole === UserRole.admin ? getAllTransactions : getUserTransactions;
   const { data, error, isFetching, fetchNextPage, hasNextPage, status } =
     useInfiniteQuery({
       queryKey: ["getAllTransactionsAdmin"],
-      queryFn: queryFn,
+      queryFn: ({ pageParam }) => queryFn({ pageParam, user: userId }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) => {
         if (lastPage.hasNextPage) {
@@ -36,8 +40,6 @@ function TransactionsPage() {
 
         if (entry.isIntersecting) {
           fetchNextPage();
-        } else {
-          console.log("Element not is visible in viewport");
         }
       },
       {
