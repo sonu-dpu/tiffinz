@@ -14,21 +14,28 @@ import { PaymentStatus } from "@/constants/enum";
 import { getRequests } from "@/helpers/client/add-balance";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import ExampleCharts from "../example-chart";
 import { getUsers } from "@/helpers/client/admin.users";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { setUsers } from "@/store/usersSlice";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
+
+import axios from "axios";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 function AdminDashboard({ user }: { user: IUser }) {
   return (
     <div className="px-2 pt-6">
-      <h1 className="text-2xl font-semibold mb-4">
-          Welcome, {user.fullName}!
-        </h1>
+      <h1 className="text-2xl font-semibold mb-4">Welcome, {user.fullName}!</h1>
       <div className="flex flex-wrap gap-2 items-start justify-center">
-        <RequestCountCard/>
-        <UsersCountCard/>
-        <ExampleCharts />
+        <RequestCountCard />
+        <UsersCountCard />
+        {/* <ExampleCharts /> */}
+        <TotalMoneyLast />
       </div>
     </div>
   );
@@ -36,14 +43,14 @@ function AdminDashboard({ user }: { user: IUser }) {
 export async function getRequestsCount(status?: PaymentStatus) {
   return getRequests({ status, count: true });
 }
-export async function getUsersCount(isVerified?:boolean) {
-  return getUsers({count:true, isVerified})
+export async function getUsersCount(isVerified?: boolean) {
+  return getUsers({ count: true, isVerified });
 }
 export function RequestCountCard() {
   const { data, error, isFetching } = useQuery({
     queryKey: ["getPendingRequestsCount", PaymentStatus.pending],
     queryFn: () => getRequestsCount(PaymentStatus.pending),
-    refetchOnWindowFocus:false
+    refetchOnWindowFocus: false,
   });
 
   return (
@@ -72,14 +79,15 @@ export function RequestCountCard() {
   );
 }
 
-export function UsersCountCard(){
+export function UsersCountCard() {
   const { data, error, isFetching } = useQuery({
-    queryKey: ["getUnVerifiedUsers",false],
+    queryKey: ["getUnVerifiedUsers", false],
     queryFn: () => getUsersCount(false),
-    refetchOnWindowFocus:false
+    refetchOnWindowFocus: false,
   });
   const dispatch = useAppDispatch();
-  return <Card className="w-full max-w-sm rounded-2xl shadow-md">
+  return (
+    <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
           Unverified Users
@@ -96,12 +104,124 @@ export function UsersCountCard(){
         )}
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button asChild variant="outline" onClick={()=>dispatch(setUsers(""))}>
+        <Button
+          asChild
+          variant="outline"
+          onClick={() => dispatch(setUsers(""))}
+        >
           <Link href={"/dashboard/users?verified=false"}>View Users</Link>
         </Button>
       </CardFooter>
     </Card>
+  );
 }
+type Sales = {
+  month: number;
+  year: number;
+  totalAmount: number;
+  monthLabel?: string;
+};
+const chartConfig = {
+  month: {
+    label: "Month",
+    color: "var(--chart-2)",
+  },
+} satisfies ChartConfig;
+export function TotalMoneyLast() {
+  const { data, error, isFetching } = useQuery({
+    queryKey: ["getTotalSales"],
+    queryFn: () => axios.get("api/admin/dashboard").then((res) => res.data),
+    refetchOnWindowFocus: false,
+  });
 
+  if (isFetching) return <Loader />;
+  if (error) return <p className="text-red-500">{error.message}</p>;
+  console.log(data.data?.totalMoneyRecievedMonthly);
+
+  const MONTHS = [
+    "",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const sales = data.data?.totalMoneyRecievedMonthly.map((item: Sales) => ({
+    ...item,
+    monthLabel: MONTHS[item.month],
+  }));
+
+  return (
+    <Card className="w-full max-w-sm rounded-2xl shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">Amount Recieved</CardTitle>
+      </CardHeader>
+
+      {/* <CardContent className="h-[250px] w-full"> */}
+      <ChartContainer className="px-4" config={chartConfig}>
+        <AreaChart
+          accessibilityLayer
+          data={sales}
+          margin={{ left: 12, right: 12 }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) =>
+              [
+                "",
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+              ][value]
+            }
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="line" />}
+          />
+
+          <Area
+            dataKey="totalAmount"
+            type="natural"
+            fill="var(--color-month)"
+            fillOpacity={0.3}
+            stroke="var(--color-month)"
+          />
+        </AreaChart>
+      </ChartContainer>
+      {/* </CardContent> */}
+
+      <CardFooter className="flex justify-end">
+        <div className="text-xs text-shadow-accent bg-accent p-2 m-1 rounded-lg">
+          Showing the total amount credited monthly
+        </div>
+        <Button asChild variant="outline">
+          <Link href={"/dashboard/transactions"}>View Transactions</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
 
 export default AdminDashboard;
