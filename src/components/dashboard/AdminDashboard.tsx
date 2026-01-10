@@ -165,7 +165,6 @@ export function TotalMoneyLast() {
         <CardTitle className="text-lg font-semibold">Amount Recieved</CardTitle>
       </CardHeader>
 
-      {/* <CardContent className="h-[250px] w-full"> */}
       <ChartContainer className="px-4" config={chartConfig}>
         <AreaChart
           accessibilityLayer
@@ -178,30 +177,17 @@ export function TotalMoneyLast() {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) =>
-              [
-                "",
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ][value]
-            }
+            tickFormatter={(value) => MONTHS[value]}
           />
           <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent indicator="line" />}
+            cursor={true}
+            content={
+              <ChartTooltipContent animationEasing="ease" indicator="line" />
+            }
           />
 
           <Area
+            activeDot
             dataKey="totalAmount"
             type="natural"
             fill="var(--color-month)"
@@ -210,7 +196,6 @@ export function TotalMoneyLast() {
           />
         </AreaChart>
       </ChartContainer>
-      {/* </CardContent> */}
 
       <CardFooter className="flex justify-end">
         <div className="text-xs text-shadow-accent bg-accent p-2 m-1 rounded-lg">
