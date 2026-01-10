@@ -29,6 +29,15 @@ export const GET = withAuth(
       },
       {
         $sort: {
+          year: -1,
+          month: -1,
+        },
+      },
+      {
+        $limit: 6,
+      },
+      {
+        $sort: {
           year: 1,
           month: 1,
         },
