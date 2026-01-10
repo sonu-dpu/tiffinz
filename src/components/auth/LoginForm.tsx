@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import LoaderButton from "../ui/loader-button";
 import {
   Card,
@@ -10,13 +10,12 @@ import {
 } from "../ui/card";
 import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  loginWithPhoneSchema,
-  UserLoginWithPhoneInput,
-} from "@/zod/user.login.schema";
 import { Button } from "../ui/button";
-import { loginUserWithPhone } from "@/helpers/client/user.auth";
+import {
+  loginUserWithPhone,
+  loginUserWithEmail,
+  loginUserWithUsername,
+} from "@/helpers/client/user.auth";
 import { login } from "@/store/authSlice";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { EyeClosed, LucideEye } from "lucide-react";
@@ -24,17 +23,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import Link from "next/link";
+import { email } from "zod/v4";
+
+type LoginFormData = {
+  identifier: string;
+  password: string;
+};
 
 function LoginForm() {
   const { user, isLoggedIn } = useCurrentUser();
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(loginWithPhoneSchema) });
-  const [isLoggingIn, startLoggingIn] = useTransition();
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>();
   const [showPassword, setShowPassword] = useState(false);
-  const [errorResponse, setErrorResponse] = useState("");
   const router = useRouter();
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -51,46 +55,62 @@ function LoginForm() {
     e.preventDefault();
     setShowPassword(!showPassword);
   };
-  const onSubmit = async (data: UserLoginWithPhoneInput) => {
-    setErrorResponse("");
-    startLoggingIn(async () => {
-      const { user, error } = await loginUserWithPhone({
-        phone: data.phone,
+
+  const onSubmit = async (data: LoginFormData) => {
+    const loginType = detectLoginType(data.identifier);
+    let result;
+
+    if (loginType === "phone") {
+      result = await loginUserWithPhone({
+        phone: data.identifier,
         password: data.password,
       });
-      if (error) {
-        setErrorResponse(error.message);
-        console.error("Login failed:", error);
-        toast.error("Login failed: " + error.message);
-        return;
-      }
-      toast.success("Login Success");
-      console.log("Login successful:", user);
-      dispatch(login(user));
-      // router.push("/dashboard")
-    });
+    } else if (loginType === "email") {
+      result = await loginUserWithEmail({
+        email: data.identifier,
+        password: data.password,
+      });
+    } else {
+      result = await loginUserWithUsername({
+        username: data.identifier,
+        password: data.password,
+      });
+    }
+
+    const { user, error } = result;
+    if (error) {
+      setError("root", { message: error.message });
+      console.error("Login failed:", error);
+      toast.error("Login failed: " + error.message);
+      return;
+    }
+    toast.success("Login Success");
+    console.log("Login successful:", user);
+    dispatch(login(user));
   };
   return (
     <Card className="w-full max-w-sm mx-auto">
       <CardHeader>
-        <CardTitle>Login with Phone</CardTitle>
+        <CardTitle>Login</CardTitle>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <Input
-            label="Enter Your Phone"
-            placeholder="99999 77777"
-            errorMessage={errors.phone?.message}
-            {...register("phone")}
+            label="Phone / Email / Username"
+            placeholder="Enter phone, email or username"
+            errorMessage={errors.identifier?.message as string}
+            {...register("identifier", {
+              required: "Phone, email or username is required",
+            })}
           />
           <div className="w-full flex items-end">
             <Input
               className="border w-full"
-              errorMessage={errors.password?.message}
+              errorMessage={errors.password?.message as string}
               label="Enter your password"
               placeholder="Password"
               type={showPassword ? "text" : "password"}
-              {...register("password")}
+              {...register("password", { required: "Password is required" })}
             />
             <Button
               className=""
@@ -101,14 +121,14 @@ function LoginForm() {
               {showPassword ? <EyeClosed /> : <LucideEye />}
             </Button>
           </div>
-          {errorResponse && (
+          {errors.root && (
             <p className="text-red-600 text-sm text-center pt-2">
-              {errorResponse}
+              {errors.root.message}
             </p>
           )}
           <LoaderButton
             className="w-full"
-            isLoading={isLoggingIn}
+            isLoading={isSubmitting}
             fallbackText="logging in..."
           >
             Login
@@ -128,3 +148,15 @@ function LoginForm() {
 }
 
 export default LoginForm;
+
+function detectLoginType(identifier: string) {
+  const phoneRegex = /^[0-9]{10,15}$/;
+
+  if (phoneRegex.test(identifier.replace(/\s/g, ""))) {
+    return "phone";
+  } else if (email().safeParse(identifier).success) {
+    return "email";
+  } else {
+    return "username";
+  }
+}

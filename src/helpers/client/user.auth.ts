@@ -2,7 +2,6 @@
 
 import { handleError } from "@/lib/handleError";
 import { IUser } from "@/models/user.model";
-import { UserLoginWithPhoneInput } from "@/zod/user.login.schema";
 import { RegisterFormInput } from "@/zod/user.schema";
 import axios from "axios";
 
@@ -33,9 +32,55 @@ async function registerUser(userData: RegisterFormInput) {
   }
 }
 
-async function loginUserWithPhone(
-  credentials: UserLoginWithPhoneInput
-): Promise<IAuthUser> {
+async function loginUserWithPhone(credentials: {
+  phone: string;
+  password: string;
+}): Promise<IAuthUser> {
+  try {
+    const response = await fetch("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Login failed");
+    }
+    const payload = await response.json();
+    const data = payload.data;
+    const user = data.user;
+    return { user, error: null };
+  } catch (error) {
+    return { user: null, error: handleError(error, "login") };
+  }
+}
+async function loginUserWithEmail(credentials: {
+  email: string;
+  password: string;
+}): Promise<IAuthUser> {
+  try {
+    const response = await fetch("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Login failed");
+    }
+    const payload = await response.json();
+    const data = payload.data;
+    const user = data.user;
+    return { user, error: null };
+  } catch (error) {
+    return { user: null, error: handleError(error, "login") };
+  }
+}
+
+async function loginUserWithUsername(credentials: {
+  username: string;
+  password: string;
+}): Promise<IAuthUser> {
   try {
     const response = await fetch("/api/users/login", {
       method: "POST",
@@ -66,8 +111,8 @@ async function getCurrentUser(): Promise<unknown> {
 
     return user;
   } catch (error) {
-    const message = handleError(error,"get current user").message
-    throw new Error(message)
+    const message = handleError(error, "get current user").message;
+    throw new Error(message);
   } // Just return the user object, no error handling here
 }
 
@@ -80,7 +125,7 @@ async function logoutUser(): Promise<boolean> {
       throw new Error("Logout failed");
     }
   } catch (error) {
-    throw new Error(handleError(error, "logout error").message)
+    throw new Error(handleError(error, "logout error").message);
   }
 }
 
@@ -92,7 +137,7 @@ async function refreshUserSession(): Promise<IUser> {
     if (!user) {
       throw new Error("Failed to refresh user session");
     }
-    return user
+    return user;
   } catch (error) {
     console.log("error while refreshing token", error);
     const message = handleError(error, "refresh user session").message;
@@ -106,4 +151,6 @@ export {
   getCurrentUser,
   logoutUser,
   refreshUserSession,
+  loginUserWithEmail,
+  loginUserWithUsername,
 };
