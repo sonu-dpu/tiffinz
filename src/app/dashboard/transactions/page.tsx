@@ -21,7 +21,7 @@ function TransactionsPage() {
     userRole === UserRole.admin ? getAllTransactions : getUserTransactions;
   const { data, error, isFetching, fetchNextPage, hasNextPage, status } =
     useInfiniteQuery({
-      queryKey: ["getAllTransactionsAdmin"],
+      queryKey: ["getAllTransactionsAdmin", userId],
       queryFn: ({ pageParam }) => queryFn({ pageParam, user: userId }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) => {
