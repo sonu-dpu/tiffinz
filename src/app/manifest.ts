@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Tiffinz",
-    short_name: "Next.js App",
-    description: "Next.js App",
+    short_name: "Tiffinz",
+    description: "Tiffinz",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#fff",
@@ -21,14 +21,14 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/screenshots/home-desktop.png",
         sizes: "2560x1440",
         type: "image/png",
-        form_factor: "wide"   
+        form_factor: "wide",
       },
       {
         src: "/screenshots/home-mobile.png",
         sizes: "750x1334",
         type: "image/png",
-        form_factor: "narrow" 
-      }
+        form_factor: "narrow",
+      },
     ],
   };
 }
