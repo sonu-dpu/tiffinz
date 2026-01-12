@@ -1,18 +1,21 @@
 "use client";
 import { RegisterFormInput, registerUserSchema } from "@/zod/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import LoaderButton from "../ui/loader-button";
 import { Input } from "../ui/input";
 import { registerUser } from "@/helpers/client/user.auth";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
 import Link from "next/link";
-
-
 
 function RegisterForm() {
   const {
@@ -21,63 +24,55 @@ function RegisterForm() {
     setValue,
     setError,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(registerUserSchema),
   });
-  const [errorResponse, setErrorResponse] = useState<string>("");
-  const [isLoading, startTransition] = useTransition();
   const searchParams = useSearchParams();
-  const router = useRouter()
-  //console.log("errors", errors);
+  const router = useRouter();
+
   const registrationType = searchParams.get("type");
   const onSubmit = async (data: RegisterFormInput) => {
-    if (registrationType === "admin" && !data.adminSecret) {
-      setError("adminSecret", {
-        message: "Admin secret is required for admin registration",
-      });
-      return;
-    }
-    if (data.adminSecret?.trim()) {
-      setValue("role", UserRole.admin);
-    }
-    startTransition(async () => {
-      setErrorResponse("");
-      const response = await registerUser(data);
-      if (!response.success) {
-        setErrorResponse(response.message);
+    if (registrationType === "admin") {
+      if (!data.adminSecret) {
+        setError("adminSecret", {
+          message: "Admin secret is required for admin registration",
+        });
         return;
       }
-
-      if (response.success) {
-        reset();
-        toast.success("Registered Successfully", {description:"Login with your credentials"})
-        router.push("/login")
+      if (data.adminSecret?.trim()) {
+        data.role = UserRole.admin;
       }
-    });
+    }
+    const { user, error } = await registerUser(data);
+    if (error) {
+      toast.error("Registration Failed", {
+        description: error.message,
+      });
+      setError("root", { message: error.message });
+      return;
+    }
+    if (user) {
+      reset();
+      toast.success("Registered Successfully", {
+        description: "Login with your credentials",
+      });
+      router.push("/login");
+    }
   };
   return (
     <Card className="w-full max-w-sm mx-auto">
       <CardHeader>
         <CardTitle>Register</CardTitle>
-        {/* <CardDescription></CardDescription> */}
-        {/* <CardAction>Card Action</CardAction> */}
       </CardHeader>
       <CardContent>
         <form
           className="flex flex-col gap-y-4"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {errorResponse && (
-            <span className="text-red-600 text-sm">{errorResponse}</span>
+          {errors.root?.message && (
+            <span className="text-red-600 text-sm">{errors.root.message}</span>
           )}
-          <Input
-            label="Username"
-            type="text"
-            {...register("username")}
-            placeholder="Username"
-            errorMessage={errors.username?.message}
-          />
 
           <Input
             label="Full Name"
@@ -86,7 +81,13 @@ function RegisterForm() {
             placeholder="First Last"
             errorMessage={errors.fullName?.message}
           />
-
+          <Input
+            label="Username"
+            type="text"
+            {...register("username")}
+            placeholder="Username"
+            errorMessage={errors.username?.message}
+          />
           <Input
             label="Phone"
             type="tel"
@@ -119,14 +120,17 @@ function RegisterForm() {
               errorMessage={errors.adminSecret?.message}
             />
           )}
-          <LoaderButton isLoading={isLoading} fallbackText="Registering...">
+          <LoaderButton isLoading={isSubmitting} fallbackText="Registering...">
             Register
           </LoaderButton>
         </form>
       </CardContent>
       <CardFooter>
         <div className="text-center w-full text-muted-foreground">
-          Already registered? <Link href='/login' className="underline">Login</Link>
+          Already registered?{" "}
+          <Link href="/login" className="underline">
+            Login
+          </Link>
         </div>
       </CardFooter>
     </Card>

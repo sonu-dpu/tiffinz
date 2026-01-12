@@ -13,22 +13,16 @@ export interface IAuthUser {
   } | null;
 }
 
-async function registerUser(userData: RegisterFormInput) {
+async function registerUser(userData: RegisterFormInput): Promise<IAuthUser> {
   try {
-    const response = await fetch("/api/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      console.log("error", error);
-      throw error;
+    const response = await axios.post("/api/users/register", userData);
+    const user = response.data;
+    if (!user) {
+      throw new Error("Failed to register user");
     }
-    return await response.json();
+    return { user, error: null };
   } catch (error) {
-    console.log("error", error);
-    return error;
+    return { error: handleError(error, "register"), user: null };
   }
 }
 
