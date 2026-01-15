@@ -25,7 +25,7 @@ import {
 } from "../ui/chart";
 
 import axios from "axios";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 function AdminDashboard({ user }: { user: IUser }) {
   return (
@@ -158,7 +158,6 @@ export function TotalMoneyLast() {
     ...item,
     monthLabel: MONTHS[item.month],
   }));
-
   return (
     <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader>
@@ -166,12 +165,12 @@ export function TotalMoneyLast() {
       </CardHeader>
 
       <ChartContainer className="px-4" config={chartConfig}>
-        <AreaChart
+        <BarChart
           accessibilityLayer
           data={sales}
           margin={{ left: 12, right: 12 }}
         >
-          <CartesianGrid vertical={false} />
+          <CartesianGrid vertical={true} />
           <XAxis
             dataKey="month"
             tickLine={false}
@@ -179,22 +178,17 @@ export function TotalMoneyLast() {
             tickMargin={8}
             tickFormatter={(value) => MONTHS[value]}
           />
-          <ChartTooltip
-            cursor={true}
-            content={
-              <ChartTooltipContent animationEasing="ease" indicator="line" />
-            }
-          />
 
-          <Area
-            activeDot
+          <ChartTooltip cursor={true} content={<ChartTooltipContent />} />
+
+          <Bar
             dataKey="totalAmount"
             type="natural"
             fill="var(--color-month)"
-            fillOpacity={0.3}
+            fillOpacity={0.5}
             stroke="var(--color-month)"
           />
-        </AreaChart>
+        </BarChart>
       </ChartContainer>
 
       <CardFooter className="flex justify-end">
