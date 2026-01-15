@@ -62,6 +62,19 @@ export async function getAllTransactions({
         ...match,
       },
     },
+    {
+      $lookup: {
+        from: "meallogs",
+        localField: "mealLog",
+        foreignField: "_id",
+        as: "mealLog",
+      },
+    },
+    {
+      $addFields: {
+        mealLog: { $first: "$mealLog" },
+      },
+    },
   ];
   if (!searchOptions?.user) {
     transactionsPipeline.push(...stageToAddUser);
