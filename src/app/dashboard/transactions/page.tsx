@@ -4,10 +4,10 @@ import Loader from "@/components/ui/Loader";
 
 import { UserRole } from "@/constants/enum";
 import { getAllTransactions } from "@/helpers/client/admin.transactions";
+import { TransactionWithMealLog } from "@/helpers/client/client.types";
 import { getUserTransactions } from "@/helpers/client/user.transactions";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { ITransactionWithUser } from "@/models/transaction.model";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
@@ -66,7 +66,7 @@ function TransactionsPage() {
     <>
       <div className="flex justify-center flex-col max-w-[600px] mx-auto">
         {data.pages.map((group) => {
-          return group.docs.map((transaction: ITransactionWithUser) => {
+          return group.docs.map((transaction: TransactionWithMealLog) => {
             const month = getMonthFromDate(new Date(transaction.createdAt!));
             if (currentMonth !== month) {
               currentMonth = month;

@@ -10,7 +10,6 @@ import Loader from "@/components/ui/Loader";
 import { TransactionType } from "@/constants/enum";
 import { getUserTransactions } from "@/helpers/client/user.transactions";
 import { cn, formatToIndianCurrency } from "@/lib/utils";
-import { ITransaction } from "@/models/transaction.model";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +18,7 @@ import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { TransactionWithMealLog } from "@/helpers/client/client.types";
 
 function UserTransactions() {
   const { user } = useCurrentUser();
@@ -48,7 +48,7 @@ function UserTransactions() {
         <CardTitle>Transactions</CardTitle>
       </CardHeader>
       <CardContent className="p-0 mt-0 border-t">
-        {transactions.map((transaction: ITransaction) => (
+        {transactions.map((transaction: TransactionWithMealLog) => (
           <TransactionItem
             key={String(transaction._id)}
             transaction={transaction}
@@ -69,7 +69,7 @@ function UserTransactions() {
 export function TransactionItem({
   transaction,
 }: {
-  transaction: ITransaction;
+  transaction: TransactionWithMealLog;
 }) {
   const isCredit = transaction.type === TransactionType.credit;
   return (
@@ -78,7 +78,9 @@ export function TransactionItem({
         <div className="flex gap-1 flex-col justify-center">
           {transaction.isMeal && <Badge variant={"secondary"}>Meal</Badge>}
           <span className="text-xs text-muted-foreground bg-accent px-2 py-1 rounded-xl">
-            {getDateAndTimeString(transaction.createdAt!)}
+            {getDateAndTimeString(
+              transaction?.mealLog?.date || transaction.createdAt
+            )}
           </span>
         </div>
         <div>
