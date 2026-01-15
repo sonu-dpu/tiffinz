@@ -31,7 +31,7 @@ function AdminDashboard({ user }: { user: IUser }) {
   return (
     <div className="px-2 pt-6">
       <h1 className="text-2xl font-semibold mb-4">Welcome, {user.fullName}!</h1>
-      <div className="flex flex-wrap gap-2 items-start justify-center">
+      <div className="flex items-center md:items-start justify-center flex-col md:flex-row flex-wrap gap-4">
         <RequestCountCard />
         <UsersCountCard />
         {/* <ExampleCharts /> */}
@@ -134,7 +134,14 @@ export function TotalMoneyLast() {
     refetchOnWindowFocus: false,
   });
 
-  if (isFetching) return <Loader />;
+  if (isFetching)
+    return (
+      <Card className="w-full max-w-sm rounded-2xl shadow-md">
+        <CardContent>
+          <Loader />
+        </CardContent>
+      </Card>
+    );
   if (error) return <p className="text-red-500">{error.message}</p>;
   console.log(data.data?.totalMoneyRecievedMonthly);
 
@@ -162,6 +169,9 @@ export function TotalMoneyLast() {
     <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Amount Recieved</CardTitle>
+        <div className="text-xs text-muted-foreground rounded-lg">
+          Showing the total amount credited monthly
+        </div>
       </CardHeader>
 
       <ChartContainer className="px-4" config={chartConfig}>
@@ -191,10 +201,7 @@ export function TotalMoneyLast() {
         </BarChart>
       </ChartContainer>
 
-      <CardFooter className="flex justify-end">
-        <div className="text-xs text-shadow-accent bg-accent p-2 m-1 rounded-lg">
-          Showing the total amount credited monthly
-        </div>
+      <CardFooter className="flex flex-col justify-end">
         <Button asChild variant="outline">
           <Link href={"/dashboard/transactions"}>View Transactions</Link>
         </Button>
