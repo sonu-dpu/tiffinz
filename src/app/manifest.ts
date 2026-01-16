@@ -18,14 +18,14 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     screenshots: [
       {
-        src: "/screenshots/home-desktop.png",
-        sizes: "2560x1440",
+        src: "/screenshots/admin-dashboard-desktop.png",
+        sizes: "1431x849",
         type: "image/png",
         form_factor: "wide",
       },
       {
-        src: "/screenshots/home-mobile.png",
-        sizes: "750x1334",
+        src: "/screenshots/wallet-mobile.png",
+        sizes: "390x844",
         type: "image/png",
         form_factor: "narrow",
       },
