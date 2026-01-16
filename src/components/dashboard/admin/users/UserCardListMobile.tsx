@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +24,7 @@ export const UserCardListMobile: React.FC<Props> = ({
     <div className="space-y-4 md:hidden">
       {users.map((user) => (
         <Card key={user._id?.toString()}>
-            <Link  href={`/dashboard/users/${user._id}`}>
+          <Link href={`/dashboard/users/${user._id}`}>
             <CardHeader className="flex flex-row justify-between items-center gap-3">
               {/* <div className="flex justify-between w-full items-center"> */}
               <div className="flex gap-2">
@@ -88,8 +87,8 @@ export const UserCardListMobile: React.FC<Props> = ({
                 )}
               </div>
             </CardContent>
-        </Link>
-          </Card>
+          </Link>
+        </Card>
       ))}
     </div>
   );

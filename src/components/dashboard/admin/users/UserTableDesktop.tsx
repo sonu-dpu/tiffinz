@@ -1,6 +1,4 @@
 "use client";
-
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { IUser } from "@/models/user.model";
 import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
