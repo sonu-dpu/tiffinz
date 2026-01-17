@@ -54,9 +54,13 @@ export interface GetAllMealsOptions {
 async function getAllMeals(searchOptions: GetAllMealsOptions) {
   await connectDB();
   const options = {
-    ...(searchOptions.isActive !== undefined && { isActive: searchOptions.isActive }),
+    ...(searchOptions.isActive !== undefined && {
+      isActive: searchOptions.isActive,
+    }),
     ...(searchOptions.mealType && { type: searchOptions.mealType }),
-    ...(searchOptions.searchQuery && { description: searchOptions.searchQuery}),
+    ...(searchOptions.searchQuery && {
+      description: searchOptions.searchQuery,
+    }),
   };
   console.log("options", options);
 
@@ -96,7 +100,7 @@ async function updateMeal(id: string, mealData: UpdateMealInput) {
 async function orderMeal(
   mealData: MealLogSchemaInputType,
   userId: string,
-  mealId: string
+  mealId: string,
 ) {
   if (!isValidObjectId(userId)) {
     throw new ApiError("Invalid user id", 400);
@@ -135,17 +139,6 @@ async function getMealLogById(mealLogId: string) {
   }
   return mealLog;
 }
-// async function getAllMealLogs() {
-//   await connectDB();
-//   const mealLogs = await MealLog.find().populate("mealId").populate("extras.extrasId");
-//   if(!mealLogs){
-//     throw new ApiError("Meal log not found", 404)
-//   }
-//   return mealLogs.map((log) => ({
-//     ...log.toObject(),
-//     priceBreakdown: log.priceBreakdown,
-//   }));
-// }
 
 interface paginationParams {
   page?: number;
@@ -158,7 +151,7 @@ export interface ISearchQuery {
   end?: string;
   sortType?: "asc" | "desc";
 }
-async function getAllMealLogsAggregate(
+async function getAllMealLogs(
   query: ISearchQuery = {
     start: "",
     end: "",
@@ -166,7 +159,7 @@ async function getAllMealLogsAggregate(
     username: "",
     sortType: "desc",
   },
-  options: paginationParams = { page: 1, limit: 10 }
+  options: paginationParams = { page: 1, limit: 10 },
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const match = {} as Record<string, any>;
@@ -204,10 +197,8 @@ async function getAllMealLogsAggregate(
           pipeline: [
             {
               $project: {
-                _id: 1,
-                fullname: 1,
-                email: 1,
-                role: 1,
+                fullName: 1,
+                username: 1,
               },
             },
           ],
@@ -216,7 +207,7 @@ async function getAllMealLogsAggregate(
       {
         $lookup: {
           from: "meals",
-          localField: "mealId",
+          localField: "meal",
           foreignField: "_id",
           as: "meal",
           pipeline: [
@@ -234,24 +225,8 @@ async function getAllMealLogsAggregate(
       {
         $lookup: {
           from: "meals",
-          let: { extrasArray: "$extras" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $in: ["$_id", "$$extrasArray.extrasId"],
-                },
-              },
-            },
-            {
-              $project: {
-                _id: 1,
-                name: 1,
-                price: 1,
-                quantity: 1,
-              },
-            },
-          ],
+          localField: "extras.extras",
+          foreignField: "_id",
           as: "populatedExtras",
         },
       },
@@ -269,7 +244,7 @@ async function getAllMealLogsAggregate(
                       input: "$populatedExtras",
                       as: "populated",
                       cond: {
-                        $eq: ["$$populated._id", "$$extraItem.extrasId"],
+                        $eq: ["$$populated._id", "$$extraItem.extras"],
                       },
                     },
                   },
@@ -279,73 +254,28 @@ async function getAllMealLogsAggregate(
           },
         },
       },
-      {
-        $unset: ["user", "meal", "populatedExtras"],
-      },
+
       {
         $addFields: {
           user: { $first: "$user" },
           meal: { $first: "$meal" },
         },
       },
+      {
+        $unset: ["populatedExtras"],
+      },
     ],
     {
       ...options,
-      customLabels: {
-        docs: "mealLogs",
-        totalDocs: "total",
+      sort: {
+        createdAt: query.sortType == "asc" ? 1 : -1,
       },
-    }
+    },
   );
 
   return meals;
 }
 
-async function getAllMealLogs(
-  query: ISearchQuery = {
-    start: "",
-    end: "",
-    userId: "",
-    username: "",
-    sortType: "desc",
-  },
-  options: paginationParams = { page: 1, limit: 10 }
-) {
-  const match = {} as Record<string, unknown>;
-  const { page = 1, limit = 10 } = options;
-  if (query.userId) {
-    if (!isValidObjectId(query?.userId)) {
-      throw new ApiError("Invalid userId", 400);
-    }
-    match.user = new mongoose.Types.ObjectId(query.userId);
-  }
-  if (query?.start || query?.end) {
-    if (query.start && !query.end) {
-      match.createdAt = { $gte: new Date(query.start) };
-    } else if (!query.start && query.end) {
-      match.createdAt = { $lte: new Date(query.end) };
-    } else {
-      match.createdAt = {
-        $gte: new Date(String(query?.start)),
-        $lte: new Date(String(query?.end)),
-      };
-    }
-  }
-  await connectDB();
-  const mealLogs = await MealLog.find(match)
-    .populate({ path: "user", select: "username fullName email" })
-    .populate("meal")
-    .populate("extras.extras")
-    .skip((page - 1) * limit)
-    .limit(limit);
-  if (mealLogs.length === 0) {
-    throw new ApiError("No meal logs found", 400);
-  }
-  const mealLogsWithVirtuals = mealLogs.map((log) =>
-    log.toObject({ virtuals: true })
-  );
-  return mealLogsWithVirtuals;
-}
 export {
   deleteMealById,
   deleteMealByIds,
@@ -355,5 +285,4 @@ export {
   orderMeal,
   getMealLogById,
   getAllMealLogs,
-  getAllMealLogsAggregate,
 };
