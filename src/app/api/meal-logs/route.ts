@@ -19,13 +19,12 @@ export const GET = withAuth(
       start,
       end,
       sortType: sortType === "asc" ? "asc" : "desc",
-      // ...(sortType === "acs" ? {sortType:"asc"}: {sortType:"desc"})
     };
 
-    // console.log('query', query)
+    console.log("query", query);
     const mealLogs = await getAllMealLogs(query, { page, limit });
 
     return ApiResponse.success("Fetched meal logs successfully", mealLogs);
   },
-  { requiredRole: UserRole.admin }
+  { requiredRole: UserRole.admin },
 );
