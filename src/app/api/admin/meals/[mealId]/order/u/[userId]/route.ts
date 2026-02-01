@@ -1,5 +1,5 @@
 import { UserRole } from "@/constants/enum";
-import { markMealTakenAndUpdateAccountBalance } from "@/helpers/server/admin.meal-logs";
+import { markAsMealTaken } from "@/helpers/server/admin.meal-logs";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
 import { mealLogSchemaInput } from "@/zod/mealLog.schema";
@@ -8,7 +8,7 @@ type MealOrderParamsByAdmin = { mealId: string; userId: string };
 /**
  * this is the admin only api route
  * - responsible for marking the meal as taken
- * - creates a meallog -> updates account -> transaction using the helper `markMealTakenAndUpdateAccountBalance()`
+ * - creates a meallog -> updates account -> transaction using the helper `markMealAsTaken()`
  */
 export const POST = withAuth<MealOrderParamsByAdmin>(
   async (req, context, user) => {
@@ -19,8 +19,9 @@ export const POST = withAuth<MealOrderParamsByAdmin>(
       return ApiResponse.zodError(parseResult.error);
     }
     const mealLogData = parseResult.data;
+    console.log("mealLogData", mealLogData);
     const adminId = String(user?._id);
-    const response = await markMealTakenAndUpdateAccountBalance(mealLogData, {
+    const response = await markAsMealTaken(mealLogData, {
       adminId,
       mealId,
       userId,
@@ -31,8 +32,8 @@ export const POST = withAuth<MealOrderParamsByAdmin>(
 
     return ApiResponse.success(
       `Meal marked as taken successfully for user ${userId}`,
-      response
+      response,
     );
   },
-  { requiredRole: UserRole.admin }
+  { requiredRole: UserRole.admin },
 );
