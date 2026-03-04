@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IUser } from "@/models/user.model";
 import { Badge } from "@/components/ui/badge";
-import { Verified, X } from "lucide-react";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { Mail, Phone, Verified, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
@@ -25,10 +24,10 @@ export const UserCardListMobile: React.FC<Props> = ({
       {users.map((user) => (
         <Card key={user._id?.toString()}>
           <Link href={`/dashboard/users/${user._id}`}>
-            <CardHeader className="flex flex-row justify-between items-center gap-3">
+            <CardHeader className="flex flex-row flex-wrap justify-between items-center gap-2 mb-2">
               {/* <div className="flex justify-between w-full items-center"> */}
-              <div className="flex gap-2">
-                <Avatar className="h-12 w-12 rounded-full overflow-hidden">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-14 w-14 rounded-full overflow-hidden">
                   <AvatarImage
                     src={user.avatar || undefined}
                     alt={user.fullName}
@@ -37,39 +36,36 @@ export const UserCardListMobile: React.FC<Props> = ({
                     {user.fullName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <CardTitle className="text-lg">
+                <CardTitle className="truncate max-w-[150px]">
                   {user.username}
-                  <p className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground flex items-center gap-1">
                     {user.fullName}
-                  </p>
+                    {user.isVerified ? (
+                      <Verified className="w-4 h-4 text-card" fill="#0f68f7" />
+                    ) : (
+                      <X />
+                    )}
+                  </div>
                 </CardTitle>
               </div>
-              {user.isVerified ? (
-                <Badge variant={"default"}>
-                  <Verified /> Verified
-                </Badge>
-              ) : (
-                <Badge variant={"destructive"}>
-                  <X /> Not Verified
-                </Badge>
-              )}
+              <Badge variant={"outline"} className="w-max mx-2">
+                {user.role}
+              </Badge>
               {/* </div> */}
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p>
-                <strong>Email:</strong> {user.email || "-"}
-              </p>
-              <p>
-                <strong>Phone:</strong> {user.phone}
-              </p>
-              <p>
-                <strong>Role:</strong> {user.role}
-              </p>
-
-              <p>
+              <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Mail className="w-4" /> {user.email || "NA"}
+                </div>
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Phone className="w-4" /> {user.phone}
+                </div>
+              </div>
+              {/* <p>
                 <strong>Created:</strong>{" "}
                 {getDateAndTimeString(String(user.createdAt))}
-              </p>
+              </p> */}
               <div className="flex gap-2 pt-2">
                 {onVerify && !user.isVerified && (
                   <Button size="sm" onClick={() => onVerify(user)}>
