@@ -10,7 +10,7 @@ async function getAllTransactions(options?: {
     const resp = await axios.get("/api/admin/transactions", {
       params: {
         page: options?.pageParam,
-        user: options?.user,
+        ...(options?.user && { user: options?.user }),
       },
     });
     if (!resp.data?.success) {
