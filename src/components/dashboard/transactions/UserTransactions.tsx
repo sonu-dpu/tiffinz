@@ -73,13 +73,13 @@ export function TransactionItem({
 }) {
   const isCredit = transaction.type === TransactionType.credit;
   return (
-    <Link href={`/dashboard/transactions/${transaction._id}`}>
+    <Link href={`/dashboard/transactions/${transaction._id}`} prefetch={false}>
       <div className="flex justify-between items-center p-4 hover:bg-accent/50 duration-100 border-b">
         <div className="flex gap-1 flex-col justify-center">
           {transaction.isMeal && <Badge variant={"secondary"}>Meal</Badge>}
           <span className="text-xs text-muted-foreground bg-accent px-2 py-1 rounded-xl">
             {getDateAndTimeString(
-              transaction?.mealLog?.date || transaction.createdAt
+              transaction?.mealLog?.date || transaction.createdAt,
             )}
           </span>
         </div>
@@ -87,7 +87,7 @@ export function TransactionItem({
           <span
             className={cn(
               "font-medium",
-              isCredit ? "text-green-600 dark:text-green-400" : "text-red-400"
+              isCredit ? "text-green-600 dark:text-green-400" : "text-red-400",
             )}
           >
             {(isCredit ? "+" : "-") +
