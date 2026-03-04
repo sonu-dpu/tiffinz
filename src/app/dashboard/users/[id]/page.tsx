@@ -12,7 +12,7 @@ function UserPage() {
   const {
     data: user,
     error,
-    isFetching,
+    isLoading,
   } = useQuery({
     queryKey: ["userWithAccount", String(userId)],
     queryFn: () => getUserWithAccount(String(userId)),
@@ -22,7 +22,7 @@ function UserPage() {
   if (error) {
     toast.error(error.message);
   }
-  if (isFetching) {
+  if (isLoading) {
     return <Loader />;
   } else if (user) {
     return (
