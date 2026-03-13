@@ -41,7 +41,7 @@ export const UserCardListMobile: React.FC<Props> = ({
                   <div className="text-sm text-muted-foreground flex items-center gap-1">
                     {user.fullName}
                     {user.isVerified ? (
-                      <Verified className="w-4 h-4 text-card" fill="#0f68f7" />
+                      <Verified className="w-4 h-4 text-card" fill="#238636" />
                     ) : (
                       <X />
                     )}
