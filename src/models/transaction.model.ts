@@ -1,9 +1,14 @@
 import { TransactionType } from "@/constants/enum";
-import mongoose, { AggregatePaginateModel, model, models, Schema } from "mongoose";
+import mongoose, {
+  AggregatePaginateModel,
+  model,
+  models,
+  Schema,
+} from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IUser } from "./user.model";
 
-interface ITransaction  {
+interface ITransaction {
   _id?: mongoose.Types.ObjectId;
   amount: number;
   type: TransactionType;
@@ -11,12 +16,12 @@ interface ITransaction  {
   mealLog?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   account: mongoose.Types.ObjectId;
-  description?:string;
+  description?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 interface TransactionModel extends AggregatePaginateModel<ITransaction> {
-  _sample?:string
+  _sample?: string;
 }
 const transactionSchema = new Schema<ITransaction>(
   {
@@ -47,17 +52,22 @@ const transactionSchema = new Schema<ITransaction>(
       ref: "Account",
       required: true,
     },
-    description:{
-      type:String
-    }
+    description: {
+      type: String,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-transactionSchema.plugin(mongooseAggregatePaginate)
+transactionSchema.index({ createdAt: -1 });
+transactionSchema.index({ user: 1, createdAt: -1 });
+transactionSchema.index({ user: 1, mealLog: 1, createdAt: -1 });
+
+transactionSchema.plugin(mongooseAggregatePaginate);
 const Transaction =
-  models?.Transaction as TransactionModel|| model<ITransaction>("Transaction", transactionSchema);
+  (models?.Transaction as TransactionModel) ||
+  model<ITransaction>("Transaction", transactionSchema);
 type ITransactionWithUser = ITransaction & {
-  user:IUser
-}
+  user: IUser;
+};
 export type { ITransaction, ITransactionWithUser };
 export default Transaction;
