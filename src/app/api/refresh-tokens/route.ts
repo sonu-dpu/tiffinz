@@ -1,10 +1,14 @@
 import { getUserById } from "@/helpers/server/admin.user";
-import { createUserSession } from "@/helpers/server/user.auth";
+import { refreshUserSession } from "@/helpers/server/user.auth";
+import { ApiResponse } from "@/utils/ApiResponse";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { verifyJWT } from "@/utils/verifyJWT";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export const GET = asyncHandler(async (req) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _cookieStore = await cookies();
   const refreshToken = req.cookies.get("refreshToken")?.value;
   if (!refreshToken) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -22,5 +26,7 @@ export const GET = asyncHandler(async (req) => {
     response.cookies.delete("accessToken").delete("refreshToken");
     return response;
   }
-  return await createUserSession(userExists._id);
+  const user = await refreshUserSession();
+
+  return ApiResponse.success("Session refreshed successfully", { user }, 200);
 });

@@ -16,7 +16,8 @@ import {
   loginWithUsernameSchema,
 } from "@/zod/user.login.schema";
 import { CreateUserByAdminInput } from "@/zod/user.schema";
-import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 
 async function doesUserAlreadyExist(userData: IUser | CreateUserByAdminInput) {
   // Check if user exists
@@ -50,7 +51,7 @@ export async function registerUser(userData: IUser) {
   if (exists) {
     throw new ApiError(
       error || "User registered with same credentials already",
-      409
+      409,
     );
   }
   const newUser: IUser = {
@@ -98,7 +99,7 @@ const loginOptions: LoginOption[] = [
 async function loginUser(
   key: "email" | "username" | "phone",
   value: string,
-  password: string
+  password: string,
 ) {
   const query: Record<string, string> = {};
   query[key] = value;
@@ -124,9 +125,8 @@ const cookieFlags = {
 };
 
 async function createUserSession(userId: string) {
-  const { accessToken, refreshToken } = await generateRefreshAndAccessToken(
-    userId
-  );
+  const { accessToken, refreshToken } =
+    await generateRefreshAndAccessToken(userId);
 
   if (!accessToken || !refreshToken) {
     throw new ApiError("Failed to generate tokens", 500);
@@ -135,7 +135,7 @@ async function createUserSession(userId: string) {
   const userSession = await Session.findOneAndUpdate(
     { user: userId },
     { refreshToken },
-    { upsert: true, new: true }
+    { upsert: true, new: true },
   ).select("-password");
 
   if (!userSession) {
@@ -179,11 +179,14 @@ async function logoutUser(req: NextRequest) {
   return res;
 }
 
-async function refreshUserSession(
-  refreshToken: string,
-  response: NextResponse
-) {
+async function refreshUserSession() {
   try {
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("refreshToken")?.value;
+    if (!refreshToken) {
+      console.log("refreshToken not found in cookies");
+      throw new ApiError("Session expired, login again", 400);
+    }
     const { payload, error } = await verifyJWT(refreshToken, "refresh");
     if (error) {
       console.error("Error while verifying the refreshToken", error);
@@ -205,19 +208,29 @@ async function refreshUserSession(
     const userSession = await Session.findOneAndUpdate(
       { user: userId },
       { refreshToken: newRefreshToken },
-      { upsert: true, new: true }
-    );
+      { upsert: true, new: true },
+    ).lean();
     console.log("userSession", userSession);
     if (!userSession) {
       throw new ApiError("Session creation failed", 500);
     }
-    response.cookies
-      .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
-      .set("refreshToken", newRefreshToken, {
-        ...cookieFlags,
-        maxAge: 60 * 60 * 24 * 7,
-      });
-    return response;
+    // response.cookies
+    //   .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
+    //   .set("refreshToken", newRefreshToken, {
+    //     ...cookieFlags,
+    //     maxAge: 60 * 60 * 24 * 7,
+    //   });
+    cookieStore.set("accessToken", accessToken, {
+      ...cookieFlags,
+      maxAge: 60 * 15,
+    });
+    cookieStore.set("refreshToken", newRefreshToken, {
+      ...cookieFlags,
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    const user = await User.findById(userId).select("-password");
+    return user;
   } catch (error) {
     console.log("Error while refreshing the user session error", error);
     return handleError(error);
@@ -229,5 +242,5 @@ export {
   loginOptions,
   loginUser,
   refreshUserSession,
-  doesUserAlreadyExist
+  doesUserAlreadyExist,
 };
