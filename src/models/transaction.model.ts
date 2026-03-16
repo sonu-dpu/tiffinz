@@ -59,7 +59,6 @@ const transactionSchema = new Schema<ITransaction>(
   { timestamps: true },
 );
 transactionSchema.index({ createdAt: -1 });
-transactionSchema.index({ user: 1, createdAt: -1 });
 transactionSchema.index({ user: 1, mealLog: 1, createdAt: -1 });
 
 transactionSchema.plugin(mongooseAggregatePaginate);
