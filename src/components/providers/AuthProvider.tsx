@@ -7,7 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 import { setUser } from "@/store/authSlice";
-import { notFound, usePathname, useRouter } from "next/navigation";
+import {
+  notFound,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { toast } from "sonner";
 
 const publicRoutes = [
@@ -31,7 +36,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  const isRedirectedAfterLogout = searchParams.get("loggedOut") === "true";
   const isPublicRoute = publicRoutes.includes(pathname);
   const isValidRoute =
     publicRoutes.some((route) => pathname === route) ||
@@ -47,22 +53,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryFn: getCurrentUserOrRefresh,
     retry: false,
     enabled:
-      !currentUser && pathname !== "/logout" && pathname !== "/refresh-session",
+      !currentUser &&
+      pathname !== "/logout" &&
+      pathname !== "/refresh-session" &&
+      !isRedirectedAfterLogout,
   });
-  // useEffect(()=>{
-  //   if(pathname.startsWith("/login") && isLoading){
-  //     toast.loading("Logging in..")
-  //   }
-  //   if(pathname.startsWith("/refresh-session")){
-  //     toast.loading("Refreshing Session")
-  //   }
-  // },[pathname, isLoading])
+
   useEffect(() => {
-    // console.log('pathname', pathname)
     if (user && !currentUser && isFetched && !error) {
       dispatch(setUser(user));
     }
-  }, [user, currentUser, dispatch, isFetched, pathname, error, isLoggedIn]);
+  }, [user, currentUser, dispatch, isFetched, error]);
 
   useEffect(() => {
     if (

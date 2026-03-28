@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { logout } from "@/store/authSlice";
 import { logoutUser } from "@/helpers/client/user.auth";
@@ -13,25 +13,25 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 const LogoutPage = () => {
   const { isLoggedIn } = useCurrentUser();
   const dispatch = useAppDispatch();
-  const { data: logoutSuccess, isFetched } = useQuery({
-    queryKey: ["logoutUser"],
-    queryFn: logoutUser,
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (isFetched && isLoggedIn) {
-      dispatch(logout());
+    if (isLoggedIn) {
+      logoutUser()
+        .then(() => {
+          dispatch(logout());
+          toast.success("Logged out successfully");
+        })
+        .catch((error) => {
+          toast.error("Failed to logout: " + error.message);
+        })
+        .finally(() => {
+          queryClient.clear();
+        });
+    } else {
+      redirect("/login?loggedOut=true");
     }
-    if (!isLoggedIn && isFetched) {
-      const message = logoutSuccess
-        ? "Logout successful"
-        : "User already logged out";
-      toast.success(message);
-      redirect("/login");
-    }
-  }, [isFetched, dispatch, isLoggedIn, logoutSuccess]);
+  }, [isLoggedIn, dispatch, queryClient]);
 
   return <Loader />;
 };
