@@ -34,7 +34,18 @@ function TransactionsByUserId({ userId }: { userId: string }) {
 
   const transactions = response.docs;
   if (transactions?.length == 0) {
-    return null;
+    return (
+      <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
+        <CardHeader>
+          <CardTitle>Transactions</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 mt-0 border-t">
+          <p className="text-center py-4">
+            No transactions found for this user.
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
   return (
     <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
