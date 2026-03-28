@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { logout } from "@/store/authSlice";
@@ -25,11 +25,13 @@ const LogoutPage = () => {
       dispatch(logout());
     }
     if (!isLoggedIn && isFetched) {
-      const message =  logoutSuccess ? "Logout successful" : "User already logged out";
-      toast.success(message)
+      const message = logoutSuccess
+        ? "Logout successful"
+        : "User already logged out";
+      toast.success(message);
       redirect("/login");
     }
-  }, [isFetched, dispatch, isLoggedIn]);
+  }, [isFetched, dispatch, isLoggedIn, logoutSuccess]);
 
   return <Loader />;
 };
