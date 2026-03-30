@@ -5,10 +5,10 @@ import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 w-full border min-h-[100vh] items-center px-4">
-        <Suspense fallback={<Loader />}>
-          <LoginForm />
-        </Suspense>
+    <div className="grid grid-cols-1 md:grid-cols-2 w-full max-h-dvh items-center px-4">
+      <Suspense fallback={<Loader />}>
+        <LoginForm />
+      </Suspense>
       <div className="w-full h-full hidden md:block"></div>
     </div>
   );

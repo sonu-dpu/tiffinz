@@ -4,12 +4,10 @@ import React, { Suspense } from "react";
 
 function LoginPage() {
   return (
-    <div className="grid gap-2 grid-cols-1 md:grid-cols-2 w-full border min-h-[100vh] items-center px-4 md:px-2">
-      <div>
-        <Suspense fallback={<Loader />}>
-          <LoginForm />
-        </Suspense>
-      </div>
+    <div className="grid gap-2 grid-cols-1 md:grid-cols-2 w-full max-h-dvh items-center px-4 md:px-2">
+      <Suspense fallback={<Loader />}>
+        <LoginForm />
+      </Suspense>
       <div className="w-full h-full hidden md:block"></div>
     </div>
   );

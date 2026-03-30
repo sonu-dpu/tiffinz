@@ -44,7 +44,7 @@ function RefreshPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full">
+    <div className="flex items-center justify-center max-h-dvh w-full">
       <Loader />
     </div>
   );
