@@ -5,14 +5,14 @@ import { UserRole } from "@/constants/enum";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 function DashboardPage() {
-  const {user, userRole} = useCurrentUser();
-  if(!user){
+  const { user, userRole } = useCurrentUser();
+  if (!user) {
     return null;
   }
-  if(userRole===UserRole.user){
-    return <UserDashboard user={user}/>
-  }else if(userRole===UserRole.admin){
-    return <AdminDashboard user={user}/>
+  if (userRole === UserRole.user) {
+    return <UserDashboard user={user} />;
+  } else if (userRole === UserRole.admin) {
+    return <AdminDashboard user={user} />;
   }
 }
 

@@ -25,14 +25,13 @@ function UserTransactions() {
   const {
     data: response,
     error,
-    isFetching,
+    isLoading,
   } = useQuery({
     queryKey: ["getUserTransactions", user?._id],
     queryFn: () => getUserTransactions({ pageParam: 1 }),
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
   });
-  if (isFetching && !error) {
+  if (isLoading && !error) {
     return <Loader />;
   } else if (error) {
     toast.error(error.message);

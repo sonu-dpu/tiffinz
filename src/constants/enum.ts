@@ -23,7 +23,7 @@ enum PaymentMode {
 
 enum MealStatus {
   ordered = "ORDERED",
-  cancelled = "CANCELLED ",
+  cancelled = "CANCELLED",
   not_required = "NOT_REQUIRED",
   taken = "TAKEN",
   not_taken = "NOT_TAKEN",
@@ -44,10 +44,9 @@ enum LoginType {
   username = "username",
 }
 
-
 enum ImageKitFolder {
   users = "/tifinz/users",
-  payments = "/tifinz/payments",    
+  payments = "/tifinz/payments",
 }
 
 export {
