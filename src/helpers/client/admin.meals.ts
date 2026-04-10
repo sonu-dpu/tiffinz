@@ -34,4 +34,12 @@ async function deleteMealById(mealId: string) {
     throw new Error("Error: deleteMeal " + String(error));
   }
 }
-export { markMealTakenByUser, addNewMeal, deleteMealById };
+async function updateMealById(mealId: string, data: MealInput) {
+  try {
+    const resp = await axios.patch(`/api/admin/meals/${mealId}`, data);
+    return resp.data?.data;
+  } catch (error) {
+    throw new Error("Error: updateMeal " + String(error));
+  }
+}
+export { markMealTakenByUser, addNewMeal, deleteMealById, updateMealById };
