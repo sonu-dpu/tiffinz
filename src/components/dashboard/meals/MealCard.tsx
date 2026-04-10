@@ -52,7 +52,7 @@ function MealCard({
         <p>
           <strong>Price:</strong> ₹{meal.price}
         </p>
-        <p>
+        <p className="line-clamp-2">
           <strong>Description:</strong> {meal.description}
         </p>
         <p>
