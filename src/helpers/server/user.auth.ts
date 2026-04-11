@@ -17,7 +17,6 @@ import {
 } from "@/zod/user.login.schema";
 import { CreateUserByAdminInput } from "@/zod/user.schema";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
 
 async function doesUserAlreadyExist(userData: IUser | CreateUserByAdminInput) {
   // Check if user exists
@@ -158,25 +157,35 @@ async function createUserSession(userId: string) {
   return response;
 }
 
-async function logoutUser(req: NextRequest) {
-  const refreshToken = req.cookies.get("refreshToken")?.value;
-  if (!refreshToken) {
+async function logoutUser() {
+  const cookieStore = await cookies();
+  const refreshTokenFromClient = cookieStore.get("refreshToken")
+    ?.value as string;
+  if (!refreshTokenFromClient) {
     console.log("refreshToken not found in cookies");
     return ApiResponse.success("User already logged out");
   }
-
+  const { payload, error } = await verifyJWT(refreshTokenFromClient, "refresh");
+  if (error || !payload?._id) {
+    console.log("Invalid refresh token", error);
+    cookieStore.delete("refreshToken");
+    cookieStore.delete("accessToken");
+    return;
+  }
   await connectDB();
-  const deletedSession = await Session.findOneAndDelete({ refreshToken });
+  const deletedSession = await Session.findOneAndDelete({
+    refreshToken: refreshTokenFromClient,
+    user: payload._id,
+  }).lean();
 
   if (!deletedSession) {
     console.log("Session not found — probably already logged out");
     // Proceed anyway
   }
 
-  const res = ApiResponse.success("User logged out");
-  res.cookies.delete("accessToken");
-  res.cookies.delete("refreshToken");
-  return res;
+  cookieStore.delete("refreshToken");
+  cookieStore.delete("accessToken");
+  return;
 }
 
 async function refreshUserSession() {
@@ -206,7 +215,7 @@ async function refreshUserSession() {
     }
 
     const userSession = await Session.findOneAndUpdate(
-      { user: userId },
+      { user: userId, refreshToken },
       { refreshToken: newRefreshToken },
       { upsert: true, new: true },
     ).lean();
