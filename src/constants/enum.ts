@@ -30,7 +30,7 @@ enum MealStatus {
 }
 enum DailyMealFor {
   breakfast = "BREAKFAST",
-  morning = "LUNCH",
+  lunch = "LUNCH",
   dinner = "DINNER",
 }
 enum TransactionType {
