@@ -1,3 +1,4 @@
+import { DailyMealFor, MealStatus } from "@/constants/enum";
 import { mealLogSchemaForAdminClientType } from "@/zod/mealLog.schema";
 import { MealInput } from "@/zod/meals.schema";
 import axios from "axios";
@@ -6,7 +7,7 @@ async function markMealTakenByUser(data: mealLogSchemaForAdminClientType) {
   try {
     const resp = await axios.post(
       `/api/admin/meals/${data.meal}/order/u/${data.user}`,
-      data
+      data,
     );
     return resp.data?.data;
   } catch (error) {
@@ -42,4 +43,26 @@ async function updateMealById(mealId: string, data: MealInput) {
     throw new Error("Error: updateMeal " + String(error));
   }
 }
-export { markMealTakenByUser, addNewMeal, deleteMealById, updateMealById };
+type GetMealOrderProps = {
+  date?: string;
+  status?: MealStatus;
+  mealFor?: DailyMealFor;
+};
+async function getMealOrders(options: GetMealOrderProps) {
+  try {
+    const resp = await axios.get(
+      `/api/admin/meals/orders?status=${options.status}&mealFor=${options.mealFor}`,
+    );
+    return resp.data?.data;
+  } catch (error) {
+    throw new Error("Error: getMealOrders " + String(error));
+  }
+}
+
+export {
+  markMealTakenByUser,
+  addNewMeal,
+  deleteMealById,
+  updateMealById,
+  getMealOrders,
+};

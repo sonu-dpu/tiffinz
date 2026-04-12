@@ -7,15 +7,15 @@ const getOrders = withAuth(
   async (req) => {
     const searchParams = req.nextUrl.searchParams;
     const options = {
-      status: searchParams.get("status")?.toLowerCase() as MealStatus,
+      status: searchParams.get("status")?.toLowerCase() || "",
       count: searchParams.get("count") === "true",
-      mealFor: searchParams.get("mealFor")?.toLowerCase() as DailyMealFor,
+      mealFor: searchParams.get("mealFor")?.toLowerCase() || "",
     };
 
-    if (!(options?.status in MealStatus)) {
+    if (options.status !== "" && !(options.status in MealStatus)) {
       return ApiResponse.error("Invalid status", 400);
     }
-    if (options.mealFor && !(options.mealFor in DailyMealFor)) {
+    if (options.mealFor !== "" && !(options.mealFor in DailyMealFor)) {
       return ApiResponse.error("Invalid mealFor", 400);
     }
     if (options.count) {
@@ -29,11 +29,12 @@ const getOrders = withAuth(
         200,
       );
     }
+    console.log("options", options);
 
     const meals = await MealLog.aggregatePaginate([
       {
         $match: {
-          status: options.status.toUpperCase(),
+          ...(options.status && { status: options.status.toUpperCase() }),
           ...(options.mealFor && { mealFor: options.mealFor.toUpperCase() }),
         },
       },
@@ -47,6 +48,11 @@ const getOrders = withAuth(
       },
       {
         $unwind: "$meal",
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
       },
     ]);
     return ApiResponse.success("Orders fetched successfully", meals, 200);
