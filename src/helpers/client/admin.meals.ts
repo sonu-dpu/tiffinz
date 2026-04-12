@@ -53,7 +53,7 @@ async function getMealOrders(options: GetMealOrderProps) {
     const resp = await axios.get(
       `/api/admin/meals/orders?status=${options.status}&mealFor=${options.mealFor}`,
     );
-    return resp.data?.data;
+    return resp.data?.data.docs;
   } catch (error) {
     throw new Error("Error: getMealOrders " + String(error));
   }

@@ -44,10 +44,47 @@ const getOrders = withAuth(
           localField: "meal",
           foreignField: "_id",
           as: "meal",
+          pipeline: [
+            {
+              $project: {
+                name: 1,
+                price: 1,
+              },
+            },
+          ],
         },
       },
       {
-        $unwind: "$meal",
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+          pipeline: [
+            {
+              $project: {
+                // _id: 1,
+                fullName: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          baseMealName: {
+            $arrayElemAt: ["$meal.name", 0],
+          },
+          user: {
+            $arrayElemAt: ["$user", 0],
+          },
+          extras: {
+            $arrayElemAt: ["$extras.quantity", 0],
+          },
+        },
+      },
+      {
+        $unset: ["meal"],
       },
       {
         $sort: {
