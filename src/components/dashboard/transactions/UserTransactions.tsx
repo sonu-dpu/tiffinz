@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";

@@ -8,7 +8,7 @@ import { getTransactionById } from "@/helpers/client/admin.transactions";
 import { getUserTransactionById } from "@/helpers/client/user.transactions";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 import { cn, formatToIndianCurrency } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -41,7 +41,7 @@ function UserTransactionDetailsCard({
   console.log("data", transaction);
   const isCredit = transaction.type === TransactionType.credit;
   const amount = `${isCredit ? "+" : "- "} ${formatToIndianCurrency(
-    transaction.amount
+    transaction.amount,
   )}`;
 
   return (

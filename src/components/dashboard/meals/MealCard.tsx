@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 import { EditIcon, Ellipsis, Trash2 } from "lucide-react";
 
 import {
@@ -45,10 +45,20 @@ function MealCard({
               {meal.name}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1.5">
-              <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+              <Badge
+                variant="secondary"
+                className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              >
                 {meal.type}
               </Badge>
-              <Badge variant={meal.isActive ? "default" : "destructive"} className={meal.isActive ? "bg-green-500/10 text-green-600 hover:bg-green-500/20" : ""}>
+              <Badge
+                variant={meal.isActive ? "default" : "destructive"}
+                className={
+                  meal.isActive
+                    ? "bg-green-500/10 text-green-600 hover:bg-green-500/20"
+                    : ""
+                }
+              >
                 {meal.isActive ? "Active" : "Inactive"}
               </Badge>
             </div>
@@ -109,7 +119,10 @@ function MealActionMenu({ meal }: { meal: IMeal }) {
         onOpenChange={setIsEditDialogOpen}
         title="Edit Meal"
       >
-        <EditMealForm meal={meal} onSuccess={() => setIsEditDialogOpen(false)} />
+        <EditMealForm
+          meal={meal}
+          onSuccess={() => setIsEditDialogOpen(false)}
+        />
       </DialogWrapper>
 
       <DropdownMenu>
@@ -120,7 +133,9 @@ function MealActionMenu({ meal }: { meal: IMeal }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem onSelect={() => setTimeout(() => setIsEditDialogOpen(true), 0)}>
+          <DropdownMenuItem
+            onSelect={() => setTimeout(() => setIsEditDialogOpen(true), 0)}
+          >
             <EditIcon className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
@@ -130,7 +145,10 @@ function MealActionMenu({ meal }: { meal: IMeal }) {
               title="Confirm to delete the meal"
               onConfirm={() => deleteMealMutation.mutate(String(meal._id))}
               trigger={
-                <Button className="w-full justify-start px-2 py-1.5 h-auto text-sm font-normal text-destructive focus:text-destructive focus:bg-destructive/10" variant={"ghost"}>
+                <Button
+                  className="w-full justify-start px-2 py-1.5 h-auto text-sm font-normal text-destructive focus:text-destructive focus:bg-destructive/10"
+                  variant={"ghost"}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </Button>
@@ -138,7 +156,9 @@ function MealActionMenu({ meal }: { meal: IMeal }) {
             >
               <div className="text-muted-foreground">
                 <p>Are you sure you want to delete the meal?</p>
-                <p className="font-semibold text-foreground my-1">{meal.name} </p>
+                <p className="font-semibold text-foreground my-1">
+                  {meal.name}{" "}
+                </p>
                 <p> This action cannot be undone.</p>
               </div>
             </WithAlert>

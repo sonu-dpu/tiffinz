@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import WithDrawer from "@/components/ui/withDrawer";
 import { useAppDispatch } from "@/hooks/reduxHooks";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 import { setSelectedUser } from "@/store/usersSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BadgeCheck, CircleX, PlusCircleIcon } from "lucide-react";
@@ -131,7 +131,7 @@ export default function UserDetailsCard({ user }: { user: IUserWithAccount }) {
         >
           <AddBalanceForm className="bg-transparent border-none max-w-md mx-auto" />
         </WithDrawer>
-              
+
         <Button onClick={selectUserForMealRecord} className="w-full sm:w-auto">
           Record Meal
         </Button>

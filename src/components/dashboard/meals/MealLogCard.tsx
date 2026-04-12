@@ -4,14 +4,12 @@ import { Separator } from "@/components/ui/separator";
 import { MealLogPopulatedType } from "@/helpers/client/client.types";
 import { MealStatus } from "@/constants/enum";
 import { formatToIndianCurrency } from "@/lib/utils";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 
 function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
   const { meal, totalAmount, extras } = mealLog;
-  if(!meal) return <div className="mx-auto">
-    meal details not found
-  </div>;
-  console.log('meal', meal)
+  if (!meal) return <div className="mx-auto">meal details not found</div>;
+  console.log("meal", meal);
   return (
     <Card className="mt-4 max-w-2xl mx-auto">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -27,8 +25,8 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
               mealLog.status === MealStatus.taken
                 ? "secondary"
                 : mealLog.status === MealStatus.not_taken
-                ? "outline"
-                : "destructive"
+                  ? "outline"
+                  : "destructive"
             }
             className="capitalize"
           >
@@ -39,7 +37,9 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
           <div className="text-xs text-muted-foreground">
             <div>Logged: {getDateAndTimeString(mealLog.createdAt!)}</div>
             <div>Date: {getDateAndTimeString(mealLog.date)}</div>
-            <div className="mt-0.5">Meal ID: <span className="font-medium">{String(meal?._id)}</span></div>
+            <div className="mt-0.5">
+              Meal ID: <span className="font-medium">{String(meal?._id)}</span>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -52,7 +52,10 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
           <div>
             <h4 className="text-sm font-semibold">{String(meal.name)}</h4>
             <p className="text-xs text-muted-foreground">{meal.description}</p>
-            <p className="text-xs text-muted-foreground">Meal SKU / reference: <span className="font-medium">{String(meal._id)}</span></p>
+            <p className="text-xs text-muted-foreground">
+              Meal SKU / reference:{" "}
+              <span className="font-medium">{String(meal._id)}</span>
+            </p>
           </div>
 
           <div className="text-right">
@@ -69,8 +72,12 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
 
           <ul className=" list-inside space-y-1 text-sm text-muted-foreground">
             <li className="w-full flex justify-between">
-              <span className="inline-block w-36 text-foreground">Base Price</span>
-              <span className="font-medium">{formatToIndianCurrency(meal.price)}</span>
+              <span className="inline-block w-36 text-foreground">
+                Base Price
+              </span>
+              <span className="font-medium">
+                {formatToIndianCurrency(meal.price)}
+              </span>
             </li>
 
             {extras && extras.length > 0 ? (
@@ -79,14 +86,23 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
                   <div className="text-foreground font-medium">Extras</div>
                   <ul className=" mt-1 space-y-1">
                     {extras.map((extra) => (
-                      <li key={String(extra.details._id)} className="flex justify-between gap-4">
+                      <li
+                        key={String(extra.details._id)}
+                        className="flex justify-between gap-4"
+                      >
                         <div>
-                          <span className="inline-block w-28">{extra.details.name}</span>{" "}
-                        <span>
-                           {extra.details.price} x {extra.quantity}
-                        </span>
+                          <span className="inline-block w-28">
+                            {extra.details.name}
+                          </span>{" "}
+                          <span>
+                            {extra.details.price} x {extra.quantity}
+                          </span>
                         </div>
-                        <span className="font-medium">{formatToIndianCurrency(mealLog.priceBreakdown?.extrasTotal as number)}</span>
+                        <span className="font-medium">
+                          {formatToIndianCurrency(
+                            mealLog.priceBreakdown?.extrasTotal as number,
+                          )}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -103,17 +119,20 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
         {/* Totals row */}
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">Logged At</div>
-          <div className="text-sm font-medium">{getDateAndTimeString(mealLog.createdAt!)}</div>
+          <div className="text-sm font-medium">
+            {getDateAndTimeString(mealLog.createdAt!)}
+          </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="text-sm font-semibold">Total Amount</div>
-          <div className="text-xl font-bold">{formatToIndianCurrency(totalAmount)}</div>
+          <div className="text-xl font-bold">
+            {formatToIndianCurrency(totalAmount)}
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 }
-
 
 export default MealLogCard;

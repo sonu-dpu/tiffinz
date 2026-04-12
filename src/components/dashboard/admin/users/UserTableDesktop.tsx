@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { IUser } from "@/models/user.model";
-import { getDateAndTimeString } from "@/lib/getDateAndTimeString";
+import { getDateAndTimeString } from "@/lib/date-format";
 import {
   Table,
   TableHeader,
@@ -28,7 +28,7 @@ export const UserTableDesktop: React.FC<Props> = ({
   const router = useRouter();
   const handleRowClick = (
     userId: string,
-    e: React.MouseEvent<HTMLTableRowElement>
+    e: React.MouseEvent<HTMLTableRowElement>,
   ) => {
     const target = e.target as HTMLElement;
     if (target.closest("button")) {
