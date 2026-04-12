@@ -6,6 +6,7 @@ import { UpdateMealInput } from "@/zod/meals.schema";
 import { MealLogSchemaInputType } from "@/zod/mealLog.schema";
 import MealLog from "@/models/mealLogs.model";
 import { MealType } from "@/constants/enum";
+import Account, { IAccount } from "@/models/account.model";
 
 //DELETE
 async function deleteMealById(id: string) {
@@ -97,7 +98,13 @@ async function updateMeal(id: string, mealData: UpdateMealInput) {
   return updatedMeal;
 }
 
-async function orderMeal(
+/**
+ * orders meal partially
+  - create mealLog with status -> not_taken
+  - if the user current account balance is less than the total amount
+  -  throws `ApiError('Insufficient balance', 409)`
+ */
+async function orderMealByUser(
   mealData: MealLogSchemaInputType,
   userId: string,
   mealId: string,
@@ -109,16 +116,41 @@ async function orderMeal(
     throw new ApiError("Invalid meal id", 400);
   }
   await connectDB();
-
+  const account = await Account.findOne<IAccount>({ user: userId });
+  if (!account) {
+    throw new ApiError("User Account not found", 404);
+  }
   const meal: IMeal | null = await Meal.findById(mealId);
   if (!meal) {
     throw new ApiError("Meal not found", 404);
+  }
+  let totalAmountWithExtras = meal.price;
+
+  if (mealData.extras && mealData.extras.length > 0) {
+    const extraIds = mealData.extras.map((e) => e.extras);
+    const extraMealItems = await Meal.find<IMeal>({
+      _id: { $in: extraIds },
+    });
+
+    // calculating extras total
+    let extrasTotal = 0;
+    mealData.extras.forEach((extra) => {
+      const item = extraMealItems.find((e) => e._id?.equals(extra.extras));
+      if (item) {
+        extrasTotal += item?.price * extra.quantity;
+      }
+    });
+    totalAmountWithExtras += extrasTotal;
+  }
+
+  if (account.balance <= 0 || totalAmountWithExtras > account.balance) {
+    throw new ApiError("Insufficient balance", 409);
   }
   const mealLogDoc = {
     ...mealData,
     user: userId,
     meal: meal._id,
-    totalAmount: meal.price,
+    totalAmount: totalAmountWithExtras,
   };
   const mealLog = await MealLog.create(mealLogDoc);
   if (!mealLog) {
@@ -282,7 +314,7 @@ export {
   getAllMeals,
   getMealById,
   updateMeal,
-  orderMeal,
+  orderMealByUser,
   getMealLogById,
   getAllMealLogs,
 };

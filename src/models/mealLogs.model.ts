@@ -99,10 +99,16 @@ mealLogSchema.pre("save", async function (next) {
   if (this.isModified("extras") || this.isModified("meal") || this.isNew) {
     console.log("Calculating total amount for meal log");
     const meal = await Meal.findById(this.meal);
+
     const basePrice = meal?.price ?? 0;
+
     let extrasTotal = 0;
     let extraMealItems = null;
     if (this.extras && this.extras.length > 0) {
+      if (this.totalAmount > basePrice) {
+        console.log("Total amount already set, skipping recalculation");
+        return next();
+      }
       extraMealItems = await Meal.find({
         _id: { $in: this.extras.map((e) => e.extras) },
       });

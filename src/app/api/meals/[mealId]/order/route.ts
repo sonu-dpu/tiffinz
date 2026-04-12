@@ -1,4 +1,4 @@
-import { orderMeal } from "@/helpers/server/meals";
+import { orderMealByUser } from "@/helpers/server/meals";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { withAuth } from "@/utils/withAuth";
 import { mealLogSchemaInput } from "@/zod/mealLog.schema";
@@ -22,6 +22,6 @@ export const POST = withAuth<MealParams>(async (req, context, user) => {
   const mealData = parseResult.data;
   console.log("mealData", mealData);
 
-  const orderedMeal = await orderMeal(mealData, String(userId), mealId);
+  const orderedMeal = await orderMealByUser(mealData, String(userId), mealId);
   return ApiResponse.success("Data", { orderedMeal });
 });
