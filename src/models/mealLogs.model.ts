@@ -47,7 +47,7 @@ const mealLogSchema = new Schema<IMealLog>(
       ref: "User",
       required: true,
     },
-    date: { type: Date, required: true },
+    date: { type: Date },
     meal: {
       type: Schema.Types.ObjectId,
       ref: "Meal",
@@ -115,7 +115,13 @@ mealLogSchema.pre("save", async function (next) {
     });
     this.totalAmount = basePrice + extrasTotal;
   }
-
+  if (
+    !this.isModified("date") &&
+    this.isModified("status") &&
+    this.status === MealStatus.taken
+  ) {
+    this.date = new Date();
+  }
   next();
 });
 
