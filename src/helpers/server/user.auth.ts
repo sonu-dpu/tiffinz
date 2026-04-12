@@ -6,7 +6,6 @@ import { ApiError } from "@/utils/apiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 import connectDB from "@/utils/dbConnect";
 import generateRefreshAndAccessToken from "@/utils/generateTokens";
-import { handleError } from "@/utils/handleError";
 import { verifyJWT } from "@/utils/verifyJWT";
 
 import {
@@ -189,61 +188,67 @@ async function logoutUser() {
 }
 
 async function refreshUserSession() {
-  try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get("refreshToken")?.value;
-    if (!refreshToken) {
-      console.log("refreshToken not found in cookies");
-      throw new ApiError("Session expired, login again", 400);
-    }
-    const { payload, error } = await verifyJWT(refreshToken, "refresh");
-    if (error) {
-      console.error("Error while verifying the refreshToken", error);
-      throw new ApiError("Session expired, login again", 400);
-    }
-    const userId = payload?._id as string;
-    console.log("userId", userId);
-    if (!userId) {
-      console.error("userId not found in the payload");
-      throw new ApiError("Session expired");
-    }
-    const { accessToken, refreshToken: newRefreshToken } =
-      await generateRefreshAndAccessToken(userId);
-
-    if (!accessToken || !newRefreshToken) {
-      throw new ApiError("Failed to generate tokens", 500);
-    }
-
-    const userSession = await Session.findOneAndUpdate(
-      { user: userId, refreshToken },
-      { refreshToken: newRefreshToken },
-      { upsert: true, new: true },
-    ).lean();
-    console.log("userSession", userSession);
-    if (!userSession) {
-      throw new ApiError("Session creation failed", 500);
-    }
-    // response.cookies
-    //   .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
-    //   .set("refreshToken", newRefreshToken, {
-    //     ...cookieFlags,
-    //     maxAge: 60 * 60 * 24 * 7,
-    //   });
-    cookieStore.set("accessToken", accessToken, {
-      ...cookieFlags,
-      maxAge: 60 * 15,
-    });
-    cookieStore.set("refreshToken", newRefreshToken, {
-      ...cookieFlags,
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
-    const user = await User.findById(userId).select("-password");
-    return user;
-  } catch (error) {
-    console.log("Error while refreshing the user session error", error);
-    return handleError(error);
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+  if (!refreshToken) {
+    console.log("refreshToken not found in cookies");
+    throw new ApiError("Session expired, login again", 400);
   }
+  const { payload, error } = await verifyJWT(refreshToken, "refresh");
+  if (error) {
+    console.error("Error while verifying the refreshToken", error);
+    throw new ApiError("Session expired, login again", 400);
+  }
+  const userId = payload?._id as string;
+  console.log("userId", userId);
+  if (!userId) {
+    console.error("userId not found in the payload");
+    throw new ApiError("Session expired");
+  }
+  await connectDB();
+  const existingUserSession = await Session.findOne({
+    user: userId,
+    refreshToken,
+  }).lean();
+
+  if (!existingUserSession) {
+    console.log(
+      "No session found for the user with the provided refresh token",
+    );
+    throw new ApiError("Session expired, login again", 400);
+  }
+  const { accessToken, refreshToken: newRefreshToken } =
+    await generateRefreshAndAccessToken(userId);
+
+  if (!accessToken || !newRefreshToken) {
+    throw new ApiError("Failed to generate tokens", 500);
+  }
+  const newUserSession = await Session.findOneAndUpdate(
+    { user: userId, refreshToken },
+    { refreshToken: newRefreshToken },
+    { upsert: true, new: true },
+  ).lean();
+  console.log("userSession", newUserSession);
+  if (!newUserSession) {
+    throw new ApiError("Session creation failed", 500);
+  }
+  // response.cookies
+  //   .set("accessToken", accessToken, { ...cookieFlags, maxAge: 60 * 15 })
+  //   .set("refreshToken", newRefreshToken, {
+  //     ...cookieFlags,
+  //     maxAge: 60 * 60 * 24 * 7,
+  //   });
+  cookieStore.set("accessToken", accessToken, {
+    ...cookieFlags,
+    maxAge: 60 * 15,
+  });
+  cookieStore.set("refreshToken", newRefreshToken, {
+    ...cookieFlags,
+    maxAge: 60 * 60 * 24 * 7,
+  });
+
+  const user = await User.findById(userId).select("-password");
+  return user;
 }
 export {
   logoutUser,
