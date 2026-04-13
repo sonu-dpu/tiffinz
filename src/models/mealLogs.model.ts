@@ -76,8 +76,9 @@ const mealLogSchema = new Schema<IMealLog>(
   { timestamps: true },
 );
 
-mealLogSchema.index({ user: 1, meal: 1, extras: 1 });
+mealLogSchema.index({ meal: 1, extras: 1 });
 mealLogSchema.index({ user: 1, createdAt: -1 });
+mealLogSchema.index({ user: 1, updatedAt: -1 });
 mealLogSchema.virtual("priceBreakdown").get(function (
   this: IMealLog & { meal?: IMeal },
 ) {
