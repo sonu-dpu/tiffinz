@@ -1,7 +1,7 @@
 import connectDB from "@/utils/dbConnect";
 import Meal, { IMeal } from "@/models/meal.model";
 import { ApiError } from "@/utils/apiError";
-import mongoose, { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId, Types } from "mongoose";
 import { UpdateMealInput } from "@/zod/meals.schema";
 import { MealLogSchemaInputType } from "@/zod/mealLog.schema";
 import MealLog from "@/models/mealLogs.model";
@@ -163,13 +163,103 @@ async function getMealLogById(mealLogId: string) {
   if (!isValidObjectId(mealLogId)) {
     throw new ApiError("Invalid meal log id");
   }
-  const mealLog = await MealLog.findById(mealLogId)
-    .populate("meal")
-    .populate("extras.etxras");
-  if (!mealLog) {
+  await connectDB();
+  const mealLog = await MealLog.aggregate([
+    {
+      $match: {
+        _id: new Types.ObjectId(mealLogId),
+      },
+    },
+    {
+      $lookup: {
+        from: "meals",
+        localField: "meal",
+        foreignField: "_id",
+        as: "meal",
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              price: 1,
+              description: 1,
+              type: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "meals",
+        localField: "extras.extras",
+        foreignField: "_id",
+        as: "populatedExtras",
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              price: 1,
+              description: 1,
+              // type: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        extras: {
+          $map: {
+            input: "$extras",
+            as: "extraItem",
+            in: {
+              quantity: "$$extraItem.quantity",
+              details: {
+                $first: {
+                  $filter: {
+                    input: "$populatedExtras",
+                    as: "populated",
+                    cond: {
+                      $eq: ["$$populated._id", "$$extraItem.extras"],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+        pipeline: [
+          {
+            $project: {
+              fullName: 1,
+              username: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        user: { $first: "$user" },
+        meal: { $first: "$meal" },
+      },
+    },
+    {
+      $unset: "populatedExtras",
+    },
+  ]);
+  if (!mealLog?.[0]) {
     throw new ApiError("Meal log not found", 404);
   }
-  return mealLog;
+  return mealLog[0];
 }
 
 interface paginationParams {
