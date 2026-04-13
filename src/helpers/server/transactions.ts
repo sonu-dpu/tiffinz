@@ -1,8 +1,15 @@
 import Transaction, { ITransaction } from "@/models/transaction.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
-import { PaginateOptions, PipelineStage, Types } from "mongoose";
+import { ClientSession, PaginateOptions, PipelineStage, Types } from "mongoose";
 import { isValidObjectId } from "mongoose";
+
+/**
+ *
+ * @param transactionDoc
+ * @returns
+ * @deprecated - use `createTransactionDoc`
+ */
 async function createTransaction(transactionDoc: ITransaction) {
   if (!isValidObjectId(transactionDoc.account)) {
     throw new ApiError("Inavlid Account id");
@@ -52,7 +59,7 @@ async function getUserTransactions(userId: string, options: PaginateOptions) {
   await connectDB();
   const transactions = await Transaction.aggregatePaginate(
     [{ $match: { user: new Types.ObjectId(userId) } }],
-    { ...options }
+    { ...options },
   );
   return transactions;
 }
@@ -60,7 +67,7 @@ async function getUserTransactions(userId: string, options: PaginateOptions) {
 // using agggregation pipeline in this function
 async function getTransactionWithPopuplatedFields(
   transactionId: string,
-  userId?: string
+  userId?: string,
 ) {
   if (!isValidObjectId(transactionId)) {
     throw new ApiError("Invalid Transaction ID");
@@ -189,28 +196,28 @@ async function getTransactionWithPopuplatedFields(
       },
     },
     {
-      $lookup:{
-        from:"users",
-        localField:"user",
-        foreignField:"_id",
-        as:"user",
-        pipeline:[
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+        pipeline: [
           {
-            $project:{
-              fullName:1,
-              email:1,
-              role:1,
-              username:1,
-              phone:1
-            }
-          }
-        ]
-      }
+            $project: {
+              fullName: 1,
+              email: 1,
+              role: 1,
+              username: 1,
+              phone: 1,
+            },
+          },
+        ],
+      },
     },
     {
       $addFields: {
         mealLog: { $first: "$mealLog" },
-        user:{ $first:"$user" }
+        user: { $first: "$user" },
       },
     },
   ];
@@ -221,8 +228,30 @@ async function getTransactionWithPopuplatedFields(
   return transaction[0];
 }
 
+type CreateTransactionDocParams = {
+  data: ITransaction;
+  session: ClientSession;
+};
+async function createTransactionDoc({
+  data,
+  session,
+}: CreateTransactionDocParams) {
+  try {
+    const newTransaction = await Transaction.create([data], { session });
+    if (!newTransaction || newTransaction.length === 0) {
+      throw new ApiError("Failed to create a transaction");
+    }
+    return newTransaction[0];
+  } catch (error: unknown) {
+    await session.abortTransaction();
+    console.error("Failed to create transaction", error);
+    throw new ApiError("Failed to create transaction", 500);
+  }
+}
+
 export {
   createTransaction,
+  createTransactionDoc,
   getTransactionById,
   getUserTransactions,
   getTransactionWithPopuplatedFields,
