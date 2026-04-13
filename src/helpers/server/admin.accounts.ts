@@ -88,6 +88,10 @@ type UpdateAccountBalanceParams = {
   amount: number;
   session?: ClientSession;
 };
+/*
+- updates the account balance based on the transaction type and amount
+- if session is provided, it will use the session to update the account balance, otherwise it will update without session
+*/
 async function updateAccountBalance({
   accountId,
   amount,

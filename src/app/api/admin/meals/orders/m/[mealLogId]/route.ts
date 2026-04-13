@@ -18,7 +18,9 @@ const getMealLogByIdRoute = withAuth<MealLogParam>(
     const { mealLogId } = await context.params;
 
     const mealLog = await getMealLogById(mealLogId);
-    return ApiResponse.success("Hello", { order: mealLog });
+    return ApiResponse.success("Fetched order successfully", {
+      order: mealLog,
+    });
   },
   { requiredRole: UserRole.admin },
 );
@@ -42,10 +44,10 @@ const updateMealLogStatusRoute = withAuth<MealLogParam>(
     }
     const session = await startSession();
     try {
+      mealLog.status = status.toLocaleUpperCase() as MealStatus;
       // if status is taken create a transaction and then upadte the user account balance
       if (status === MealStatus.taken) {
         session.startTransaction();
-        mealLog.status = status.toLocaleUpperCase() as MealStatus;
         const account = await Account.findOne({ user: mealLog.user }).session(
           session,
         );
