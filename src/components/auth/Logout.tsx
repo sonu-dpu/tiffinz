@@ -20,14 +20,18 @@ function LogoutButton() {
         Logout{" "}
       </DrawerTrigger>
       <DrawerContent aria-describedby="logout-drawer">
-        <DrawerHeader>
-          <DrawerTitle>Are you absolutely sure to logout?</DrawerTitle>
-          {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
-        </DrawerHeader>
-        <DrawerFooter>
-          <DrawerClose onClick={() => redirect("/logout")}>Logout</DrawerClose>
-          <DrawerClose variant={"outline"}>Cancel</DrawerClose>
-        </DrawerFooter>
+        <div className="max-w-md w-full mx-auto">
+          <DrawerHeader>
+            <DrawerTitle>Are you absolutely sure to logout?</DrawerTitle>
+            {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose onClick={() => redirect("/logout")}>
+              Logout
+            </DrawerClose>
+            <DrawerClose variant={"outline"}>Cancel</DrawerClose>
+          </DrawerFooter>
+        </div>
       </DrawerContent>
     </Drawer>
   );
