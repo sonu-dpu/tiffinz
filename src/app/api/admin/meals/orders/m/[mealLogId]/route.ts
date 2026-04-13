@@ -43,18 +43,19 @@ const updateMealLogStatusRoute = withAuth<MealLogParam>(
       throw new ApiError("Meal log not found", 404);
     }
     const session = await startSession();
+    session.startTransaction();
     try {
       mealLog.status = status.toLocaleUpperCase() as MealStatus;
+      let newTransaction = null;
       // if status is taken create a transaction and then upadte the user account balance
       if (status === MealStatus.taken) {
-        session.startTransaction();
         const account = await Account.findOne({ user: mealLog.user }).session(
           session,
         );
         if (!account) {
           throw new ApiError("Account not found for the user", 404);
         }
-        const newTransaction = await createTransactionDoc({
+        newTransaction = await createTransactionDoc({
           data: {
             account: account._id,
             user: mealLog.user,
@@ -76,6 +77,8 @@ const updateMealLogStatusRoute = withAuth<MealLogParam>(
       await session.commitTransaction();
       return ApiResponse.success("Meal log status updated successfully", {
         mealLog,
+        status,
+        transaction: status === MealStatus.taken ? newTransaction : null,
       });
     } catch (error) {
       await session.abortTransaction();
