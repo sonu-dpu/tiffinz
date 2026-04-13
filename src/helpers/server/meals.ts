@@ -379,9 +379,20 @@ async function getAllMealLogs(
 
       {
         $addFields: {
+          extras: { $sum: "$extras.quantity" }
+        }
+      },
+      {
+        $addFields: {
           user: { $first: "$user" },
-          meal: { $first: "$meal" },
+          mealDetails: { $first: "$meal" },
+          baseMealName: { $first: "$meal.name" },
         },
+      },
+      {
+        $addFields: {
+          meal: "$mealDetails._id"
+        }
       },
       {
         $unset: ["populatedExtras"],

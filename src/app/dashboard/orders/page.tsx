@@ -4,27 +4,40 @@ import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { getMealOrders } from "@/helpers/client/admin.meals";
-import { DailyMealFor, MealStatus } from "@/constants/enum";
+import { getMyOrders } from "@/helpers/client/meal";
+import { DailyMealFor, MealStatus, UserRole } from "@/constants/enum";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 
 import OrderCard, { Order } from "@/components/dashboard/admin/orders/OrderCard";
+import OrderDetailsDialog from "@/components/dashboard/admin/orders/OrderDetailsDialog";
+import { useState } from "react";
 
 export default function MyOrdersPage() {
   const searchParams = useSearchParams();
   const status = searchParams.get("status") || "";
   const mealFor = searchParams.get("mealFor") || "";
+  const { userRole } = useCurrentUser();
+  const isAdmin = userRole === UserRole.admin;
+
   const { data: orders, isLoading } = useQuery<Order[]>({
-    queryKey: ["getMealOrders", status, mealFor],
+    queryKey: ["getOrders", status, mealFor, isAdmin],
     queryFn: () =>
-      getMealOrders({
-        status: status as MealStatus,
-        mealFor: mealFor as DailyMealFor,
-      }),
+      isAdmin
+        ? getMealOrders({
+            status: status as MealStatus,
+            mealFor: mealFor as DailyMealFor,
+          })
+        : getMyOrders(),
     // enabled: false,
   });
 
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const handleViewDetails = (order: Order) => {
-    console.log("Open details for:", order);
+    setSelectedOrder(order);
+    setIsDialogOpen(true);
   };
   if (isLoading) {
     return (
@@ -47,6 +60,12 @@ export default function MyOrdersPage() {
           );
         })}
       </div>
+
+      <OrderDetailsDialog
+        order={selectedOrder}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
     </div>
   );
 }

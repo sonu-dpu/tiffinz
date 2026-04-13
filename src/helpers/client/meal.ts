@@ -42,4 +42,26 @@ async function getMealById(id: string) {
     throw new Error(errMessage);
   }
 }
-export { getAllMeals, getMealById };
+async function getMyOrders() {
+  try {
+    const resp = await axios.get("/api/meals/order/me");
+    return resp.data?.data.orders.docs;
+  } catch (error) {
+    const errMessage = handleError(error, "get my orders").message;
+    throw new Error(errMessage);
+  }
+}
+
+async function updateMyMealOrderStatus(mealLogId: string, status: string) {
+  try {
+    const resp = await axios.patch(`/api/meals/order/me/${mealLogId}`, {
+      status,
+    });
+    return resp.data?.data;
+  } catch (error) {
+    const errMessage = handleError(error, "update my order").message;
+    throw new Error(errMessage);
+  }
+}
+
+export { getAllMeals, getMealById, getMyOrders, updateMyMealOrderStatus };

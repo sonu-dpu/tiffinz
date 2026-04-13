@@ -59,10 +59,22 @@ async function getMealOrders(options: GetMealOrderProps) {
   }
 }
 
+async function updateMealOrderStatus(mealLogId: string, status: MealStatus) {
+  try {
+    const resp = await axios.patch(`/api/admin/meals/orders/m/${mealLogId}`, {
+      status,
+    });
+    return resp.data?.data;
+  } catch (error) {
+    throw new Error("Error updating order status: " + String(error));
+  }
+}
+
 export {
   markMealTakenByUser,
   addNewMeal,
   deleteMealById,
   updateMealById,
   getMealOrders,
+  updateMealOrderStatus,
 };
