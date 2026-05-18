@@ -32,14 +32,14 @@ Tiffinz is a full-stack tiffin management platform designed to help users track 
 ### **🔸 User Login**
 
 ```
-Email: user@test.com
+username : testUser1
 Password: user123
 ```
 
 ### **🔸 Admin Login**
 
 ```
-Email: admin@test.com
+username: testAdmin
 Password: admin123
 ```
 
