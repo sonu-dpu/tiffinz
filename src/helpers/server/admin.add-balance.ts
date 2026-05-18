@@ -5,26 +5,26 @@ import AddBalanceRequest, {
 } from "@/models/addBalanceRequest.model";
 import { ApiError } from "@/utils/apiError";
 import connectDB from "@/utils/dbConnect";
-import { isValidObjectId } from "mongoose";
+import { ClientSession, isValidObjectId } from "mongoose";
 
 async function verifyBalanceRequest(
   reqId: string,
-  status: PaymentStatus = PaymentStatus.approved
+  status: PaymentStatus = PaymentStatus.approved,
+  session: ClientSession,
 ) {
   if (!isValidObjectId(reqId)) {
     throw new ApiError("Invalid request id", 400);
   }
   await connectDB();
-  const reqDoc: IAddBalanceRequest | null =
-    await AddBalanceRequest.findByIdAndUpdate(
-      reqId,
-      {
-        $set: {
-          status: status,
-        },
+  const reqDoc = await AddBalanceRequest.findByIdAndUpdate<IAddBalanceRequest>(
+    reqId,
+    {
+      $set: {
+        status: status,
       },
-      { new: true }
-    );
+    },
+    { new: true, session },
+  );
   if (!reqDoc || reqDoc.status !== status) {
     throw new ApiError("Failed to update the request status");
   }
@@ -44,7 +44,7 @@ async function verifyBalanceRequest(
 async function updateAccountBalance(
   userId: string,
   amount: number,
-  accountId?: string
+  accountId?: string,
 ) {
   if (accountId && !isValidObjectId(accountId)) {
     throw new ApiError("Invalid account id", 400);
@@ -80,6 +80,8 @@ async function getBalanceRequestDetailsById(reqId: string) {
   return request;
 }
 
-
-
-export { verifyBalanceRequest, updateAccountBalance,getBalanceRequestDetailsById };
+export {
+  verifyBalanceRequest,
+  updateAccountBalance,
+  getBalanceRequestDetailsById,
+};
