@@ -9,6 +9,8 @@ import {
   // Search,
   Settings,
   User,
+  UserCircle,
+  Wallet,
 } from "lucide-react";
 
 import {
@@ -28,6 +30,7 @@ import Link from "next/link";
 import { UserRole } from "@/constants/enum";
 import LogoutButton from "../auth/Logout";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ISidebarItem {
   title: string;
@@ -35,8 +38,8 @@ interface ISidebarItem {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   onlyForAdmin?: boolean;
   onlyForUser?: boolean;
+  onlyDesktop?: boolean;
 }
-// Menu items.
 
 const sidebarItems: ISidebarItem[] = [
   {
@@ -85,6 +88,20 @@ const sidebarItems: ISidebarItem[] = [
     icon: PlusCircleIcon,
     onlyForAdmin: true,
   },
+  {
+    title: "Wallet",
+    url: "/dashboard/wallet",
+    icon: Wallet,
+    onlyForUser: true,
+    onlyDesktop: true,
+  },
+  {
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: UserCircle,
+    onlyForUser: true,
+    onlyDesktop: true,
+  },
   // {
   //   title: "Settings",
   //   url: "/dashboard/settings",
@@ -94,6 +111,7 @@ const sidebarItems: ISidebarItem[] = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
 
   // console.log('currentUser', currentUser);
   const currentUserRole = useAppSelector((state) => state.auth.user?.role);
@@ -122,6 +140,9 @@ export function AppSidebar() {
                 }
                 if (item.onlyForUser && currentUserRole !== UserRole.user) {
                   return null; // Skip items that are only for regular users
+                }
+                if (isMobile && item.onlyDesktop) {
+                  return null;
                 }
                 return (
                   <SidebarMenuItem key={item.title}>
