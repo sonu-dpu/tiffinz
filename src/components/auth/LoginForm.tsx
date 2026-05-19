@@ -16,14 +16,13 @@ import {
   loginUserWithEmail,
   loginUserWithUsername,
 } from "@/helpers/client/user.auth";
-import { login } from "@/store/authSlice";
-import { useAppDispatch } from "@/hooks/reduxHooks";
+
 import { EyeClosed, LucideEye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import useCurrentUser from "@/hooks/useCurrentUser";
 import Link from "next/link";
 import { email } from "zod/v4";
+import { useAuth } from "@/hooks/useAuth";
 
 type LoginFormData = {
   identifier: string;
@@ -31,7 +30,7 @@ type LoginFormData = {
 };
 
 function LoginForm() {
-  const { user, isLoggedIn } = useCurrentUser();
+  const { user, isLoggedIn, setUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -40,7 +39,6 @@ function LoginForm() {
   } = useForm<LoginFormData>();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -85,8 +83,7 @@ function LoginForm() {
       return;
     }
     toast.success("Login Success");
-    console.log("Login successful:", user);
-    dispatch(login(user));
+    setUser(user);
   };
   return (
     <Card className="w-full max-w-sm mx-auto">

@@ -1,9 +1,12 @@
 "use client";
 import UserProfile from '@/components/dashboard/profile/UserProfile';
-import { useAppSelector } from '@/hooks/reduxHooks';
+import { useAuth } from '@/hooks/useAuth';
+import Loader from '@/components/ui/Loader';
+
 
 function ProfilePage() {
-  const user = useAppSelector((state) => state.auth.user);
+  const { user } = useAuth();
+  if(!user) return <Loader />
   return (
     <>
         <UserProfile user={user} />

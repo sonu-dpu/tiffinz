@@ -14,10 +14,10 @@ import {
   Wallet,
   UserCircle,
 } from "lucide-react";
-// import { UserRole } from "@/constants/enum";
-import { useAppSelector } from "@/hooks/reduxHooks";
+
 import { UserRole } from "@/constants/enum";
 import { useIsMobile } from "@/hooks/use-mobile";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 interface NavItem {
   label: string;
@@ -66,8 +66,7 @@ interface NavItem {
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const currentUser = useAppSelector((state) => state.auth.user);
-  const role = currentUser?.role;
+  const {user,userRole:role}=useCurrentUser()
   const isMobile = useIsMobile();
   const navItems = role === UserRole.admin ? adminNav : userNav;
   if (

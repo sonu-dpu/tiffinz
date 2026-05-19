@@ -29,8 +29,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@/constants/enum";
 import LogoutButton from "../auth/Logout";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import { useIsMobile } from "@/hooks/use-mobile";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 interface ISidebarItem {
   title: string;
@@ -112,10 +112,8 @@ const sidebarItems: ISidebarItem[] = [
 export function AppSidebar() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
-
-  // console.log('currentUser', currentUser);
-  const currentUserRole = useAppSelector((state) => state.auth.user?.role);
-
+  const { userRole: currentUserRole } = useCurrentUser();
+  
   if (!pathname.startsWith("/dashboard")) {
     return null;
   }

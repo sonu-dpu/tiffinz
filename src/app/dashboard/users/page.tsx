@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { setUsers } from "@/store/usersSlice";
+import { useMemo, useState } from "react";
+
 import { UserRole } from "@/constants/enum";
 import { toast } from "sonner";
 import {
@@ -11,16 +10,16 @@ import {
   verifyUser,
 } from "@/helpers/client/admin.users";
 import Loader from "@/components/ui/Loader";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { UserTableDesktop } from "@/components/dashboard/admin/users/UserTableDesktop";
 import { UserCardListMobile } from "@/components/dashboard/admin/users/UserCardListMobile";
 import { useSearchParams } from "next/navigation";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { IUser } from "@/models/user.model";
 
 export default function UsersPage() {
-  const currentUser = useAppSelector((state) => state.auth.user);
-  const { users } = useAppSelector((state) => state.users);
-  const dispatch = useAppDispatch();
+  const { user: currentUser } = useCurrentUser();
   const searchParams = useSearchParams();
   const isVerified = searchParams.get("verified");
   const options: GetUsersOptions = {};
@@ -29,15 +28,15 @@ export default function UsersPage() {
     console.log("isVerified", isVerified);
   }
   const {
-    data: usersData,
+    data: users,
     error,
     isLoading,
-    isFetched,
   } = useQuery({
     queryKey: ["getUsers", options],
     queryFn: () => getUsers(options),
-    enabled: !users && currentUser?.role === UserRole.admin,
+    enabled: currentUser?.role === UserRole.admin,
   });
+  const queryClient = useQueryClient();
 
   async function handleVerifyUser(userId: string) {
     const { data, error } = await verifyUser(userId);
@@ -47,20 +46,16 @@ export default function UsersPage() {
     }
     if (data) {
       toast.success("User verified successfully");
+      queryClient.invalidateQueries({ queryKey: ["getUsers", options] });
     }
   }
-  useEffect(() => {
-    if (usersData && !users && isFetched) {
-      dispatch(setUsers(usersData));
-    }
-  }, [dispatch, users, usersData, error, isFetched, isLoading, isVerified]);
-
+ 
   const [search, setSearch] = useState("");
   const filteredUsers = useMemo(() => {
     const s = search.trim().toLowerCase();
     if (!s) return users || [];
     return (users || []).filter(
-      (user) =>
+      (user:IUser) =>
         user.username?.toLowerCase().includes(s) ||
         user.fullName?.toLowerCase().includes(s) ||
         user._id?.toString().toLowerCase().includes(s) ||

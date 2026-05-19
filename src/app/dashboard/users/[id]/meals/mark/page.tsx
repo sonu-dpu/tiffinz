@@ -22,11 +22,10 @@ import { DailyMealFor, MealType } from "@/constants/enum";
 import { markMealTakenByUser } from "@/helpers/client/admin.meals";
 import { getUserById } from "@/helpers/client/admin.users";
 import { getAllMeals, GetAllMealsOptions } from "@/helpers/client/meal";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import { formatToIndianCurrency } from "@/lib/utils";
 import { IMeal } from "@/models/meal.model";
 import { IUser } from "@/models/user.model";
-import { setSelectedUser } from "@/store/usersSlice";
+
 import {
   extrasItemSchema,
   ExtrasItemSchemaType,
@@ -37,26 +36,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import React, { FC, useEffect, useMemo, useState, useTransition } from "react";
+import React, { FC, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
 function RecordMealPage() {
   const { id: userId } = useParams();
-  const selectedUser = useAppSelector((state) => state.users.selectedUser);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (userId && String(selectedUser?._id) !== String(userId)) {
-      getUserById(String(userId)).then((user) => {
-        dispatch(setSelectedUser(user));
-      });
-    }
-  }, [userId, dispatch, selectedUser]);
-
-  if (!selectedUser) {
+  const { data: selectedUser, isLoading, error } = useQuery({
+    queryKey: ["getUserById", userId],
+    queryFn: () => getUserById(String(userId)),
+    enabled: !!userId,
+  });
+  if (isLoading) {
     return <div>Loading user...</div>;
+  }
+  if (error||!selectedUser) {
+    const message = error?.message|| "User not found";
+    console.log(message,"message")
+    toast.error(message);
+    return <div>{message}</div>;
   }
   return (
     <Card className="max-w-md mx-auto bg-transparent border-none shadow-none">

@@ -10,21 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import WithDrawer from "@/components/ui/withDrawer";
-import { useAppDispatch } from "@/hooks/reduxHooks";
 import { getDateAndTimeString } from "@/lib/date-format";
-import { setSelectedUser } from "@/store/usersSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BadgeCheck, CircleX, PlusCircleIcon } from "lucide-react";
 import { IUserWithAccount } from "@/helpers/client/admin.users";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function UserDetailsCard({ user }: { user: IUserWithAccount }) {
-  const dispatch = useAppDispatch();
   const router = useRouter();
-
-  const selectUserForMealRecord = () => {
-    dispatch(setSelectedUser(user));
-    router.push(`./${user._id}/meals/mark`);
-  };
 
   return (
     <Card className="rounded-xl shadow-md w-full max-w-3xl mx-auto">
@@ -132,8 +125,8 @@ export default function UserDetailsCard({ user }: { user: IUserWithAccount }) {
           <AddBalanceForm className="bg-transparent border-none max-w-md mx-auto" />
         </WithDrawer>
 
-        <Button onClick={selectUserForMealRecord} className="w-full sm:w-auto">
-          Record Meal
+        <Button asChild className="w-full sm:w-auto">
+          <Link href={`./${user._id}/meals/mark`}>Record Meal</Link>
         </Button>
       </CardFooter>
     </Card>

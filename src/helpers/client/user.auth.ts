@@ -94,7 +94,7 @@ async function loginUserWithUsername(credentials: {
   }
 }
 
-async function getCurrentUser(): Promise<unknown> {
+async function getCurrentUser(): Promise<IUser> {
   try {
     const response = await axios.get("/api/users");
     const user = response.data?.data?.user;

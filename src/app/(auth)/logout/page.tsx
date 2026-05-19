@@ -2,8 +2,6 @@
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { logout } from "@/store/authSlice";
 import { logoutUser } from "@/helpers/client/user.auth";
 import { toast } from "sonner";
 import Loader from "@/components/ui/Loader";
@@ -12,14 +10,13 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 
 const LogoutPage = () => {
   const { isLoggedIn } = useCurrentUser();
-  const dispatch = useAppDispatch();
+
   const queryClient = useQueryClient();
   const router = useRouter();
   useEffect(() => {
     if (isLoggedIn) {
       logoutUser()
         .then(() => {
-          dispatch(logout());
           toast.success("Logged out successfully");
         })
         .catch((error) => {
@@ -32,7 +29,7 @@ const LogoutPage = () => {
     } else {
       router.replace("/login");
     }
-  }, [isLoggedIn, dispatch, queryClient, router]);
+  }, [isLoggedIn, queryClient, router]);
 
   return <Loader />;
 };

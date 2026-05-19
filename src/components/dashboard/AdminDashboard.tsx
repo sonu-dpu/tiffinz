@@ -15,8 +15,6 @@ import { getRequests } from "@/helpers/client/add-balance";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { getUsers } from "@/helpers/client/admin.users";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { setUsers } from "@/store/usersSlice";
 import {
   ChartConfig,
   ChartContainer,
@@ -160,7 +158,7 @@ export function UsersCountCard({
   error: unknown;
   isLoading: boolean;
 }) {
-  const dispatch = useAppDispatch();
+
   return (
     <Card className="w-full max-w-sm rounded-2xl shadow-md">
       <CardHeader className="flex flex-row items-start justify-between pb-2">
@@ -183,7 +181,6 @@ export function UsersCountCard({
         <Button
           asChild
           variant="outline"
-          onClick={() => dispatch(setUsers(""))}
         >
           <Link href={"/dashboard/users?verified=false"}>View Users</Link>
         </Button>

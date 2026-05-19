@@ -1,15 +1,16 @@
 "use client";
 import Loader from "@/components/ui/Loader";
 import { refreshUserSession } from "@/helpers/client/user.auth";
-import { login } from "@/store/authSlice";
+
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 function RefreshPage() {
+  const { setUser } = useAuth();
   const {
     data: user,
     error,
@@ -19,13 +20,13 @@ function RefreshPage() {
     queryFn: refreshUserSession,
     retry: false,
   });
-  const dispatch = useDispatch();
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/dashboard";
   useEffect(() => {
     if (user) {
-      dispatch(login(user));
+      setUser(user);
       router.replace(`${decodeURIComponent(redirectTo)}`);
     } else if (error) {
       toast.error("Failed to refresh session: " + error.message);
@@ -38,7 +39,7 @@ function RefreshPage() {
     return () => {
       toast.dismiss();
     };
-  }, [user, error, dispatch, router, isFetching, redirectTo]);
+  }, [user, error, router, isFetching, redirectTo]);
   if (error) {
     toast.error(error.message);
   }
