@@ -14,11 +14,9 @@ import { getDateAndTimeString } from "@/lib/date-format";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BadgeCheck, CircleX, PlusCircleIcon } from "lucide-react";
 import { IUserWithAccount } from "@/helpers/client/admin.users";
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 export default function UserDetailsCard({ user }: { user: IUserWithAccount }) {
-  const router = useRouter();
-
   return (
     <Card className="rounded-xl shadow-md w-full max-w-3xl mx-auto">
       {/* HEADER */}

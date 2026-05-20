@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import DialogWrapper from "@/components/ui/dialog-wrapper";
 import { Input } from "@/components/ui/input";
+import Loader from "@/components/ui/Loader";
 import LoaderButton from "@/components/ui/loader-button";
 import {
   NativeSelect,
@@ -42,17 +43,21 @@ import { toast } from "sonner";
 
 function RecordMealPage() {
   const { id: userId } = useParams();
-  const { data: selectedUser, isLoading, error } = useQuery({
+  const {
+    data: selectedUser,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["getUserById", userId],
     queryFn: () => getUserById(String(userId)),
     enabled: !!userId,
   });
   if (isLoading) {
-    return <div>Loading user...</div>;
+    return <Loader />;
   }
-  if (error||!selectedUser) {
-    const message = error?.message|| "User not found";
-    console.log(message,"message")
+  if (error || !selectedUser) {
+    const message = error?.message || "User not found";
+    console.log(message, "message");
     toast.error(message);
     return <div>{message}</div>;
   }
@@ -120,7 +125,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
   const [formData, setFormData] =
     useState<mealLogSchemaForAdminClientType | null>(null);
   const handleFormValidationAndSetFormData = async (
-    formData: mealLogSchemaForAdminClientType
+    formData: mealLogSchemaForAdminClientType,
   ) => {
     setValue("user", String(user?._id));
     // transform local MealExtrasTypes (mealId, quantity) to the shape expected by the API ({ extras, quantity })
@@ -137,7 +142,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
         const response = await markMealTakenByUser(formData!);
         toast.success("Meal recorded successfully");
         router.push(
-          `/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`
+          `/dashboard/transactions/${response.transactionId}?mealLogId=${response.mealLog._id}`,
         );
         console.log("response", response);
       } catch (err) {
@@ -237,7 +242,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
               <ul className="list-disc list-inside">
                 {mealExtras.map((extra, index) => {
                   const mealDetails = extras.find(
-                    (meal: IMeal) => String(meal._id) === extra.mealId
+                    (meal: IMeal) => String(meal._id) === extra.mealId,
                   );
                   return (
                     <li
@@ -253,7 +258,7 @@ const RecordMealForm: FC<{ user: IUser }> = ({ user }) => {
                         onClick={() => {
                           // remove this extra from mealExtras
                           setMealExtras((prev) =>
-                            prev.filter((meal) => meal.mealId !== extra.mealId)
+                            prev.filter((meal) => meal.mealId !== extra.mealId),
                           );
                         }}
                       >
@@ -316,7 +321,7 @@ const AddMealExtrasForm = ({
   } = useForm({ resolver: zodResolver(extrasItemSchema) });
   const handleAddExtra = (data: ExtrasItemSchemaType) => {
     const isAvailable = extrasItemsWithDetails.some(
-      (meal: IMeal) => String(meal._id) === data.extras
+      (meal: IMeal) => String(meal._id) === data.extras,
     );
     if (!isAvailable) {
       setError("extras", {
@@ -327,7 +332,7 @@ const AddMealExtrasForm = ({
     }
     // check if already added then just update quantity
     const alreadyAddedIndex = mealsExtras.findIndex(
-      (extra) => String(extra.mealId) === data.extras
+      (extra) => String(extra.mealId) === data.extras,
     );
     if (alreadyAddedIndex !== -1) {
       const updatedExtras = [...mealsExtras];

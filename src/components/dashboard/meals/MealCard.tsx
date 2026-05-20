@@ -27,13 +27,7 @@ import { toast } from "sonner";
 import { useContext, useState } from "react";
 import DialogWrapper from "@/components/ui/dialog-wrapper";
 import EditMealForm from "./EditMealForm";
-function MealCard({
-  meal,
-  listOnly = false,
-}: {
-  meal: IMeal;
-  listOnly?: boolean;
-}) {
+function MealCard({ meal }: { meal: IMeal; listOnly?: boolean }) {
   const { userRole } = useCurrentUser();
   return (
     // <Link href={`/dashboard/meals/${meal._id}`}>
@@ -100,7 +94,7 @@ function MealActionMenu({ meal }: { meal: IMeal }) {
       toast.loading("Deleting meal...", { id: "delete-meal" });
       return deleteMealById(mealId);
     },
-    onSuccess(_) {
+    onSuccess() {
       toast.dismiss("delete-meal");
       client?.invalidateQueries({
         queryKey: ["getAllMeals"],
