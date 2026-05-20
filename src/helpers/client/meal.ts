@@ -13,16 +13,13 @@ async function getAllMeals({
   searchQuery = "",
 }: GetAllMealsOptions) {
   try {
-    const resp = await axios.get(
-      "/api/meals",
-      {
-        params:{
-          isActive,
-          ...(type!=="ALL" && {type}),
-          q: searchQuery
-        }
-      }
-    );
+    const resp = await axios.get("/api/meals", {
+      params: {
+        isActive,
+        ...(type !== "ALL" && { type }),
+        q: searchQuery,
+      },
+    });
     const data = resp.data?.data;
     return data;
   } catch (error) {
@@ -64,4 +61,26 @@ async function updateMyMealOrderStatus(mealLogId: string, status: string) {
   }
 }
 
-export { getAllMeals, getMealById, getMyOrders, updateMyMealOrderStatus };
+async function getAllMealLogs({ userId }: { userId?: string }) {
+  try {
+    const resp = await axios.get("/api/meal-logs", {
+      params: { user: userId },
+    });
+    const data = resp.data.data?.docs;
+    if (!data) {
+      throw new Error("Failed to fetch the meal log");
+    }
+    return data;
+  } catch (error) {
+    const errMessage = handleError(error, "get all meal logs").message;
+    throw new Error(errMessage);
+  }
+}
+
+export {
+  getAllMeals,
+  getMealById,
+  getMyOrders,
+  updateMyMealOrderStatus,
+  getAllMealLogs,
+};

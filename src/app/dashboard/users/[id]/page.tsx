@@ -1,6 +1,7 @@
 "use client";
-import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
+// import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 import UserDetailsCard from "@/components/dashboard/admin/users/UserDetailsCard";
+import MealLogsList from "@/components/dashboard/meals/MealLogsList";
 import Loader from "@/components/ui/Loader";
 import { getUserWithAccount } from "@/helpers/client/admin.users";
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +29,8 @@ function UserPage() {
     return (
       <>
         <UserDetailsCard user={user} />
-        <TransactionsByUserId userId={String(userId)} />
+        {/* <TransactionsByUserId userId={String(userId)} /> */}
+        <MealLogsList userId={userId as string} />
       </>
     );
   }
