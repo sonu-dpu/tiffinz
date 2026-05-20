@@ -310,92 +310,30 @@ async function getAllMealLogs(
       {
         $match: match,
       },
+      // {
+      //   $lookup: {
+      //     from: "users",
+      //     localField: "user",
+      //     foreignField: "_id",
+      //     as: "user",
+      //     pipeline: [
+      //       {
+      //         $project: {
+      //           fullName: 1,
+      //           username: 1,
+      //         },
+      //       },
+      //     ],
+      //   },
+      // },
       {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-          pipeline: [
-            {
-              $project: {
-                fullName: 1,
-                username: 1,
-              },
-            },
-          ],
+        $project: {
+          mealFor: 1,
+          totalAmount: 1,
+          date: 1,
+          createdAt: 1,
+          status: 1,
         },
-      },
-      {
-        $lookup: {
-          from: "meals",
-          localField: "meal",
-          foreignField: "_id",
-          as: "meal",
-          pipeline: [
-            {
-              $project: {
-                _id: 1,
-                name: 1,
-                type: 1,
-                price: 1,
-              },
-            },
-          ],
-        },
-      },
-      {
-        $lookup: {
-          from: "meals",
-          localField: "extras.extras",
-          foreignField: "_id",
-          as: "populatedExtras",
-        },
-      },
-      {
-        $addFields: {
-          extras: {
-            $map: {
-              input: "$extras",
-              as: "extraItem",
-              in: {
-                quantity: "$$extraItem.quantity",
-                details: {
-                  $first: {
-                    $filter: {
-                      input: "$populatedExtras",
-                      as: "populated",
-                      cond: {
-                        $eq: ["$$populated._id", "$$extraItem.extras"],
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-
-      {
-        $addFields: {
-          extras: { $sum: "$extras.quantity" }
-        }
-      },
-      {
-        $addFields: {
-          user: { $first: "$user" },
-          mealDetails: { $first: "$meal" },
-          baseMealName: { $first: "$meal.name" },
-        },
-      },
-      {
-        $addFields: {
-          meal: "$mealDetails._id"
-        }
-      },
-      {
-        $unset: ["populatedExtras"],
       },
     ],
     {
