@@ -8,6 +8,7 @@ import { TransactionWithMealLog } from "@/helpers/client/client.types";
 import { getUserTransactions } from "@/helpers/client/user.transactions";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { getMonthFromDate } from "@/lib/date-format";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
@@ -45,7 +46,7 @@ function TransactionsPage() {
       {
         root: null,
         threshold: 0.1,
-      }
+      },
     );
     const element = loaderRef.current;
     if (element) {
@@ -99,24 +100,6 @@ function TransactionsPage() {
       </div>
     </>
   );
-}
-
-function getMonthFromDate(date: Date) {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  return monthNames[date.getMonth()];
 }
 
 export default TransactionsPage;
