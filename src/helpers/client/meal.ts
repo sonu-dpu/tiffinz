@@ -61,15 +61,24 @@ async function updateMyMealOrderStatus(mealLogId: string, status: string) {
   }
 }
 
-async function getAllMealLogs({ userId }: { userId?: string }) {
+async function getAllMealLogs({
+  userId,
+  limit = 10,
+  page = 1,
+}: {
+  userId?: string;
+  limit?: number;
+  page?: number;
+}) {
   try {
     const resp = await axios.get("/api/meal-logs", {
-      params: { user: userId },
+      params: { user: userId, limit, page, sortBy: "createdAt", order: "desc" },
     });
-    const data = resp.data.data?.docs;
+    const data = resp.data?.data;
     if (!data) {
       throw new Error("Failed to fetch the meal log");
     }
+    console.log("Fetched meal logs:", data);
     return data;
   } catch (error) {
     const errMessage = handleError(error, "get all meal logs").message;

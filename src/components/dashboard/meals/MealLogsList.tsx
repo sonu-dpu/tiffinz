@@ -6,9 +6,11 @@ import Loader from "@/components/ui/Loader";
 import { getAllMealLogs } from "@/helpers/client/meal";
 import { useQuery } from "@tanstack/react-query";
 import { formatToIndianCurrency } from "@/lib/utils";
-import { getDateAndTimeString } from "@/lib/date-format";
+import { getSmartDate } from "@/lib/date-format";
+import { Button } from "@/components/ui/button";
+import { PaginatedResult } from "@/helpers/client/client.types";
 
-type MealLogListItemType = {
+export type MealLogListItemType = {
   _id: string;
   mealFor?: number;
   totalAmount?: number;
@@ -18,7 +20,9 @@ type MealLogListItemType = {
 };
 
 function MealLogsList({ userId }: { userId: string }) {
-  const { data, error, isLoading } = useQuery<MealLogListItemType[]>({
+  const { data, error, isLoading } = useQuery<
+    PaginatedResult<MealLogListItemType>
+  >({
     queryKey: ["getUserMealLogs", userId],
     queryFn: () => getAllMealLogs({ userId }),
     refetchOnWindowFocus: false,
@@ -35,28 +39,36 @@ function MealLogsList({ userId }: { userId: string }) {
       </div>
     );
   }
-
-  if (!data || data.length === 0) {
+  const logs = data?.docs || [];
+  if (!logs || logs.length === 0) {
     return null;
   }
 
   return (
     <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 mt-4">
       <CardHeader>
-        <CardTitle>Orders</CardTitle>
+        <CardTitle>Recent Tiffins</CardTitle>
       </CardHeader>
       <CardContent className="p-0 mt-0 border-t">
-        {data.map((mealLog) => (
+        {logs.map((mealLog) => (
           <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
         ))}
       </CardContent>
+      <div className="p-4 text-center">
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/dashboard/meal-logs?user=${userId}`} prefetch={false}>
+            View All
+          </Link>
+        </Button>
+      </div>
     </Card>
   );
 }
 
-function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
-  const dateValue = mealLog.date ? getDateAndTimeString(mealLog.date) : "-";
+export function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
+  const dateValue = mealLog.date ? getSmartDate(mealLog.date) : "-";
   const amountValue = formatToIndianCurrency(mealLog.totalAmount ?? 0);
+  const loggedAtValue = getSmartDate(mealLog.createdAt ?? "");
 
   return (
     <Link href={`/dashboard/meals/${mealLog._id}`} prefetch={false}>
@@ -74,6 +86,9 @@ function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
 
         <div className="text-right">
           <span className="font-medium text-foreground">{amountValue}</span>
+          <p className="text-xs text-muted-foreground">
+            Logged: {loggedAtValue}
+          </p>
         </div>
       </div>
     </Link>

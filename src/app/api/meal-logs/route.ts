@@ -15,6 +15,8 @@ export const GET = withAuth(
     };
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+    console.log("Received query params for meal logs:", query, { page, limit });
     if (user?.role === UserRole.user) {
       query.userId = String(user._id);
     }
