@@ -39,3 +39,21 @@ export function getSmartDate(date: Date | string): string {
   // Fallback
   return input.toFormat("ccc, dd LLL yyyy, hh:mm a");
 }
+
+export function getMonthFromDate(date: Date) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return monthNames[date.getMonth()];
+}
