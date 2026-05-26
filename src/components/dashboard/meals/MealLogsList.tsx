@@ -68,14 +68,14 @@ function MealLogsList({ userId }: { userId: string }) {
 export function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
   const dateValue = mealLog.date ? getSmartDate(mealLog.date) : "-";
   const amountValue = formatToIndianCurrency(mealLog.totalAmount ?? 0);
-  const loggedAtValue = getSmartDate(mealLog.createdAt ?? "");
+  // const loggedAtValue = getSmartDate(mealLog.createdAt ?? "");
 
   return (
     <Link href={`/dashboard/meals/${mealLog._id}`} prefetch={false}>
       <div className="flex justify-between items-center p-4 hover:bg-accent/50 duration-100 border-b cursor-pointer">
         <div className="flex gap-2 flex-col justify-center">
           {mealLog.status ? (
-            <Badge className="capitalize" variant={"success"}>
+            <Badge variant={"default"} className=" ">
               {mealLog.mealFor}
             </Badge>
           ) : null}
@@ -85,10 +85,10 @@ export function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
         </div>
 
         <div className="text-right">
-          <span className="font-medium text-foreground">{amountValue}</span>
-          <p className="text-xs text-muted-foreground">
+          <span className="font-medium text-pretty">{amountValue}</span>
+          {/* <p className="text-xs text-muted-foreground">
             Logged: {loggedAtValue}
-          </p>
+          </p> */}
         </div>
       </div>
     </Link>

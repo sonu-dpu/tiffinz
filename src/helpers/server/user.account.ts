@@ -8,7 +8,7 @@ import { AddBalanceRequestInput } from "@/zod/addBalanceRequest.schema";
 import { isValidObjectId } from "mongoose";
 
 async function doesUserAccountExist(
-  userId: string
+  userId: string,
 ): Promise<boolean | IAccount> {
   try {
     await connectDB();
@@ -43,8 +43,7 @@ async function getUserAccount(userId: string) {
     throw new ApiError("Invalid user id", 400);
   }
   await connectDB();
-  const userAccount = await Account.findOne({ user: userId })
-    .populate({ path: "user", select: "-password" });
+  const userAccount = await Account.findOne({ user: userId }).lean();
   if (!userAccount) {
     throw new ApiError("User account not found", 404);
   }

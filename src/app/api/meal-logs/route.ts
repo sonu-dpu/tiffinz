@@ -25,5 +25,5 @@ export const GET = withAuth(
 
     return ApiResponse.success("Fetched meal logs successfully", mealLogs);
   },
-  { requiredRole: UserRole.admin },
+  { requiredRole: UserRole.user },
 );

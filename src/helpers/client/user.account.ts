@@ -1,11 +1,12 @@
 import axios from "axios";
 import { handleError } from "@/lib/handleError";
+import { IAccount } from "@/models/account.model";
 
-async function getCurrentUserAccount(): Promise<unknown> {
+async function getCurrentUserAccount(): Promise<IAccount> {
   try {
     const resp = await axios.get("/api/accounts");
     const data = resp.data?.data?.account;
-    return data;
+    return data as IAccount;
   } catch (error) {
     throw handleError(error, "get current user account");
   }
