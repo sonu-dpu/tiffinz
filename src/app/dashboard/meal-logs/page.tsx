@@ -82,7 +82,7 @@ function MealLogs() {
 
   return (
     <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 mt-4">
-      <CardContent className="p-0 mt-0 border-t">
+      <CardContent className="p-0 mt-0 ">
         {data.pages.map((group) =>
           group.docs.map((mealLog: MealLogListItemType) => (
             <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
