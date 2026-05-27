@@ -26,7 +26,6 @@ function MealLogByIdPage() {
   return (
     <div className="space-y-6 p-4">
       <MealLogCard mealLog={mealLog} />
-
       {transaction && <TransactionCard transaction={transaction} />}
     </div>
   );
