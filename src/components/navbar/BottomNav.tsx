@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils"; // Optional utility for merging classNames
 import {
   Home,
@@ -8,13 +8,14 @@ import {
   Users,
   BarChart2,
   Receipt,
-  Wallet,
+  IndianRupeeIcon,
   UserCircle,
 } from "lucide-react";
 
 import { UserRole } from "@/constants/enum";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import Link from "next/link";
 
 interface NavItem {
   label: string;
@@ -30,9 +31,9 @@ const userNav: NavItem[] = [
   { label: "Home", icon: <Home size={20} />, path: "/dashboard" },
   // { label: "Account", icon: <User size={20} />, path: "/dashboard/account" },
   {
-    label: "Wallet",
-    icon: <Wallet size={20} />,
-    path: "/dashboard/wallet",
+    label: "Transactions",
+    icon: <IndianRupeeIcon size={20} />,
+    path: "/dashboard/transactions",
   },
   {
     label: "Profile",
@@ -66,7 +67,6 @@ const adminNav: NavItem[] = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const { userRole: role } = useCurrentUser();
   const isMobile = useIsMobile();
   const navItems = role === UserRole.admin ? adminNav : userNav;
@@ -82,21 +82,22 @@ export default function BottomNav() {
   }
   return (
     <nav className="fixed bottom-0 z-50 w-full border-t bg-background shadow-sm">
-      <ul className="flex justify-around items-center">
+      <ul className="flex justify-around items-center select-none">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           return (
             <li
               key={item.label}
-              onClick={() => router.push(item.path)}
               className={cn(
-                "flex my-2 max-w-[60px] w-full p-1 flex-col items-center text-xs cursor-pointer transition-all border border-transparent rounded-md duration-150",
+                "select-none flex my-2 max-w-[60px] w-full p-1 flex-col items-center text-xs cursor-pointer transition-all border border-transparent rounded-md duration-150",
                 "text-muted-foreground hover:bg-primary/10 hover:text-primary",
                 isActive && "  text-green-700 rounded-lg",
               )}
             >
-              {item.icon}
-              <span className="text-[10px] mt-1 select-none">{item.label}</span>
+              <Link href={item.path} className="flex flex-col items-center">
+                {item.icon}
+                <span className="text-[10px] mt-1">{item.label}</span>
+              </Link>
             </li>
           );
         })}
