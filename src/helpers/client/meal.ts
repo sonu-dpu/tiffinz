@@ -86,10 +86,25 @@ async function getAllMealLogs({
   }
 }
 
+async function getMealLogById(mealLogId: string) {
+  try {
+    const resp = await axios.get(`/api/meal-logs/${mealLogId}`);
+    const data = resp.data?.data;
+    if (!data) {
+      throw new Error("Failed to fetch the meal log");
+    }
+    console.log("Fetched meal log:", data);
+    return data;
+  } catch (error) {
+    const errMessage = handleError(error, "get meal log by id").message;
+    throw new Error(errMessage);
+  }
+}
 export {
   getAllMeals,
   getMealById,
   getMyOrders,
   updateMyMealOrderStatus,
   getAllMealLogs,
+  getMealLogById,
 };

@@ -159,7 +159,10 @@ async function orderMealByUser(
   return mealLog;
 }
 
-async function getMealLogById(mealLogId: string) {
+async function getMealLogById(
+  mealLogId: string,
+  { userId, isAdmin }: { userId?: string; isAdmin?: boolean } = {},
+) {
   if (!isValidObjectId(mealLogId)) {
     throw new ApiError("Invalid meal log id");
   }
@@ -168,6 +171,7 @@ async function getMealLogById(mealLogId: string) {
     {
       $match: {
         _id: new Types.ObjectId(mealLogId),
+        ...(userId && !isAdmin ? { user: new Types.ObjectId(userId) } : {}),
       },
     },
     {
@@ -230,25 +234,51 @@ async function getMealLogById(mealLogId: string) {
         },
       },
     },
+    ...(isAdmin
+      ? [
+          {
+            $lookup: {
+              from: "users",
+              localField: "user",
+              foreignField: "_id",
+              as: "user",
+              pipeline: [
+                {
+                  $project: {
+                    fullName: 1,
+                    username: 1,
+                  },
+                },
+              ],
+            },
+          },
+        ]
+      : []),
     {
       $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "_id",
-        as: "user",
+        from: "transactions",
+        localField: "_id",
+        foreignField: "mealLog",
+        as: "transactions",
         pipeline: [
           {
             $project: {
-              fullName: 1,
-              username: 1,
+              amount: 1,
+              type: 1,
+              account: 1,
+              createdAt: 1,
             },
           },
         ],
       },
     },
+
     {
       $addFields: {
-        user: { $first: "$user" },
+        ...(isAdmin && {
+          user: { $first: "$user" },
+        }),
+        transaction: { $first: "$transactions" },
         meal: { $first: "$meal" },
       },
     },
