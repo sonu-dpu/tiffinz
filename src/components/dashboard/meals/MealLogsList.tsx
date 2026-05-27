@@ -86,7 +86,7 @@ export function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
         </div>
 
         <div className="text-right">
-          <span className="font-medium text-pretty">{amountValue}</span>
+          <span className="font-medium text-shadow-muted">{amountValue}</span>
           {/* <p className="text-xs text-muted-foreground">
             Logged: {loggedAtValue}
           </p> */}
