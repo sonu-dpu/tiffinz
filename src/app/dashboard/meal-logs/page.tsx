@@ -11,6 +11,8 @@ import Loader from "@/components/ui/Loader";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { getMonthFromDate } from "@/lib/date-format";
+import React from "react";
 
 function MealLogs() {
   const searchParams = useSearchParams();
@@ -60,7 +62,7 @@ function MealLogs() {
       }
     };
   }, [data, fetchNextPage]);
-
+  let currentMonth = "";
   if (status === "pending") {
     return <Loader />;
   }
@@ -81,12 +83,29 @@ function MealLogs() {
   }
 
   return (
-    <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 mt-4">
+    <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 border-none">
       <CardContent className="p-0 mt-0 ">
         {data.pages.map((group) =>
-          group.docs.map((mealLog: MealLogListItemType) => (
-            <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
-          )),
+          group.docs.map((mealLog: MealLogListItemType) => {
+            const month = getMonthFromDate(new Date(mealLog.date ?? "")) || "";
+            if (currentMonth !== month) {
+              currentMonth = month;
+              return (
+                <React.Fragment key={String(mealLog._id)}>
+                  <div className="text-left bg-accent py-2 px-4 mx-2 mt-6 rounded-xl font-semibold text-shadow-muted-foreground text-xl">
+                    {currentMonth}
+                  </div>
+                  <MealLogListItem
+                    mealLog={mealLog}
+                    key={String(mealLog._id)}
+                  />
+                </React.Fragment>
+              );
+            }
+            return (
+              <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
+            );
+          }),
         )}
         <div
           ref={loaderRef}
