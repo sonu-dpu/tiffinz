@@ -9,6 +9,7 @@ import { formatToIndianCurrency } from "@/lib/utils";
 import { getSmartDate } from "@/lib/date-format";
 import { Button } from "@/components/ui/button";
 import { PaginatedResult } from "@/helpers/client/client.types";
+import { ArrowRight } from "lucide-react";
 
 export type MealLogListItemType = {
   _id: string;
@@ -24,7 +25,7 @@ function MealLogsList({ userId }: { userId: string }) {
     PaginatedResult<MealLogListItemType>
   >({
     queryKey: ["getUserMealLogs", userId],
-    queryFn: () => getAllMealLogs({ userId }),
+    queryFn: () => getAllMealLogs({ userId, limit: 5 }),
     refetchOnWindowFocus: false,
   });
 
@@ -45,7 +46,7 @@ function MealLogsList({ userId }: { userId: string }) {
   }
 
   return (
-    <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 mt-4">
+    <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-4">
       <CardHeader>
         <CardTitle>Recent Tiffins</CardTitle>
       </CardHeader>
@@ -54,10 +55,10 @@ function MealLogsList({ userId }: { userId: string }) {
           <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
         ))}
       </CardContent>
-      <div className="p-4 text-center">
-        <Button variant="outline" size="sm" asChild>
+      <div className=" text-center">
+        <Button variant="outline" size="sm" className="px-8" asChild>
           <Link href={`/dashboard/meal-logs?user=${userId}`} prefetch={false}>
-            View All
+            View All <ArrowRight className="ml-1" />
           </Link>
         </Button>
       </div>
@@ -71,11 +72,11 @@ export function MealLogListItem({ mealLog }: { mealLog: MealLogListItemType }) {
   // const loggedAtValue = getSmartDate(mealLog.createdAt ?? "");
 
   return (
-    <Link href={`/dashboard/meals/${mealLog._id}`} prefetch={false}>
+    <Link href={`/dashboard/meal-logs/${mealLog._id}`} prefetch={false}>
       <div className="flex justify-between items-center p-4 hover:bg-accent/50 duration-100 border-b cursor-pointer">
         <div className="flex gap-2 flex-col justify-center">
           {mealLog.status ? (
-            <Badge variant={"default"} className=" ">
+            <Badge variant={"secondary"} className=" ">
               {mealLog.mealFor}
             </Badge>
           ) : null}
