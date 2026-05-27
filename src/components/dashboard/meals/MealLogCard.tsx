@@ -5,6 +5,7 @@ import { MealLogPopulatedType } from "@/helpers/client/client.types";
 import { MealStatus } from "@/constants/enum";
 import { formatToIndianCurrency } from "@/lib/utils";
 import { getDateAndTimeString } from "@/lib/date-format";
+import Link from "next/link";
 
 function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
   const { meal, totalAmount, extras, mealFor } = mealLog;
@@ -36,11 +37,8 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
 
           {/* Small meta */}
           <div className="text-xs text-muted-foreground">
-            <div>Logged: {getDateAndTimeString(mealLog.createdAt!)}</div>
+            <div>Logged: {getDateAndTimeString(mealLog.updatedAt!)}</div>
             <div>Date: {getDateAndTimeString(mealLog.date)}</div>
-            <div className="mt-0.5">
-              Meal ID: <span className="font-medium">{String(meal?._id)}</span>
-            </div>
           </div>
         </div>
       </CardHeader>
@@ -56,7 +54,13 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
             <p className="text-xs text-muted-foreground">{meal.description}</p>
             <p className="text-xs text-muted-foreground">
               Meal SKU / reference:{" "}
-              <span className="font-medium">{String(meal._id)}</span>
+              <Link
+                href={`/dashboard/meals/${meal._id}`}
+                className="hover:underline"
+                prefetch={false}
+              >
+                <span className="font-medium">{String(meal._id)}</span>
+              </Link>
             </p>
           </div>
 
