@@ -23,7 +23,7 @@ function TransactionsByUserId({ userId }: { userId: string }) {
     isFetching,
   } = useQuery({
     queryKey: ["transactionsByUserId", userId],
-    queryFn: () => getTransactionsByUserId(userId),
+    queryFn: () => getTransactionsByUserId(userId, { limit: 5 }),
   });
   console.log("response", response);
   if (isFetching && !error) {

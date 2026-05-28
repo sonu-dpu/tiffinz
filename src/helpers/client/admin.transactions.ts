@@ -35,10 +35,13 @@ async function getTransactionById(transactionId: string) {
   }
 }
 
-async function getTransactionsByUserId(userId: string) {
+async function getTransactionsByUserId(
+  userId: string,
+  { limit }: { limit?: number } = {},
+) {
   try {
     const resp = await axios.get(`/api/admin/transactions`, {
-      params: { user: userId },
+      params: { user: userId, limit },
     });
     const data = resp.data?.data;
 
