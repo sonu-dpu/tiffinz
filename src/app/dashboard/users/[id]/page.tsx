@@ -1,4 +1,5 @@
 "use client";
+import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 // import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 import UserDetailsCard from "@/components/dashboard/admin/users/UserDetailsCard";
 import MealLogsList from "@/components/dashboard/meals/MealLogsList";
@@ -29,8 +30,10 @@ function UserPage() {
     return (
       <>
         <UserDetailsCard user={user} />
-        {/* <TransactionsByUserId userId={String(userId)} /> */}
-        <MealLogsList userId={userId as string} />
+        <div className="space-y-6 gap-4 max-w-3xl mx-auto flex flex-col lg:flex-row justify-center items-start mt-4">
+          <MealLogsList userId={userId as string} />
+          <TransactionsByUserId userId={String(userId)} />
+        </div>
       </>
     );
   }

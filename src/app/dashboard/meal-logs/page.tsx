@@ -5,7 +5,6 @@ import {
 } from "@/components/dashboard/meals/MealLogsList";
 import { getAllMealLogs } from "@/helpers/client/meal";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
 
 import Loader from "@/components/ui/Loader";
 import { useSearchParams } from "next/navigation";
@@ -83,38 +82,33 @@ function MealLogs() {
   }
 
   return (
-    <Card className="w-full md:max-w-2xl mx-auto bg-transparent shadow-none px-0 border-none">
-      <CardContent className="p-0 mt-0 ">
-        {data.pages.map((group) =>
-          group.docs.map((mealLog: MealLogListItemType) => {
-            const month = getMonthFromDate(new Date(mealLog.date ?? "")) || "";
-            if (currentMonth !== month) {
-              currentMonth = month;
-              return (
-                <React.Fragment key={String(mealLog._id)}>
-                  <div className="text-left bg-accent py-2 px-4 mx-2 mt-6 rounded-xl font-semibold text-shadow-muted-foreground text-xl">
-                    {currentMonth}
-                  </div>
-                  <MealLogListItem
-                    mealLog={mealLog}
-                    key={String(mealLog._id)}
-                  />
-                </React.Fragment>
-              );
-            }
+    <div className="w-full max-w-[600px] mx-auto bg-transparent shadow-none px-0 border-none">
+      {data.pages.map((group) =>
+        group.docs.map((mealLog: MealLogListItemType) => {
+          const month = getMonthFromDate(new Date(mealLog.date ?? "")) || "";
+          if (currentMonth !== month) {
+            currentMonth = month;
             return (
-              <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
+              <React.Fragment key={String(mealLog._id)}>
+                <div className="text-left bg-accent py-2 px-4 mt-6 rounded-xl font-semibold text-shadow-muted-foreground text-xl">
+                  {currentMonth}
+                </div>
+                <MealLogListItem mealLog={mealLog} key={String(mealLog._id)} />
+              </React.Fragment>
             );
-          }),
-        )}
-        <div
-          ref={loaderRef}
-          className="mx-auto mt-4 p-4 flex justify-center text-muted-foreground"
-        >
-          {isFetching ? <Loader /> : hasNextPage ? "" : "No more meal logs"}
-        </div>
-      </CardContent>
-    </Card>
+          }
+          return (
+            <MealLogListItem key={String(mealLog._id)} mealLog={mealLog} />
+          );
+        }),
+      )}
+      <div
+        ref={loaderRef}
+        className="mx-auto mt-4 p-4 flex justify-center text-muted-foreground"
+      >
+        {isFetching ? <Loader /> : hasNextPage ? "" : "No more meal logs"}
+      </div>
+    </div>
   );
 }
 

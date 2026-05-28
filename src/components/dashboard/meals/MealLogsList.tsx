@@ -46,7 +46,7 @@ function MealLogsList({ userId }: { userId: string }) {
   }
 
   return (
-    <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-4">
+    <Card className="w-full md:max-w-md mx-auto bg-transparent shadow-none px-0 mt-2">
       <CardHeader>
         <CardTitle>Recent Tiffins</CardTitle>
       </CardHeader>
