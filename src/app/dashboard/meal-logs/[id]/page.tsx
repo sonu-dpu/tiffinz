@@ -10,16 +10,28 @@ import { useParams } from "next/navigation";
 
 function MealLogByIdPage() {
   const { id: mealLogId } = useParams();
-  const { data: mealLog, isLoading } = useQuery({
+  const {
+    data: mealLog,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["getMealLogById", mealLogId],
     queryFn: () => getMealLogById(String(mealLogId)),
     refetchOnWindowFocus: false,
+    retry: false,
   });
   const transaction = mealLog?.transaction;
   if (isLoading) {
     return (
       <div className="p-4">
         <Loader />
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="p-4 text-sm text-destructive">
+        Unable to load meal log details.
       </div>
     );
   }
