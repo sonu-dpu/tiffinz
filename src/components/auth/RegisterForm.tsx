@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import LoaderButton from "../ui/loader-button";
 import { Input } from "../ui/input";
+import { PasswordInput } from "../ui/password-input";
 import { registerUser } from "@/helpers/client/user.auth";
 import {
   Card,
@@ -96,23 +97,20 @@ function RegisterForm() {
             errorMessage={errors.phone?.message}
           />
 
-          <Input
+          <PasswordInput
             label="Password"
-            type="password"
             {...register("password")}
             placeholder="Password"
             errorMessage={errors.password?.message}
           />
-          <Input
+          <PasswordInput
             label="Confirm Password"
-            type="Password"
             placeholder="Confirm your password"
             {...register("confirmPassword")}
             errorMessage={errors.confirmPassword?.message}
           />
           {registrationType?.trim() === "admin" && (
-            <Input
-              type="password"
+            <PasswordInput
               label="Secret Token"
               {...register("adminSecret", { required: true })}
               placeholder="***"

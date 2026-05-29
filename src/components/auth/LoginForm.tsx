@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import LoaderButton from "../ui/loader-button";
 import {
   Card,
@@ -9,15 +9,13 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Input } from "../ui/input";
+import { PasswordInput } from "../ui/password-input";
 import { useForm } from "react-hook-form";
-import { Button } from "../ui/button";
 import {
   loginUserWithPhone,
   loginUserWithEmail,
   loginUserWithUsername,
 } from "@/helpers/client/user.auth";
-
-import { EyeClosed, LucideEye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -37,7 +35,6 @@ function LoginForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>();
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -47,12 +44,6 @@ function LoginForm() {
       router.replace(redirectPath);
     }
   }, [user, searchParams, isLoggedIn, router]);
-  const toggleShowPassword = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
-    e.preventDefault();
-    setShowPassword(!showPassword);
-  };
 
   const onSubmit = async (data: LoginFormData) => {
     const loginType = detectLoginType(data.identifier);
@@ -100,24 +91,12 @@ function LoginForm() {
               required: "Phone, email or username is required",
             })}
           />
-          <div className="w-full flex items-end">
-            <Input
-              className="border w-full"
-              errorMessage={errors.password?.message as string}
-              label="Enter your password"
-              placeholder="Password"
-              type={showPassword ? "text" : "password"}
-              {...register("password", { required: "Password is required" })}
-            />
-            <Button
-              className=""
-              variant={"outline"}
-              type="button"
-              onClick={toggleShowPassword}
-            >
-              {showPassword ? <EyeClosed /> : <LucideEye />}
-            </Button>
-          </div>
+          <PasswordInput
+            errorMessage={errors.password?.message as string}
+            label="Enter your password"
+            placeholder="Password"
+            {...register("password", { required: "Password is required" })}
+          />
           {errors.root && (
             <p className="text-red-600 text-sm text-center pt-2">
               {errors.root.message}
