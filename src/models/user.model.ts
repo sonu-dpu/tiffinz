@@ -13,6 +13,8 @@ interface IUser {
   avatar: string;
   role: UserRole;
   isVerified: boolean;
+  passwordResetToken?: string;
+  passwordResetTokenExpiry?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -57,8 +59,16 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    passwordResetToken: {
+      type: String,
+      required: false,
+    },
+    passwordResetTokenExpiry: {
+      type: Date,
+      required: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Hash password before saving
@@ -72,7 +82,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (
-  password: string
+  password: string,
 ): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
 };
@@ -83,13 +93,13 @@ userSchema.methods.generateAccessToken = async function (): Promise<string> {
   const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET!);
 
   const token = await new SignJWT({
-    _id: this._id.toString(), 
+    _id: this._id.toString(),
     username: this.username,
     role: this.role,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("15m") 
+    .setExpirationTime("15m")
     .sign(secret);
 
   return token;
