@@ -13,7 +13,8 @@ export const userSchema = z.object({
     .string()
     .trim()
     .min(6, "Password must be at least 6 characters")
-    .max(100, "Password is too long"),
+    .max(100, "Password is too long")
+    .regex(/^(?=.*[A-Za-z])(?=.*\d).+$/, "Password must contain both letters and numbers"),
   role: z.enum(UserRole).optional().default(UserRole.user),
   avatar: z.url("Avatar must be a valid URL").optional(),
   adminSecret: z.string().optional(),
