@@ -19,8 +19,8 @@ const resetPasswordRoute = asyncHandler(async (req) => {
   if (!isTokenValid) {
     throw new ApiError("Password reset token expired", 400);
   }
-  const updatedUser = await resetPassword(userId, newPassword);
-  if (!updatedUser) {
+  const { success } = await resetPassword(userId, newPassword);
+  if (!success) {
     throw new ApiError("Failed to reset password try again later", 500);
   }
 

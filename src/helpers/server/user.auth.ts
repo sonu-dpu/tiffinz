@@ -284,21 +284,15 @@ async function resetPassword(userId: string, newPassword: string) {
     throw new ApiError("New password is required", 400);
   }
   await connectDB();
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    {
-      $set: {
-        password: newPassword,
-        passwordResetToken: null,
-        passwordResetTokenExpiry: null,
-      },
-    },
-    { new: true },
-  ).select("-password");
-  if (!updatedUser) {
+  const user = await User.findById(userId);
+  if (!user) {
     throw new ApiError("User not found", 404);
   }
-  return updatedUser;
+  user.password = newPassword;
+  user.passwordResetToken = null;
+  user.passwordResetTokenExpiry = null;
+  await user.save();
+  return { success: true };
 }
 
 export {
