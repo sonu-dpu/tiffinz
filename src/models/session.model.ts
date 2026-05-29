@@ -4,10 +4,6 @@ interface ISession {
   _id?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   refreshToken: string;
-  verifyEmailToken?: string;
-  verifyEmailTokenExpiry?: Date;
-  forgetPasswordToken?: string;
-  forgetPasswordTokenExpiry?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,18 +18,6 @@ const sessionScehma = new Schema<ISession>(
     refreshToken: {
       type: String,
       unique: true,
-    },
-    verifyEmailToken: {
-      type: String,
-    },
-    verifyEmailTokenExpiry: {
-      type: Date,
-    },
-    forgetPasswordToken: {
-      type: String,
-    },
-    forgetPasswordTokenExpiry: {
-      type: Date,
     },
   },
   { timestamps: true },
