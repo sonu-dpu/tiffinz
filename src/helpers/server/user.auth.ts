@@ -15,6 +15,8 @@ import {
   loginWithUsernameSchema,
 } from "@/zod/user.login.schema";
 import { CreateUserByAdminInput } from "@/zod/user.schema";
+import { createHash } from "crypto";
+import { isValidObjectId } from "mongoose";
 import { cookies } from "next/headers";
 
 async function doesUserAlreadyExist(userData: IUser | CreateUserByAdminInput) {
@@ -250,6 +252,55 @@ async function refreshUserSession() {
   const user = await User.findById(userId).select("-password");
   return user;
 }
+
+async function verifyPasswordResetToken(token: string, userId: string) {
+  if (!isValidObjectId(userId)) {
+    throw new ApiError("Invalid user ID", 400);
+  }
+  if (!token || token.trim() === "") {
+    throw new ApiError("Token is required", 400);
+  }
+  const hashedToken = createHash("sha256").update(token).digest("hex");
+  await connectDB();
+  const user = await User.findOne({
+    _id: userId,
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpiry: {
+      $gt: Date.now(),
+    },
+  })
+    .select("-password")
+    .lean();
+  if (!user) {
+    return false;
+  }
+  return true;
+}
+async function resetPassword(userId: string, newPassword: string) {
+  if (!isValidObjectId(userId)) {
+    throw new ApiError("Invalid user ID", 400);
+  }
+  if (!newPassword || newPassword.trim() === "") {
+    throw new ApiError("New password is required", 400);
+  }
+  await connectDB();
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        password: newPassword,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+      },
+    },
+    { new: true },
+  ).select("-password");
+  if (!updatedUser) {
+    throw new ApiError("User not found", 404);
+  }
+  return updatedUser;
+}
+
 export {
   logoutUser,
   createUserSession,
@@ -257,4 +308,6 @@ export {
   loginUser,
   refreshUserSession,
   doesUserAlreadyExist,
+  verifyPasswordResetToken,
+  resetPassword,
 };
