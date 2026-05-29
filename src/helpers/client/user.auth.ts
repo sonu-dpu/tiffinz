@@ -139,6 +139,18 @@ async function refreshUserSession(): Promise<IUser> {
   }
 }
 
+async function verifyPasswordResetToken(token: string, id: string) {
+  try {
+    const res = await axios("/api/users/reset-password/verify", {
+      params: { token, id },
+    });
+    const data = res.data.data;
+    return !data.success;
+  } catch (error) {
+    console.log("error", error);
+    return false;
+  }
+}
 export {
   registerUser,
   loginUserWithPhone,
@@ -147,4 +159,5 @@ export {
   refreshUserSession,
   loginUserWithEmail,
   loginUserWithUsername,
+  verifyPasswordResetToken,
 };
