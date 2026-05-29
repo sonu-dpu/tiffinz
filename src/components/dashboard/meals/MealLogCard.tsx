@@ -10,7 +10,6 @@ import Link from "next/link";
 function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
   const { meal, totalAmount, extras, mealFor } = mealLog;
   if (!meal) return <div className="mx-auto">meal details not found</div>;
-  console.log("meal", meal);
   return (
     <Card className="mt-4 max-w-2xl mx-auto">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -82,7 +81,7 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
                 Base Price
               </span>
               <span className="font-medium">
-                {formatToIndianCurrency(meal.price)}
+                {formatToIndianCurrency(mealLog.priceBreakdown.baseAmount)}
               </span>
             </li>
 

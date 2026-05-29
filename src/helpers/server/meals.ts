@@ -259,7 +259,7 @@ async function getMealLogById(
         from: "transactions",
         localField: "_id",
         foreignField: "mealLog",
-        as: "transactions",
+        as: "transaction",
         pipeline: [
           {
             $project: {
@@ -280,12 +280,34 @@ async function getMealLogById(
         ...(isAdmin && {
           user: { $first: "$user" },
         }),
-        transaction: { $first: "$transactions" },
+        transaction: { $first: "$transaction" },
         meal: { $first: "$meal" },
       },
     },
     {
       $unset: "populatedExtras",
+    },
+    {
+      $addFields: {
+        priceBreakdown: {
+          baseAmount: "$meal.price",
+          totalAmount: "$totalAmount",
+          extrasTotal: {
+            $reduce: {
+              input: "$extras",
+              initialValue: 0,
+              in: {
+                $add: [
+                  "$$value",
+                  {
+                    $multiply: ["$$this.quantity", "$$this.details.price"],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
     },
   ]);
   if (!mealLog?.[0]) {
