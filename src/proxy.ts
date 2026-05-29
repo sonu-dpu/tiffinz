@@ -29,7 +29,8 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/api/users/register") ||
     pathname.startsWith("/api/user/logout") ||
     (pathname.startsWith("/api/users/login") && !token) ||
-    (pathname.startsWith("/api/refresh-tokens") && refreshToken)
+    (pathname.startsWith("/api/refresh-tokens") && refreshToken) ||
+    pathname.startsWith("/api/users/reset-password")
   ) {
     return response;
   }

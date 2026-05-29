@@ -5,15 +5,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../ui/Loader";
 import { useEffect } from "react";
 
-import {
-  notFound,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { AuthContext } from "@/hooks/useAuth";
 import { IUser } from "@/models/user.model";
+import NotFound from "@/app/not-found";
 
 const publicRoutes = [
   "/",
@@ -21,6 +17,7 @@ const publicRoutes = [
   "/register",
   "/refresh-session",
   "/logout",
+  "/reset-password",
 ]; // add your actual public routes
 const validProtectedRoutes = [
   "/dashboard",
@@ -52,10 +49,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: [CURRENT_USERQUERY_KEY],
     queryFn: getCurrentUserOrRefresh,
     retry: false,
-    enabled:
-      pathname !== "/logout" &&
-      pathname !== "/refresh-session" &&
-      !isRedirectedAfterLogout,
+    enabled: !isPublicRoute && !isRedirectedAfterLogout,
   });
 
   useEffect(() => {
@@ -70,7 +64,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [isLoading, isPublicRoute, pathname, router, isFetched, user]);
 
   if (!isPublicRoute && !isValidRoute) {
-    return notFound();
+    return <NotFound />;
   }
 
   if (isLoading) {
