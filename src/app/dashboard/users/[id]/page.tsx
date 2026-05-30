@@ -2,6 +2,8 @@
 import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 // import TransactionsByUserId from "@/components/dashboard/admin/users/TransactionsByUserId";
 import UserDetailsCard from "@/components/dashboard/admin/users/UserDetailsCard";
+import UserProfileActions from "@/components/dashboard/admin/users/UserProfileActions";
+// import UserMoreActions from "@/components/dashboard/admin/users/UserProfileActions";
 import MealLogsList from "@/components/dashboard/meals/MealLogsList";
 import Loader from "@/components/ui/Loader";
 import { getUserWithAccount } from "@/helpers/client/admin.users";
@@ -34,6 +36,7 @@ function UserPage() {
           <MealLogsList userId={userId as string} />
           <TransactionsByUserId userId={String(userId)} />
         </div>
+        <UserProfileActions />
       </>
     );
   }

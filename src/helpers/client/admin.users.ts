@@ -61,7 +61,7 @@ async function getUserWithAccount(userId: string): Promise<IUserWithAccount> {
 }
 async function getUserById(
   userId: string,
-  options?: { full: boolean }
+  options?: { full: boolean },
 ): Promise<IUser> {
   try {
     if (!userId.trim()) {
@@ -77,5 +77,26 @@ async function getUserById(
     throw new Error(handleError(error, "get user by id").message);
   }
 }
-export { getUsers, verifyUser, getUserWithAccount, getUserById};
+
+type GenerateResetPasswordReturnType = {
+  resetLink: string;
+  expiresAt: number;
+};
+export async function generatePasswordResetLink(
+  userId: string,
+): Promise<GenerateResetPasswordReturnType> {
+  try {
+    if (!userId.trim()) {
+      throw new Error("User id not passed");
+    }
+
+    const resp = await axios.get(`/api/admin/users/${userId}/reset-password`);
+
+    return resp.data?.data;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error(handleError(error, "generate reset password link").message);
+  }
+}
+export { getUsers, verifyUser, getUserWithAccount, getUserById };
 export type { IUsersResponse, IUserWithAccount };
