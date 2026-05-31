@@ -18,7 +18,8 @@ const publicRoutes = [
   "/refresh-session",
   "/logout",
   "/reset-password",
-]; // add your actual public routes
+];
+const publicAuthCheckRoutes = ["/login", "/register"];
 const validProtectedRoutes = [
   "/dashboard",
   "/dashboard/users",
@@ -39,7 +40,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     publicRoutes.some((route) => pathname === route) ||
     validProtectedRoutes.some((route) => pathname.startsWith(route));
   const queryClient = useQueryClient();
-
+  const isQueryEnable = (): boolean => {
+    if (pathname === "/") {
+      return true;
+    }
+    if (publicAuthCheckRoutes.some((route) => pathname.startsWith(route))) {
+      return true;
+    } else if (isPublicRoute || isRedirectedAfterLogout) {
+      return false;
+    }
+    return true;
+  };
   const {
     data: user,
     error,
@@ -49,7 +60,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: [CURRENT_USERQUERY_KEY],
     queryFn: getCurrentUserOrRefresh,
     retry: false,
-    enabled: !isPublicRoute && !isRedirectedAfterLogout,
+    enabled: isQueryEnable,
   });
 
   useEffect(() => {
