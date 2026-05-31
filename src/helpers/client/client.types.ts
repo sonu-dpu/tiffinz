@@ -27,7 +27,7 @@ export type MealLogPopulatedType = Omit<IMealLog, "extras"> & {
     details: ExtraMealType;
   }[];
   priceBreakdown: {
-    baseAmount: number;
+    basePrice: number;
     extrasTotal?: number;
     total: number;
   };

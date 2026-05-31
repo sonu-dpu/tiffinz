@@ -290,7 +290,7 @@ async function getMealLogById(
     {
       $addFields: {
         priceBreakdown: {
-          baseAmount: "$meal.price",
+          basePrice: "$meal.price",
           totalAmount: "$totalAmount",
           extrasTotal: {
             $reduce: {

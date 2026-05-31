@@ -81,7 +81,7 @@ function MealLogCard({ mealLog }: { mealLog: MealLogPopulatedType }) {
                 Base Price
               </span>
               <span className="font-medium">
-                {formatToIndianCurrency(mealLog.priceBreakdown.baseAmount)}
+                {formatToIndianCurrency(mealLog.priceBreakdown.basePrice)}
               </span>
             </li>
 
