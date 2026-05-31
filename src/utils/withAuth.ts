@@ -5,7 +5,7 @@ import { verifyJWT } from "./verifyJWT";
 import { ApiError } from "./apiError";
 import User, { IUser } from "@/models/user.model";
 import connectDB from "./dbConnect";
-import { redis } from "./redis";
+import { redis, isRedisEnabled } from "./redis";
 import { isValidObjectId } from "mongoose";
 
 type withAuthOptions = {
@@ -40,9 +40,11 @@ export function withAuth<T = Record<string, never>>(
         throw new ApiError("Invalid userId", 401);
       }
 
-      const cachedUser = await redis
-        .get<IUser>(`user:${userId}`)
-        .catch(() => null);
+      const cachedUser = isRedisEnabled && redis
+        ? await redis
+            .get<IUser>(`user:${userId}`)
+            .catch(() => null)
+        : null;
 
       let user;
 
@@ -50,9 +52,13 @@ export function withAuth<T = Record<string, never>>(
         await connectDB();
         console.log("cache miss");
         user = await User.findById<IUser>(userId).select("-password").lean();
-        await redis.set(`user:${userId}`, user, {
-          ex: 60 * 15,
-        });
+        if (isRedisEnabled && redis) {
+          await redis
+            .set(`user:${userId}`, user, {
+              ex: 60 * 15,
+            })
+            .catch(() => null);
+        }
       } else {
         user = cachedUser;
         console.log("cache hit");

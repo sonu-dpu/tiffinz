@@ -1,6 +1,6 @@
 import { handleError } from "@/utils/handleError";
 import { NextRequest } from "next/server";
-import { redis } from "./redis";
+import { redis, isRedisEnabled } from "./redis";
 import { ApiError } from "./apiError";
 
 type RouteContext<T = Record<string, never>> = {
@@ -19,7 +19,7 @@ export function asyncHandler<T = Record<string, never>>(
 ) {
   return async function (req: NextRequest, context: RouteContext<T>) {
     try {
-      if (options?.rateLimiter) {
+      if (options?.rateLimiter && isRedisEnabled && redis) {
         const ip =
           req.headers.get("x-forwarded-for")?.split(",")[0] ||
           req.headers.get("x-real-ip") ||
