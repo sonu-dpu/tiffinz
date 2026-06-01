@@ -17,7 +17,7 @@ import ResetPasswordLinkGenerator from "./ResetPasswordLinkGenerator";
 
 function UserProfileActions() {
   return (
-    <Card className="w-full max-w-md mx-auto mt-6 space-y-0 gap-0 py-0 overflow-hidden">
+    <Card className="w-full max-w-md mx-auto mt-6 space-y-0 gap-0 py-0 overflow-hidden shadow-none">
       <CardHeader className="font-medium p-4 ">
         <CardTitle>More Actions</CardTitle>
       </CardHeader>
