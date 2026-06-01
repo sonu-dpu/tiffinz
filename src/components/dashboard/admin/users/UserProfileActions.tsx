@@ -17,8 +17,8 @@ import ResetPasswordLinkGenerator from "./ResetPasswordLinkGenerator";
 
 function UserProfileActions() {
   return (
-    <Card className="w-full max-w-md mx-auto mt-6 space-y-0 gap-0 py-4">
-      <CardHeader className="font-medium py-2 px-4 ">
+    <Card className="w-full max-w-md mx-auto mt-6 space-y-0 gap-0 py-0 overflow-hidden">
+      <CardHeader className="font-medium p-4 ">
         <CardTitle>More Actions</CardTitle>
       </CardHeader>
       <Separator />
@@ -43,7 +43,7 @@ function UserProfileActions() {
             <ResetPasswordDrawer />
           </DrawerContent>
         </Drawer>
-        <Separator />
+        {/* <Separator /> */}
       </CardContent>
     </Card>
   );
@@ -69,7 +69,7 @@ function ResetPasswordDrawer() {
           Are You Sure You want to reset Password For
         </p>
       </div>
-      <div className="w-full h-full flex flex-col gap-2 mt-4 justify-end">
+      <div className="w-full h-full flex flex-col gap-4 mt-4 justify-end">
         <Button
           className="w-full"
           variant={"destructive"}
