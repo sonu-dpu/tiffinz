@@ -14,11 +14,11 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { getDateAndTimeString } from "@/lib/date-format";
+import { getSmartDate } from "@/lib/date-format";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { TransactionWithMealLog } from "@/helpers/client/client.types";
+import { ITransactionWithUser } from "@/models/transaction.model";
 
 function UserTransactions() {
   const { user } = useCurrentUser();
@@ -47,7 +47,7 @@ function UserTransactions() {
         <CardTitle>Transactions</CardTitle>
       </CardHeader>
       <CardContent className="p-0 mt-0 border-t">
-        {transactions.map((transaction: TransactionWithMealLog) => (
+        {transactions.map((transaction: ITransactionWithUser) => (
           <TransactionItem
             key={String(transaction._id)}
             transaction={transaction}
@@ -68,31 +68,65 @@ function UserTransactions() {
 export function TransactionItem({
   transaction,
 }: {
-  transaction: TransactionWithMealLog;
+  transaction: ITransactionWithUser;
 }) {
   const isCredit = transaction.type === TransactionType.credit;
   return (
     <Link href={`/dashboard/transactions/${transaction._id}`} prefetch={false}>
-      <div className="flex justify-between items-center p-4 hover:bg-accent/50 duration-100 border-b">
-        <div className="flex gap-1 flex-col justify-center">
-          {transaction.isMeal && <Badge variant={"secondary"}>Meal</Badge>}
-          <span className="text-xs text-muted-foreground bg-accent px-2 py-1 rounded-xl">
-            {getDateAndTimeString(
-              transaction?.mealLog?.date || transaction.createdAt,
-            )}
-          </span>
+      <div className="border-b p-4 hover:bg-accent/50 transition-colors">
+        <div className="mb-1">
+          <div className="flex items-baseline justify-between gap-4">
+            {/* Left Section */}
+            <div className="flex flex-col gap-2 min-w-0">
+              {transaction.isMeal && (
+                <Badge variant="secondary" className="w-fit">
+                  Meal
+                </Badge>
+              )}
+
+              <span className="text-xs text-muted-foreground">
+                {getSmartDate(transaction.createdAt!)}
+              </span>
+            </div>
+
+            {/* Right Section */}
+            <div className="text-right shrink-0">
+              <div
+                className={cn(
+                  "text-lg font-medium",
+                  isCredit
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-400",
+                )}
+              >
+                {isCredit ? "+" : "-"}
+                {formatToIndianCurrency(transaction.amount)}
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                {isCredit ? "Credit" : "Debit"}
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <span
-            className={cn(
-              "font-medium",
-              isCredit ? "text-green-600 dark:text-green-400" : "text-red-400",
-            )}
-          >
-            {(isCredit ? "+" : "-") +
-              formatToIndianCurrency(transaction.amount)}
-          </span>
-        </div>
+        {transaction.openingBalance != null &&
+          transaction.closingBalance != null && (
+            <div className="text-xs text-muted-foreground ">
+              Bal:{" "}
+              <span className="font">
+                {formatToIndianCurrency(transaction.openingBalance)}
+              </span>
+              <ArrowRight className="inline-block w-6 px-1" />
+              <span
+                className={cn(
+                  "font-medium",
+                  transaction.closingBalance <= 0 && "text-red-400",
+                )}
+              >
+                {formatToIndianCurrency(transaction.closingBalance)}
+              </span>
+            </div>
+          )}
       </div>
     </Link>
   );
